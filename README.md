@@ -60,6 +60,8 @@ Copier `Backend/.env.example` vers `Backend/.env` puis renseigner:
 - `OPENAI_API_KEY`
 - `ELEVENLABS_API_KEY`
 - `TIKTOK_USERNAME`
+- `TIKTOK_USERNAMES` (liste separee par virgules, ex: `congogame,je_suis_gemima`)
+- `TIKTOK_RETRY_MS` (ex: `15000`)
 - `PORT`, `WS_PORT`
 
 ## Deploiement cloud (Vercel)
@@ -105,6 +107,8 @@ railway up
 - `OPENAI_API_KEY`
 - `ELEVENLABS_API_KEY`
 - `TIKTOK_USERNAME`
+- `TIKTOK_USERNAMES=congogame,je_suis_gemima`
+- `TIKTOK_RETRY_MS=15000`
 - `PORT=3000`
 - `WS_PORT=8080`
 

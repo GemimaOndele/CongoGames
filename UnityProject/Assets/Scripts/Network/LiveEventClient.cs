@@ -17,6 +17,8 @@ namespace CongoGames.Network
         public long ts;
         public string user;
         public string message;
+        public string text;
+        public string source;
         public string giftName;
         public bool accepted;
         public string action;
@@ -38,12 +40,36 @@ namespace CongoGames.Network
         [SerializeField] private QuestionUI questionUI;
         private ClientWebSocket socket;
         private CancellationTokenSource cts;
+        private string connectedEndpoint = "";
+        private string lastEventType = "";
+        private string lastEventUser = "";
+        private string lastQuestionText = "";
+        private string lastSystemText = "";
+        private string lastError = "";
+        private long lastEventTs;
+
+        public bool IsConnected => socket != null && socket.State == WebSocketState.Open;
+        public string ConnectedEndpoint => connectedEndpoint;
+        public string LastEventType => lastEventType;
+        public string LastEventUser => lastEventUser;
+        public string LastQuestionText => lastQuestionText;
+        public string LastSystemText => lastSystemText;
+        public string LastError => lastError;
+        public long LastEventTimestamp => lastEventTs;
 
         private async void Start()
         {
             cts = new CancellationTokenSource();
             if (questionUI == null) questionUI = FindObjectOfType<QuestionUI>();
-            await ConnectAndListen(cts.Token);
+            try
+            {
+                await ConnectAndListen(cts.Token);
+            }
+            catch (Exception ex)
+            {
+                lastError = ex.Message;
+                Debug.LogError("LiveEventClient start failed: " + ex.Message);
+            }
         }
 
         private async Task ConnectAndListen(CancellationToken token)
@@ -62,10 +88,13 @@ namespace CongoGames.Network
                     var candidate = new ClientWebSocket();
                     await candidate.ConnectAsync(new Uri(target), token);
                     Debug.Log("Connected WS: " + target);
+                    connectedEndpoint = target;
+                    lastError = "";
                     return candidate;
                 }
                 catch (Exception ex)
                 {
+                    lastError = ex.Message;
                     Debug.LogWarning("WS connect failed: " + target + " (" + ex.Message + ")");
                 }
             }
@@ -104,10 +133,19 @@ namespace CongoGames.Network
         {
             LiveMessage msg = JsonUtility.FromJson<LiveMessage>(json);
             if (msg == null || string.IsNullOrEmpty(msg.type)) return;
+            lastEventType = msg.type;
+            lastEventUser = msg.user ?? "";
+            lastEventTs = msg.ts;
 
             if (msg.type == "chat")
             {
                 HandleChat(msg);
+                return;
+            }
+
+            if (msg.type == "system")
+            {
+                HandleSystem(msg);
                 return;
             }
 
@@ -183,7 +221,13 @@ namespace CongoGames.Network
 
             QuestionManager.Instance.SetQuestion(question);
             questionUI?.Render(question);
+            lastQuestionText = question.question ?? "";
             AIHostManager.Instance?.Speak(question.question);
+        }
+
+        private void HandleSystem(LiveMessage msg)
+        {
+            lastSystemText = msg.text ?? msg.message ?? msg.explanation ?? "";
         }
 
         private async void OnDestroy()
