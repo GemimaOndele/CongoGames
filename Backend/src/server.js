@@ -23,6 +23,7 @@ const WS_SINGLE_PORT = String(process.env.WS_SINGLE_PORT || "false").toLowerCase
 const giftEngine = new GiftEngine(path.join(__dirname, "config", "gift-balance.json"));
 const questionGenerator = new QuestionGenerator(process.env.OPENAI_API_KEY);
 const tiktokBridge = new TikTokLiveBridge(process.env.TIKTOK_USERNAME || "");
+const TIKTOK_RETRY_MS = Number(process.env.TIKTOK_RETRY_MS || 15000);
 const recentEvents = [];
 const RECENT_MAX = 200;
 
@@ -160,18 +161,21 @@ if (activeWsPort !== WS_PORT) {
   console.warn(`Requested WS_PORT ${WS_PORT} was busy, fallback to ${activeWsPort}.`);
 }
 
-tiktokBridge
-  .connect()
-  .then((connected) => {
-    if (connected) {
-      console.log("TikTok bridge connected.");
-    } else {
-      console.log("TikTok bridge disabled.");
-    }
-  })
-  .catch((error) => {
-    console.warn("TikTok bridge not connected:", error.message);
-  });
+async function connectTikTokWithRetry() {
+  const connected = await tiktokBridge.connect();
+  if (connected) {
+    console.log("TikTok bridge connected.");
+    return;
+  }
+  if (!process.env.TIKTOK_USERNAME) {
+    console.log("TikTok bridge disabled.");
+    return;
+  }
+  console.log(`TikTok bridge retry in ${TIKTOK_RETRY_MS}ms...`);
+  setTimeout(connectTikTokWithRetry, TIKTOK_RETRY_MS);
+}
+
+connectTikTokWithRetry();
 
 tiktokBridge.on("chat", (payload) => {
   pushEvent(MessageType.CHAT, payload);
