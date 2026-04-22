@@ -136,6 +136,20 @@ Ou sous PowerShell:
 .\start-all.ps1 -Mode dev
 ```
 
+## Verification production (1 commande)
+
+Depuis la racine:
+
+```bash
+npm run smoke:live
+```
+
+Le test valide:
+
+- API cloud (`/health` + `/question/generate`)
+- WS cloud (connexion + reception d'au moins un message)
+- Flux d'evenement minimal live
+
 ## Notes performance
 
 - Object pooling pour effets/UI repetitifs

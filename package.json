@@ -5,6 +5,7 @@
   "scripts": {
     "start-all": "npm --prefix Backend run dev",
     "start-all:prod": "npm --prefix Backend run start",
-    "test:cloud": "node scripts/test-cloud.mjs"
+    "test:cloud": "node scripts/test-cloud.mjs",
+    "smoke:live": "node scripts/smoke-test-live.mjs"
   }
 }
