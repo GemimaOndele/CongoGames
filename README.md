@@ -116,6 +116,12 @@ Dans `LiveEventClient`, mettre `wsUrl` sur ton endpoint Railway:
 
 Le script tente ensuite automatiquement les fallbacks locaux (`8080/8081/8082`) si le cloud WS est indisponible.
 
+### Endpoints cloud actifs (CongoGames)
+
+- API HTTP (Vercel): `https://congogames-backend-cg.vercel.app`
+- WS 24/7 (Railway): `wss://congogames-ws-production.up.railway.app`
+- Health WS service: `https://congogames-ws-production.up.railway.app/health`
+
 ## Script de lancement unique
 
 Depuis la racine:

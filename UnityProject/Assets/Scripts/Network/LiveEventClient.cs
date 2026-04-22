@@ -33,7 +33,7 @@ namespace CongoGames.Network
 
     public class LiveEventClient : MonoBehaviour
     {
-        [SerializeField] private string wsUrl = "wss://congogames-ws-cg.up.railway.app";
+        [SerializeField] private string wsUrl = "wss://congogames-ws-production.up.railway.app";
         [SerializeField] private string[] localFallbackWsUrls = { "ws://localhost:8080", "ws://localhost:8081", "ws://localhost:8082" };
         [SerializeField] private QuestionUI questionUI;
         private ClientWebSocket socket;

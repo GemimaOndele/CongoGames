@@ -2,6 +2,7 @@ import "dotenv/config";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import http from "node:http";
 import express from "express";
 import { WebSocketServer } from "ws";
 import { GiftEngine } from "./services/giftEngine.js";
@@ -17,6 +18,7 @@ app.use(express.json());
 
 const PORT = Number(process.env.PORT || 3000);
 const WS_PORT = Number(process.env.WS_PORT || 8080);
+const WS_SINGLE_PORT = String(process.env.WS_SINGLE_PORT || "false").toLowerCase() === "true";
 
 const giftEngine = new GiftEngine(path.join(__dirname, "config", "gift-balance.json"));
 const questionGenerator = new QuestionGenerator(process.env.OPENAI_API_KEY);
@@ -47,6 +49,14 @@ async function resolveAvailablePort(startPort, maxAttempts = 5) {
   throw new Error(`Unable to resolve open port from ${startPort} to ${startPort + maxAttempts - 1}`);
 }
 
+function startHttpServer(expressApp, port) {
+  const server = http.createServer(expressApp);
+  return new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(port, () => resolve(server));
+  });
+}
+
 async function startWebSocketServer(startPort, maxAttempts = 5) {
   for (let i = 0; i < maxAttempts; i++) {
     const tryPort = startPort + i;
@@ -64,17 +74,29 @@ async function startWebSocketServer(startPort, maxAttempts = 5) {
   throw new Error(`Unable to bind WebSocket server from ${startPort} to ${startPort + maxAttempts - 1}`);
 }
 
-const { wsServer: wss, port: boundWsPort } = await startWebSocketServer(WS_PORT);
 const boundHttpPort = await resolveAvailablePort(PORT);
+const httpServer = await startHttpServer(app, boundHttpPort);
+
+let activeWss;
+let activeWsPort;
+if (WS_SINGLE_PORT || WS_PORT === PORT || WS_PORT === boundHttpPort) {
+  // Cloud-friendly mode: expose WS over the same public port as HTTP.
+  activeWss = new WebSocketServer({ server: httpServer });
+  activeWsPort = boundHttpPort;
+} else {
+  const { wsServer, port } = await startWebSocketServer(WS_PORT);
+  activeWss = wsServer;
+  activeWsPort = port;
+}
 
 function broadcast(type, payload) {
   const msg = createMessage(type, payload);
-  wss.clients.forEach((client) => {
+  activeWss.clients.forEach((client) => {
     if (client.readyState === 1) client.send(msg);
   });
 }
 
-wss.on("connection", (ws) => {
+activeWss.on("connection", (ws) => {
   ws.send(createMessage(MessageType.SYSTEM, { ok: true, text: "CongoGames WS connected" }));
 });
 
@@ -84,7 +106,7 @@ app.get("/health", (_req, res) => {
 
 app.get("/metrics", (_req, res) => {
   res.json({
-    wsClients: wss.clients.size,
+    wsClients: activeWss.clients.size,
     recentEvents: recentEvents.slice(-20)
   });
 });
@@ -129,16 +151,14 @@ app.post("/question/generate", async (req, res) => {
   res.json({ ok: true, question });
 });
 
-app.listen(boundHttpPort, () => {
-  console.log(`HTTP server on http://localhost:${boundHttpPort}`);
-  console.log(`WebSocket server on ws://localhost:${boundWsPort}`);
-  if (boundHttpPort !== PORT) {
-    console.warn(`Requested PORT ${PORT} was busy, fallback to ${boundHttpPort}.`);
-  }
-  if (boundWsPort !== WS_PORT) {
-    console.warn(`Requested WS_PORT ${WS_PORT} was busy, fallback to ${boundWsPort}.`);
-  }
-});
+console.log(`HTTP server on http://localhost:${boundHttpPort}`);
+console.log(`WebSocket server on ws://localhost:${activeWsPort}`);
+if (boundHttpPort !== PORT) {
+  console.warn(`Requested PORT ${PORT} was busy, fallback to ${boundHttpPort}.`);
+}
+if (activeWsPort !== WS_PORT) {
+  console.warn(`Requested WS_PORT ${WS_PORT} was busy, fallback to ${activeWsPort}.`);
+}
 
 tiktokBridge
   .connect()
