@@ -30,19 +30,20 @@ export class QuestionGenerator {
   "explanation": "short explanation"
 }`;
 
-    const result = await this.client.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.6,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ]
-    });
-
     try {
+      const result = await this.client.chat.completions.create({
+        model: "gpt-4o-mini",
+        temperature: 0.6,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ]
+      });
+
       return JSON.parse(result.choices[0].message.content);
-    } catch {
+    } catch (error) {
+      console.warn("Question generator fallback:", error?.message || "unknown_error");
       return fallbackQuestion;
     }
   }
