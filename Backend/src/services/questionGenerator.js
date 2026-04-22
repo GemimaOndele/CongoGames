@@ -1,0 +1,49 @@
+import OpenAI from "openai";
+
+const fallbackQuestion = {
+  category: "history",
+  difficulty: "easy",
+  question: "Quelle est la capitale de la Republique du Congo ?",
+  options: ["Pointe-Noire", "Brazzaville", "Dolisie", "Owando"],
+  correctAnswer: "B",
+  explanation: "La capitale officielle de la Republique du Congo est Brazzaville."
+};
+
+export class QuestionGenerator {
+  constructor(apiKey) {
+    this.enabled = Boolean(apiKey);
+    this.client = apiKey ? new OpenAI({ apiKey }) : null;
+  }
+
+  async generateOne(language = "fr") {
+    if (!this.enabled) return fallbackQuestion;
+
+    const systemPrompt =
+      "You are a quiz generator for Republic of the Congo. Return strict JSON only.";
+    const userPrompt = `Generate one multiple-choice question in ${language} with this schema:
+{
+  "category": "history|geography|music|science|culture|languages|people",
+  "difficulty": "easy|medium|hard",
+  "question": "string",
+  "options": ["A option", "B option", "C option", "D option"],
+  "correctAnswer": "A|B|C|D",
+  "explanation": "short explanation"
+}`;
+
+    const result = await this.client.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.6,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ]
+    });
+
+    try {
+      return JSON.parse(result.choices[0].message.content);
+    } catch {
+      return fallbackQuestion;
+    }
+  }
+}

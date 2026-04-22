@@ -1,0 +1,11 @@
+{
+  "cooldownMs": 8000,
+  "maxTriggersPerRound": 3,
+  "gifts": {
+    "Rose": { "type": "points", "value": 50 },
+    "Finger Heart": { "type": "points", "value": 100 },
+    "Lion": { "type": "multiplier", "value": 2, "durationSec": 20 },
+    "Galaxy": { "type": "battle", "value": "randomTop2" },
+    "Universe": { "type": "bonusRound", "value": 1 }
+  }
+}
