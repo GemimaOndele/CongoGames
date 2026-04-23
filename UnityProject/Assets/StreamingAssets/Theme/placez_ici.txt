@@ -1,0 +1,90 @@
+=== CongoGames — thèmes par type de jeu ===
+
+--- Médias par LIEN (sans gros fichiers dans le build) ---
+
+Fichier optionnel : Theme/remote_media.json (copie remote_media.example.json et renomme).
+Format JSON : tableau "entries" avec des objets { "modeId", "musicUrl", "bottomVideoUrl", "backgroundVideoUrl" }.
+• modeId "_global" = valeurs par défaut ; un mode précis (ex. "quiz") remplace pour ce mode.
+• Les URLs doivent pointer vers un FICHIER média direct (https://…/fichier.mp4, .webm, .mp3, .ogg…).
+• Les pages YouTube / Spotify dans le navigateur ne sont pas des liens « fichier » : Unity ne peut pas les lire telles quelles. Utilise un hébergement qui te donne une URL directe, ou exporte un fichier vers ton propre espace / CDN.
+• Tu restes responsable du respect des droits et des conditions du site qui héberge le fichier.
+• bottomVideoUrl : barre vidéo en bas de l’écran + son (évite la double musique avec ThemeMusicPlayer pour ce mode).
+• musicUrl : musique seule par lien (si bottomVideoUrl est vide pour ce mode).
+• backgroundVideoUrl : fond plein écran (son coupé comme les background locaux).
+
+Pour chaque mini-jeu, tu peux créer un sous-dossier avec le même nom que le ModeId (voir liste ci-dessous).
+Priorité de chargement (fond) :
+1) Theme/<mode>/background.mp4 ou background.webm
+2) Plusieurs images : Theme/<mode>/bg_*.png|.jpg ou slide*.png|.jpg (diaporama en boucle)
+3) sinon animation couleur procédurale
+
+Musique :
+1) Playlist : plusieurs fichiers track01.ogg, track02.wav, track03.mp3, … (tous les track* triés par nom, lecture en boucle) dans Theme/<mode>/
+2) Sinon un seul Theme/<mode>/music.ogg, .wav ou .mp3 (boucle)
+3) Si aucun track dans Theme/<mode>/ : playlist Theme/track*.ogg (ou .wav/.mp3) à la racine de Theme/ — partagée entre les modes
+4) sinon Theme/music.* global, Resources, puis pad procédural
+   → Crédits des pistes fournies : voir Theme/ATTRIBUTION.md
+   → Idées d’artistes & rumba (références + légal) : Theme/PLAYLIST_ARTISTES_CONGO.txt
+
+Exemple playlist Congo (à télécharger légalement, licences CC0 / Pixabay, etc.) :
+  Theme/quiz/track01.ogg
+  Theme/quiz/track02.ogg
+  Theme/semantic/track01.ogg
+  …
+
+Exemple fonds multiples :
+  Theme/word-scramble/bg_01.png
+  Theme/word-scramble/slide_foret.png
+
+ModeId (dossiers) :
+  quiz
+  semantic
+  word-scramble
+  crossword-lite
+  blind-test
+  mystery-word
+  memory
+  speed-chrono
+  image-guess
+
+Exemple :
+  Theme/quiz/background.mp4
+  Theme/quiz/music.ogg
+  Theme/semantic/music.wav
+
+Resources (optionnel) :
+  Assets/Resources/Audio/theme_quiz, theme_semantic, … (AudioClip)
+  ou Audio/theme par défaut
+  Effets : sfx_tap, sfx_correct, sfx_wrong, sfx_cheer, sfx_laugh (.wav ou .ogg)
+  Réplique « Oza zoba » sans TTS : AudioClip Resources/Audio/host_oza_zoba (.wav/.ogg)
+  ou URL HTTPS dans l’inspecteur du AIHostManager (champ oza Zoba Audio Url).
+  → Crédits : Resources/Audio/ATTRIBUTION.md
+
+La piste audio des vidéos est coupée par défaut ; utilise les fichiers music.* pour la musique.
+
+--- Où télécharger musique / sons libres de droits (vérifie la licence de chaque fichier) ---
+
+• Pixabay Music (recherche "game", "african", etc.) : https://pixabay.com/music/
+• Musiques CC0 sur Pixabay : https://pixabay.com/music/search/cc0/
+• Free Music Archive : https://freemusicarchive.org/
+• Incompetech (filtrer par ambiance) : https://incompetech.com/music/royalty-free/music.html
+• OpenGameArt (audio) : https://opengameart.org/art-search-advanced?keys=&field_art_type_tid%5B%5D=13
+
+Exporte en .ogg ou .wav pour de meilleures compatibilités Unity en local ; .mp3 fonctionne aussi.
+
+--- Cadeaux TikTok → mini-jeu (mapping exact) ---
+
+• Source principale : Backend/src/config/gift-balance.json — champ optionnel "gameMode" sur chaque cadeau (même nom que TikTok : "Rose", "Finger Heart", …). Le WS envoie gameMode vers Unity.
+• Secours / démo sans backend : Theme/tiktok_gift_modes.json — tableau "mappings" { "tiktokGiftName", "modeId" } (mêmes ids que les dossiers Theme : quiz, semantic, word-scramble, …).
+• Si aucun mapping : repli heuristique sur le nom (fragile).
+
+--- Qualité visuelle du fond 3D procédural (pas les assets HD externes) ---
+
+• PlayerPrefs "CongoPresentationQuality" : 0 = Compact, 1 = Standard, 2 = Cinematic (défaut). Plus la valeur est haute, plus le script ajoute de bandes / cubes / profondeur de caméra.
+• Pour un rendu « console HD » réel : importer tes meshes / textures / VFX dans Unity (HDRP/URP), Addressables, cinématiques Timeline ; ce réglage ne remplace pas ce pipeline artiste.
+
+--- Scène Unity (ModePanelsRoot) — grilles & mini-jeux ---
+
+• Sur le même GameObject que le ModeSurfaceController (souvent « ModePanelsRoot ») : ajoute aussi MiniGamePanelContent (Unity peut l’ajouter tout seul si tu poses MiniGamePanelContent en premier grâce à RequireComponent).
+• Si ta scène contient déjà un ModeSurfaceController sans canvas auto-généré : au chargement, RuntimeBootstrap appelle EnsureGridsIfMissing() pour créer les panneaux secondaires (mots croisés, mots mélangés, etc.) et remplir les lettres.
+• Après changement de scène ou de prefab : enregistre la scène et relance Play pour recompiler les scripts.

@@ -11,6 +11,10 @@ namespace CongoGames.Core
         [SerializeField] private string playerA;
         [SerializeField] private string playerB;
 
+        public bool IsBattleActive => battleActive;
+        public string PlayerA => playerA;
+        public string PlayerB => playerB;
+
         private void Awake()
         {
             Instance = this;

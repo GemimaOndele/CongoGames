@@ -1,0 +1,45 @@
+================================================================================
+CongoGames — rumba, musiques congolaises & traditionnelles (références)
+================================================================================
+
+IMPORTANT — DROITS D’AUTEUR
+Les morceaux commerciaux des artistes ci-dessous ne peuvent PAS être copiés
+dans le jeu sans accord de l’ayant droit (label, SACEM/SAYCE équivalent,
+licence synchronisation, etc.). Ce fichier sert de LISTE DE RÉFÉRENCE et de
+recherche ; pour le build, utilise uniquement :
+  • tes propres enregistrements,
+  • des pistes sous licence explicite (achat « royalty-free », CC, domaine public),
+  • ou des fichiers que tu places toi-même dans Theme/ (track01.ogg, …).
+
+Artistes & courants souvent cités (République du Congo, diaspora, rumba)
+------------------------------------------------------------------------
+  • Franklin Bukaka
+  • Paul Muka
+  • Tidiane Mario
+  • Dizel Gushi
+  • Nestelia Forest
+  • Zaho / Kazimir Zaho (vérifier orthographe exacte des noms sur les stores)
+  • Extra Musica / Roga Roga
+  • Jessy B (souvent orthographié « Jessy B »)
+  • Teddy Benzo
+  • Yandoro, Yulma Biala (selon discographie)
+  • Tradition : chants bantu, mboshi, kiloombo (Kikongo / Lari), percussions…
+
+Où chercher des pistes LÉGALES pour un prototype ou un usage encadré
+--------------------------------------------------------------------
+  • Pixabay Music (tag « congolese », « african », « rumba ») :
+    https://pixabay.com/music/search/congolese/
+  • Free Music Archive — genre Rumba :
+    https://freemusicarchive.org/genre/rumba/
+  • Wikimedia Commons — échantillons / enregistrements sous licence ouverte
+    (vérifier la fiche de chaque fichier).
+  • Acheter des loops / stems « world / african » sur banques professionnelles
+    (Epidemic Sound, Artlist, etc.) avec licence jeu vidéo.
+
+Comment les brancher dans Unity
+-------------------------------
+  • Playlist partagée : StreamingAssets/Theme/track01.ogg, track02.ogg, …
+  • Ou par mode : Theme/quiz/track01.ogg, Theme/semantic/track01.ogg, …
+  • Fond vidéo par mode : Theme/<mode>/background.mp4 ou .webm
+
+Mets à jour ATTRIBUTION.md pour chaque fichier ajouté (crédits + licence).

@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
+    "unity:patch-urp-menus": "powershell -NoProfile -ExecutionPolicy Bypass -File UnityProject/tools/PatchUrpScriptingMenu.ps1",
+    "unity:patch-input-uxml": "powershell -NoProfile -ExecutionPolicy Bypass -File UnityProject/tools/PatchInputSystemUxml.ps1",
+    "unity:prepare": "powershell -NoProfile -ExecutionPolicy Bypass -File prepare-unity.ps1",
     "start-all": "set TIKTOK_BRIDGE_ENABLED=false&& npm --prefix Backend run dev",
     "start-all:live": "set TIKTOK_BRIDGE_ENABLED=true&& npm --prefix Backend run dev",
     "start-all:prod": "npm --prefix Backend run start",

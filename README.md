@@ -1,6 +1,6 @@
 # CongoGames
 
-CongoGames est un jeu live interactif concu pour TikTok Live, centre sur la culture generale de la Republique du Congo (capitale: Brazzaville).
+CongoGames est un jeu live interactif concu pour TikTok Live, centre sur la culture generale du Congo (capitale : Brazzaville).
 
 ## Objectif
 
@@ -35,6 +35,8 @@ CongoGames est un jeu live interactif concu pour TikTok Live, centre sur la cult
 
 ## Demarrage rapide
 
+Guide pas à pas (`.env`, ports, Unity, dépannage) : **`docs/TESTER.md`**.
+
 ### 1) Backend
 
 ```bash
@@ -48,17 +50,19 @@ Si un port est occupe, le backend bascule automatiquement sur le port suivant (`
 
 ### 2) Unity
 
+- **Avant la première ouverture** (ou après avoir supprimé `UnityProject/Library`) : avec Unity **fermé**, exécuter `.\prepare-unity.ps1` ou `npm run unity:prepare` : correctif **URP** (menus Unity 6.4, voir checklist). Le projet utilise l’**Input Manager** classique (**Active Input Handling = Input Manager**) et `UnityEngine.Input` pour la démo clavier — **sans** package *Input System*, afin d’éviter les erreurs d’éditeur (`TypeLoadException` sur les UXML du paquet) et de garantir un **Play** stable. *(Option avancée : réintroduire `com.unity.inputsystem`, migrer le code + UI, puis `npm run unity:patch-input-uxml`.)* Unity peut avertir sur des packages **immutables** modifiés (URP) : attendu ; relancez `prepare-unity` après mise à jour d’URP.
 - Ouvrir le projet Unity dans `UnityProject/`
-- Importer les scripts sous `Assets/Scripts/`
-- Ajouter les composants sur les GameObjects de la scene
-- Suivre `docs/UNITY_SCENE_SETUP.md` pour le branchement complet
+- **URP** : menu **Window → CongoGames → Créer et assigner URP** (ou **Tools → CongoGames**), si vous ne voyez pas le menu **CongoGames** en barre du haut.
+- Lancer **Play** : un HUD CongoGames (drapeau vert/jaune, chrono, classement, robot) est créé automatiquement si aucun `LiveEventClient` n’est déjà dans la scène.
+- Voix : `AIHostManager` appelle `http://127.0.0.1:3000/tts` (même machine que `npm run dev`). Si le port HTTP n’est pas 3000, ajuste le champ **Tts Http Base** sur le composant **AI Host Manager** dans l’inspecteur (objet `CongoGames_Services` en mode Play, ou une scène perso).
 
 ## Variables d'environnement
 
 Copier `Backend/.env.example` vers `Backend/.env` puis renseigner:
 
 - `OPENAI_API_KEY`
-- `ELEVENLABS_API_KEY`
+- `ELEVENLABS_API_KEY` (synthèse vocale `/tts` pour Unity ; la clé ne doit pas être dans le build jeu)
+- `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL_ID`, `ELEVENLABS_OUTPUT_FORMAT` (optionnels, voir `.env.example`)
 - `TIKTOK_USERNAME`
 - `TIKTOK_USERNAMES` (liste separee par virgules, ex: `congogame,je_suis_gemima`)
 - `TIKTOK_RETRY_MS` (ex: `15000`)
@@ -77,6 +81,8 @@ Endpoints disponibles sur l'URL Vercel:
 
 - `GET /health`
 - `GET /metrics`
+- `GET /tts/status` — indique si la synthèse ElevenLabs est prête (clé API serveur)
+- `POST /tts` — corps `application/x-www-form-urlencoded` avec champ `text=` ; réponse JSON PCM (base64) pour Unity
 - `POST /events/chat`
 - `POST /events/gift`
 - `POST /round/reset`

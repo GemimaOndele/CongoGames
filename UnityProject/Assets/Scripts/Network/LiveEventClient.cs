@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -24,6 +25,7 @@ namespace CongoGames.Network
         public string action;
         public int value;
         public int durationSec;
+        public string gameMode;
 
         public string category;
         public string difficulty;
@@ -31,13 +33,18 @@ namespace CongoGames.Network
         public string[] options;
         public string correctAnswer;
         public string explanation;
+
+        public int httpPort;
+        public string httpApiBase;
     }
 
     public class LiveEventClient : MonoBehaviour
     {
         [SerializeField] private string wsUrl = "wss://congogames-ws-production.up.railway.app";
+        [Tooltip("Ports WS locaux essayés en plus de ws://localhost:8080 … 8120 (fusion automatique).")]
         [SerializeField] private string[] localFallbackWsUrls = { "ws://localhost:8080", "ws://localhost:8081", "ws://localhost:8082" };
         [SerializeField] private QuestionUI questionUI;
+        [SerializeField] private bool logWsConnectionToConsole = false;
         private ClientWebSocket socket;
         private CancellationTokenSource cts;
         private string connectedEndpoint = "";
@@ -57,10 +64,15 @@ namespace CongoGames.Network
         public string LastError => lastError;
         public long LastEventTimestamp => lastEventTs;
 
+        public void BindQuestionUI(QuestionUI ui)
+        {
+            questionUI = ui;
+        }
+
         private async void Start()
         {
             cts = new CancellationTokenSource();
-            if (questionUI == null) questionUI = FindObjectOfType<QuestionUI>();
+            if (questionUI == null) questionUI = FindAnyObjectByType<QuestionUI>();
             try
             {
                 await ConnectAndListen(cts.Token);
@@ -81,13 +93,19 @@ namespace CongoGames.Network
         private async Task<ClientWebSocket> ConnectWithFallback(CancellationToken token)
         {
             string[] targets = BuildTargets();
-            foreach (string target in targets)
+            string lastTarget = "";
+            for (int i = 0; i < targets.Length; i++)
             {
+                string target = targets[i];
+                lastTarget = target;
                 try
                 {
                     var candidate = new ClientWebSocket();
                     await candidate.ConnectAsync(new Uri(target), token);
-                    Debug.Log("Connected WS: " + target);
+                    if (logWsConnectionToConsole)
+                    {
+                        Debug.Log("CongoGames WS connecté : " + target);
+                    }
                     connectedEndpoint = target;
                     lastError = "";
                     return candidate;
@@ -95,27 +113,69 @@ namespace CongoGames.Network
                 catch (Exception ex)
                 {
                     lastError = ex.Message;
-                    Debug.LogWarning("WS connect failed: " + target + " (" + ex.Message + ")");
                 }
             }
 
-            throw new Exception("Unable to connect to any WS endpoint.");
+            Debug.LogError("CongoGames WS : aucune connexion après " + targets.Length + " essais. Dernière URL : " + lastTarget + " — " + lastError);
+            throw new Exception("WS indisponible (voir Console). Lance le backend et vérifie le port WS dans /health.");
+        }
+
+        private static string[] MergeLocalWsUrls(string[] configured)
+        {
+            var list = new List<string>();
+            void add(string u)
+            {
+                if (string.IsNullOrWhiteSpace(u)) return;
+                string t = u.Trim();
+                if (!list.Contains(t))
+                {
+                    list.Add(t);
+                }
+            }
+
+            if (configured != null)
+            {
+                foreach (string u in configured)
+                {
+                    add(u);
+                }
+            }
+
+            for (int p = 8080; p <= 8120; p++)
+            {
+                add("ws://localhost:" + p);
+            }
+
+            return list.ToArray();
         }
 
         private string[] BuildTargets()
         {
+            string[] locals = MergeLocalWsUrls(localFallbackWsUrls);
             if (string.IsNullOrWhiteSpace(wsUrl))
             {
-                return localFallbackWsUrls;
+                return locals;
             }
 
-            string[] targets = new string[1 + localFallbackWsUrls.Length];
-            targets[0] = wsUrl;
-            for (int i = 0; i < localFallbackWsUrls.Length; i++)
+#if UNITY_EDITOR
+            string[] targets = new string[locals.Length + 1];
+            for (int i = 0; i < locals.Length; i++)
             {
-                targets[i + 1] = localFallbackWsUrls[i];
+                targets[i] = locals[i];
             }
+
+            targets[targets.Length - 1] = wsUrl;
             return targets;
+#else
+            string[] targets = new string[1 + locals.Length];
+            targets[0] = wsUrl;
+            for (int i = 0; i < locals.Length; i++)
+            {
+                targets[i + 1] = locals[i];
+            }
+
+            return targets;
+#endif
         }
 
         private async Task ReceiveLoop(CancellationToken token)
@@ -179,6 +239,18 @@ namespace CongoGames.Network
         {
             if (!msg.accepted) return;
 
+            string modeFromGift = TikTokGiftModeRegistry.ResolveGameSwitchMode(msg);
+            if (!string.IsNullOrEmpty(modeFromGift))
+            {
+                GameModeManager.Instance?.StartMode(modeFromGift);
+                AIHostManager.Instance?.Speak("Nouvelle manche : " + GameModeManager.GetModeDisplayName(modeFromGift) + ".");
+            }
+
+            if (string.IsNullOrEmpty(msg.action))
+            {
+                return;
+            }
+
             if (msg.action == "points")
             {
                 ScoreManager.Instance.AddPoints(msg.user, msg.value);
@@ -220,7 +292,7 @@ namespace CongoGames.Network
             };
 
             QuestionManager.Instance.SetQuestion(question);
-            questionUI?.Render(question);
+            questionUI?.RenderLiveImmediate(question);
             lastQuestionText = question.question ?? "";
             AIHostManager.Instance?.Speak(question.question);
         }
@@ -228,6 +300,11 @@ namespace CongoGames.Network
         private void HandleSystem(LiveMessage msg)
         {
             lastSystemText = msg.text ?? msg.message ?? msg.explanation ?? "";
+
+            if (AIHostManager.Instance != null && (!string.IsNullOrWhiteSpace(msg.httpApiBase) || msg.httpPort > 0))
+            {
+                AIHostManager.Instance.ApplyLiveServerHints(msg.httpApiBase, msg.httpPort);
+            }
         }
 
         private async void OnDestroy()

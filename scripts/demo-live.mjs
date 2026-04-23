@@ -1,4 +1,4 @@
-const DEFAULT_PORTS = [3000, 3001, 3002, 3003, 3004];
+const DEFAULT_PORTS = [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010];
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -37,7 +37,7 @@ async function resolveBaseUrl() {
       // continue
     }
   }
-  throw new Error("Aucun backend local detecte (ports 3000-3004). Lance `npm run start-all`.");
+  throw new Error("Aucun backend local detecte (ports 3000-3010). Lance `npm run start-all`.");
 }
 
 async function sendStep(baseUrl, step) {
