@@ -43,6 +43,8 @@ Guide pas à pas (`.env`, ports, Unity, dépannage) : **`docs/TESTER.md`**.
 
 - **Unity** : dossier `Library`, script `prepare-unity`, ordre d’ouverture (ce qui se régénère, dépannage) : **`docs/UNITY_LIBRARY_AND_LAUNCH.md`**.
 
+- **Scène personnalisée (sans le canvas auto du bootstrap)** : menu **CongoGames → UI → Ajouter RoundVictoryOverlay** + **`docs/UNITY_SCENE_SETUP.md`** (§ 3 bis).
+
 ### 1) Backend
 
 ```bash

@@ -16,6 +16,12 @@ namespace CongoGames.UI
         [SerializeField] private float showSec = 1.15f;
         [SerializeField] private int sortOrder = 75;
 
+        /// <summary>À appeler depuis l’éditeur (menu) pour préparer le canvas sans passer par Play (Awake).</summary>
+        public void EnsureDisplayCanvasInEditor()
+        {
+            SetupDisplayCanvas();
+        }
+
         private GameModeManager gmm;
         private CanvasGroup group;
         private Text line1;
@@ -24,15 +30,20 @@ namespace CongoGames.UI
 
         private void Awake()
         {
+            SetupDisplayCanvas();
+        }
+
+        private void SetupDisplayCanvas()
+        {
             Canvas c = GetComponent<Canvas>();
             if (c == null)
             {
                 c = gameObject.AddComponent<Canvas>();
             }
 
+            c.renderMode = RenderMode.ScreenSpaceOverlay;
             c.overrideSorting = true;
             c.sortingOrder = sortOrder;
-            c.renderMode = RenderMode.ScreenSpaceOverlay;
 
             if (GetComponent<GraphicRaycaster>() == null)
             {
@@ -47,6 +58,17 @@ namespace CongoGames.UI
 
             group.alpha = 0f;
             group.blocksRaycasts = false;
+
+            RectTransform root = GetComponent<RectTransform>();
+            if (root != null)
+            {
+                root.anchorMin = Vector2.zero;
+                root.anchorMax = Vector2.one;
+                root.pivot = new Vector2(0.5f, 0.5f);
+                root.anchoredPosition = Vector2.zero;
+                root.offsetMin = Vector2.zero;
+                root.offsetMax = Vector2.zero;
+            }
         }
 
         private void Start()

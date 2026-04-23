@@ -48,6 +48,13 @@ Sur un objet `Modes`, ajouter:
 
 Le `GameModeManager` detecte automatiquement ces modes dans la scene.
 
+## 3 bis. Scène perso sans RuntimeBootstrap : bandeau « manche terminée »
+
+Si vous n’utilisez pas le canvas généré au lancement par `RuntimeBootstrap`, les **transitions entre modes** n’affichent pas le bandeau *RoundVictoryOverlay* tant qu’il n’est pas dans la scène.
+
+- **Menu Unity** : **CongoGames → UI → Ajouter RoundVictoryOverlay (scène perso, sans RuntimeBootstrap)**  
+  Cela crée un GameObject `RoundVictoryOverlay` (plein écran, tri 75) avec le script déjà configuré. Pré-requis : un `GameModeManager` actif en Play, comme dans `UNITY_SCENE_SETUP.md` §1–3.
+
 ## 4. Demarrage backend + tests rapides
 
 Dans `Backend/`:
