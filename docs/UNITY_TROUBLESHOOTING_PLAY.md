@@ -34,8 +34,8 @@ La vraie erreur s’y trouve souvent quand l’UI affiche 0 erreur en rouge.
 
 ## 5) Assemblies du dépôt
 
-- Le code jeu est regroupé dans l’assembly **`CongoGames.Runtime`** (`Assets/Scripts/CongoGames.Runtime.asmdef`), avec référence explicite à **Unity UI (UGUI)**.  
-- Le menu URP **CongoGames** reste dans **`CongoGames.Editor.URP`** (dossier `Assets/Editor/RenderingSetup/`). Si l’ancienne console affiche des erreurs **uniquement** côté éditeur, concentrez-vous sur ce dossier + packages URP.
+- Le code sous **`Assets/Scripts`** est compilé en **`Assembly-CSharp`** (fichier unique par défaut) : toutes les références `Unity.*` héritent des modules du projet — **inutile** d’ajouter un `.asmdef` runtime ici, au risque d’oublier un module (WebRequest, Video, UGUI…) et de provoquer des **erreurs CS invisibles** ou des Play bloqués.  
+- Le menu URP **CongoGames** est dans l’assembly éditeur **`CongoGames.Editor.URP`** (`Assets/Editor/RenderingSetup/`). En cas d’erreurs **uniquement** côté menu outil, vérifiez ce dossier + le package URP.
 
 ## 6) Dernière piste
 
