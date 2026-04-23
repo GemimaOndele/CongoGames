@@ -43,6 +43,8 @@ flowchart TD
 
 La section **Play grisé / erreurs** de [TESTER.md](TESTER.md) décrit : Safe Mode, **Console** (filtrer les erreurs), **`Editor.log`** Windows (`%LOCALAPPDATA%\Unity\Editor\Editor.log`), puis **`prepare-unity.ps1` avec Unity fermé**, et en dernier recours **supprimer `Library` et `Temp`** puis rouvrir (toujours relancer `prepare-unity` après une suppression de `Library`). Cas particulier **Bee / PDB** : chemin de projet **sans emojis** dans le chemin Windows, exclusion antivirus de `Library`, espace disque (détail dans la même doc).
 
+**Avertissement « Input Manager is deprecated »** : ce n’est **pas** l’explication d’un **Play** bloqué. Si seul ce message s’affiche en jaune, cherche ailleurs : **`Assets/csc.rsp`** (doit être vide sauf options Roslyn valides), **`Editor.log`** pour **`error CS`**, et cache **`Library` / `Temp`**.
+
 ## Résumé en une phrase
 
 **Ne pas commiter `Library` ;** le script **`prepare-unity`** se lance **Unity fermé** **avant** (ou juste **après** avoir vidé) **`Library` ;** ouvrez **`UnityProject`**, laissez l’import finir, configurez l’**URP** via le menu **CongoGames**, démarrez le **backend** puis **Play** — c’est le flux documenté [README](../README.md) + [TESTER.md](TESTER.md).
