@@ -1,10 +1,8 @@
 # Une seule règle : la branche `master`
 
-- Travaillez **uniquement** sur **`master`**.  
-- C’est la branche contenant le jeu, le backend et la doc à jour.  
-- Mettre à jour : `git pull origin master`
-
-Les branches dont le nom commence par `cursor/` viennent d’outils d’intégration. Le contenu a été **fusionné dans `master`**. Vous pouvez supprimer ces branches côté GitHub (*Branches* → corbeille) quand vous voulez alléger l’affichage ; ce n’est **pas** obligatoire pour lancer le jeu.
+- Il ne reste **que `master`** sur le dépôt (les branches `cursor/...` ont été retirées du serveur, tout le code utile y est).  
+- Mettre à jour : `git pull origin master`  
+- Si votre machine liste encore d’anciennes branches : `git fetch --prune` puis `git branch -D` le nom d’une branche locale obsolète, ou ne touchez à rien et restez sur `master`.
 
 ## Lancer le jeu (rappel court)
 
