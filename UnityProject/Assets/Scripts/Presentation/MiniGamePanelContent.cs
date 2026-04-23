@@ -15,10 +15,12 @@ namespace CongoGames.Presentation
     [RequireComponent(typeof(ModeSurfaceController))]
     public class MiniGamePanelContent : MonoBehaviour
     {
-        private const float CrosswordCellPx = 54f;
-        private const float CrosswordGapPx = 8f;
-        private const float ScrambleCellPx = 52f;
-        private const float ScrambleGapPx = 7f;
+        private const int CrosswordCols = 7;
+        private const int CrosswordTotalCells = CrosswordCols * CrosswordCols;
+        private const float CrosswordCellPx = 48f;
+        private const float CrosswordGapPx = 6f;
+        private const float ScrambleCellPx = 46f;
+        private const float ScrambleGapPx = 6f;
         [Header("Mots mélangés")]
         public Text wordScrambleTitle;
         public Text wordScrambleLetters;
@@ -44,7 +46,7 @@ namespace CongoGames.Presentation
 
         [Header("Mots croisés")]
         public Text crosswordTitle;
-        public Text[] crosswordCells = new Text[36];
+        public Text[] crosswordCells = new Text[CrosswordTotalCells];
         public InputField crosswordAnswerInput;
         public Button crosswordClearButton;
         public Button crosswordSubmitButton;
@@ -84,6 +86,7 @@ namespace CongoGames.Presentation
         private string[] memoryDeckOrder;
         private Coroutine memoryMismatchCo;
         private int lastBlindCorrectDisplayIndex;
+        private Coroutine blindEmojiPulseCo;
         private bool secondaryPanelsEnsured;
         private int suppressGridTapUntilFrame;
 
@@ -104,9 +107,8 @@ namespace CongoGames.Presentation
             if (crosswordCells == null || cellIndex < 0 || cellIndex >= crosswordCells.Length) return;
             Text tx = crosswordCells[cellIndex];
             if (tx == null) return;
-            int col = 6;
-            int r = cellIndex / col;
-            int c = cellIndex % col;
+            int r = cellIndex / CrosswordCols;
+            int c = cellIndex % CrosswordCols;
             Image bg = tx.transform.parent != null ? tx.transform.parent.GetComponent<Image>() : null;
             if (bg != null) bg.color = CrosswordDecoBg(r, c);
         }
@@ -133,6 +135,15 @@ namespace CongoGames.Presentation
             if (surf != null && !string.IsNullOrEmpty(surf.CurrentModeId))
             {
                 Populate(surf.CurrentModeId);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (blindEmojiPulseCo != null)
+            {
+                StopCoroutine(blindEmojiPulseCo);
+                blindEmojiPulseCo = null;
             }
         }
 
@@ -484,7 +495,7 @@ namespace CongoGames.Presentation
             LiveEventClient live = FindAnyObjectByType<LiveEventClient>();
             bool liveMode = live != null && live.IsConnected;
 
-            if (crosswordCells == null || crosswordCells.Length < 36)
+            if (crosswordCells == null || crosswordCells.Length < CrosswordTotalCells)
             {
                 Debug.LogError("MiniGamePanelContent : crosswordCells non initialisés — vérifie que BuildSecondaryPanels a été exécuté sur ce ModePanelsRoot.");
                 return;
@@ -522,8 +533,8 @@ namespace CongoGames.Presentation
                 }
             }
 
-            int cols = 6;
-            int rows = 6;
+            int cols = CrosswordCols;
+            int rows = CrosswordCols;
             string[] g = new string[cols * rows];
             const string cons = "BCDFGHJKLMNPQRSTVWXYZ";
             for (int i = 0; i < g.Length; i++)
@@ -562,8 +573,8 @@ namespace CongoGames.Presentation
                 SetLetter(k, vc, vert[k].ToString());
             }
 
-            SetLetter(5, 0, "Z");
-            SetLetter(5, 5, "R");
+            SetLetter(6, 0, "Z");
+            SetLetter(6, 6, "R");
 
             for (int r = 0; r < rows; r++)
             {
@@ -621,18 +632,29 @@ namespace CongoGames.Presentation
 
         private void ApplyBlindDemo()
         {
+            if (blindEmojiPulseCo != null)
+            {
+                StopCoroutine(blindEmojiPulseCo);
+                blindEmojiPulseCo = null;
+            }
+
             MiniGameDemoBanks.BlindRound raw = MiniGameDemoBanks.NextBlindRound();
             MiniGameDemoBanks.BlindRound r = MiniGameDemoBanks.ToShuffledDisplay(raw);
             lastBlindCorrectDisplayIndex = r.CorrectIndex;
-            if (blindTitle != null) blindTitle.text = "Blind test — Congo & musiques";
+            string cat = string.IsNullOrEmpty(raw.CategoryLabel) ? "Blind test" : raw.CategoryLabel;
+            if (blindTitle != null) blindTitle.text = "Blind test — " + cat;
             if (blindPrompt != null) blindPrompt.text = r.Prompt;
             if (blindSub != null)
             {
                 blindSub.text = r.SubLine
-                    + "\nUn extrait tourne en boucle (fichier dans StreamingAssets/Theme/ ou URL si configuré) — écoute puis choisis ta réponse.";
+                    + "\n▶ L’extrait démarre tout de suite (Theme/BlindTest ou Theme + track01/02, ou URL F10) — écoute puis choisis.";
             }
 
-            if (blindEmoji != null) blindEmoji.text = "♪  Écoute  ♪";
+            if (blindEmoji != null)
+            {
+                blindEmoji.text = "♪  Écoute  ♪";
+                blindEmojiPulseCo = StartCoroutine(CoPulseBlindEmoji());
+            }
             string[] letters = { "A", "B", "C", "D" };
             for (int i = 0; i < blindChoices.Length && r.Choices != null && i < r.Choices.Length; i++)
             {
@@ -647,8 +669,33 @@ namespace CongoGames.Presentation
             GameSfxHub.Instance?.PlayBlindDemoMusic(musicSeed, raw.AudioFileBase, raw.AudioUrl);
         }
 
+        private IEnumerator CoPulseBlindEmoji()
+        {
+            if (blindEmoji == null) yield break;
+            RectTransform rt = blindEmoji.rectTransform;
+            Vector3 baseScale = rt != null ? rt.localScale : Vector3.one;
+            while (blindEmoji != null && blindEmoji.gameObject.activeInHierarchy)
+            {
+                float t = Time.unscaledTime * 2.1f;
+                float s = 1f + 0.06f * Mathf.Sin(t);
+                if (rt != null) rt.localScale = baseScale * s;
+                yield return null;
+            }
+        }
+
         public void NotifyBlindPick(int choiceIndex)
         {
+            if (blindEmojiPulseCo != null)
+            {
+                StopCoroutine(blindEmojiPulseCo);
+                blindEmojiPulseCo = null;
+            }
+
+            if (blindEmoji != null)
+            {
+                blindEmoji.rectTransform.localScale = Vector3.one;
+            }
+
             GameSfxHub.Instance?.StopBlindDemoMusic();
             bool ok = choiceIndex == lastBlindCorrectDisplayIndex;
             GameSfxHub.Instance?.PlayResult(ok);
@@ -1025,8 +1072,8 @@ namespace CongoGames.Presentation
             GameObject word = PanelShell(modeRoot, "PanelWordScramble", "word-scramble", new Color(0.08f, 0.08f, 0.14f, 0.96f), white, surf);
             demo.wordScrambleTitle = Title(word.transform, font, "WTitle", "Mots mélangés", new Vector2(0f, -28f));
             demo.wordScrambleLetters = null;
-            Transform wordHost = CreateGridHost(word.transform, "WordGridHost", 0.54f, new Vector2(0f, 118f), new Vector2(920f, 392f));
-            BuildScrambleLetterGrid(wordHost, font, 6, 6, ScrambleCellPx, ScrambleGapPx, Vector2.zero, demo);
+            Transform wordHost = CreateGridHost(word.transform, "WordGridHost", 0.52f, new Vector2(0f, 116f), new Vector2(960f, 412f));
+            BuildScrambleLetterGrid(wordHost, font, 7, 7, ScrambleCellPx, ScrambleGapPx, Vector2.zero, demo);
             WireLetterGridDrag(wordHost, demo, false, demo.wordScrambleTiles);
 
             GameObject wordFoot = CreateRect(word.transform, "WordFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 108f), new Vector2(940f, 200f));
@@ -1044,8 +1091,8 @@ namespace CongoGames.Presentation
 
             GameObject cross = PanelShell(modeRoot, "PanelCrossword", "crossword-lite", new Color(0.05f, 0.1f, 0.12f, 0.96f), white, surf);
             demo.crosswordTitle = Title(cross.transform, font, "CTitle", "Mots croisés", new Vector2(0f, -28f));
-            Transform crossHost = CreateGridHost(cross.transform, "CrossGridHost", 0.54f, new Vector2(0f, 124f), new Vector2(900f, 376f));
-            demo.crosswordCells = CrosswordLetterGrid(crossHost, font, 6, 6, CrosswordCellPx, CrosswordGapPx, Vector2.zero, demo);
+            Transform crossHost = CreateGridHost(cross.transform, "CrossGridHost", 0.52f, new Vector2(0f, 122f), new Vector2(940f, 400f));
+            demo.crosswordCells = CrosswordLetterGrid(crossHost, font, CrosswordCols, CrosswordCols, CrosswordCellPx, CrosswordGapPx, Vector2.zero, demo);
             WireLetterGridDrag(crossHost, demo, true, demo.crosswordCells);
 
             GameObject crossFoot = CreateRect(cross.transform, "CrossFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 108f), new Vector2(940f, 148f));

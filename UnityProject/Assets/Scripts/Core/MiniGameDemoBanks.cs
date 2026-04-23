@@ -20,8 +20,10 @@ namespace CongoGames.Core
             public readonly string AudioFileBase;
             /// <summary>Si non vide (http/https), extrait joué à la place du fichier local.</summary>
             public readonly string AudioUrl;
+            /// <summary>Libellé court pour l’UI (ex. « Artiste / groupe », « Titre / thème »).</summary>
+            public readonly string CategoryLabel;
 
-            public BlindRound(string prompt, string[] choices, int correct, string sub, string audioFileBase = null, string audioUrl = null)
+            public BlindRound(string prompt, string[] choices, int correct, string sub, string audioFileBase = null, string audioUrl = null, string categoryLabel = "Blind test")
             {
                 Prompt = prompt;
                 Choices = choices;
@@ -29,6 +31,7 @@ namespace CongoGames.Core
                 SubLine = sub;
                 AudioFileBase = audioFileBase;
                 AudioUrl = audioUrl;
+                CategoryLabel = string.IsNullOrEmpty(categoryLabel) ? "Blind test" : categoryLabel;
             }
         }
 
@@ -123,8 +126,40 @@ namespace CongoGames.Core
                 new[] { "Frappant ou pinçant les lamelles", "Soufflant dans un tuyau de plomb", "Grattant une corde de violon", "Tapant sur une enclume" },
                 0,
                 "Indice : instrument à lames.",
+                "track01",
                 null,
-                null)
+                "Style / interprétation"),
+            // — Rounds musique : piste track01 / track02 + réponses plausibles (titre, artiste, style)
+            new BlindRound(
+                "D’après l’extrait, quel intitulé ou thème de titre collerait le mieux ici (démo) ?",
+                new[] { "Congo mawa / mélodie urbaine (style blind)", "Berceuse nordique 1850", "Hymne à la pizza", "Générique météo Alaska" },
+                0,
+                "Écoute l’intro : pense « titre thématique » plus que technique.",
+                "track01", null, "Titre / thème (démo)"),
+            new BlindRound(
+                "Qui collerait le plus comme « tête d’affiche » souvent associée à la rumba zaïroise (réf. culture) ?",
+                new[] { "Pépé Kallé / l’archétype de la scène (réf. populaire)", "Mozart (Salzbourg 1787)", "Shakira (Barcelone 2001 seulement)", "Ed Sheeran (ballades UK)" },
+                0,
+                "Indice : légende congolaise de la scène, pas la date exacte du morceau.",
+                "track02", null, "Artiste / icône"),
+            new BlindRound(
+                "Quel groupe a marqué longtemps la scène zaïr/congo avec Wenge et les danseurs en avant ?",
+                new[] { "Wenge Musica / Maison Mère (réf. culture)", "The Beatles (Liverpool)", "BTS (Séoul)", "Metallica (Bay Area)" },
+                0,
+                "Indice : orchestre et danses, pas rock métal.",
+                "track01", null, "Groupe / orchestre"),
+            new BlindRound(
+                "Quel type de thème de morceau est le plus proche d’un air « ndombolo / club Brazza » (démo) ?",
+                new[] { "Basse lourde + refrain chanté, club / ndombolo", "Messe grégorienne a cappella", "Symphonie classique 4 mouvements", "Jingle pub dentifrice" },
+                0,
+                "Pense rythme et ambiance live TikTok, pas l’orchestration symphonique.",
+                "track02", null, "Style / genre"),
+            new BlindRound(
+                "Si l’extrait rappelait un « classique congolais » côté mélodies douces, on pencherait plutôt pour…",
+                new[] { "Rumba mélodique (ballade) type souvenirs congolais", "Techno hardcore 200 BPM", "Polka bavaroise seule", "Cours de boucherie (ASMR)" },
+                0,
+                "Indice : mélopée et guitare, plutôt que boucherie.",
+                "track01", null, "Ambiance / timbre")
         };
 
         private static readonly Queue<int> BlindOrder = new Queue<int>();
@@ -169,7 +204,10 @@ namespace CongoGames.Core
             new ImageGuessRound("Couleur au centre du drapeau (entre vert et rouge) ?", "JAUNE", 1505, "drapeau"),
             new ImageGuessRound("Parc du nord connu pour la forêt et les gorilles (un mot) ?", "NOUABALE", 1606, "parc"),
             new ImageGuessRound("Océan à l’ouest du pays ?", "ATLANTIQUE", 1707, null),
-            new ImageGuessRound("Région sèche au sud du pays (nom court) ?", "POOL", 1808, null)
+            new ImageGuessRound("Région sèche au sud du pays (nom court) ?", "POOL", 1808, null),
+            new ImageGuessRound("Département du nord, forêts et eaux (un mot) ?", "LIKOUALA", 1909, null),
+            new ImageGuessRound("Département du nord, rivières Sanga, forêts (un mot) ?", "SANGHA", 2010, null),
+            new ImageGuessRound("Danse de hanches célèbre, nom court, souvent sur TikTok au Congo ?", "NDOMBOLO", 2212, null)
         };
 
         private static readonly Queue<int> ImageGuessOrder = new Queue<int>();
@@ -250,7 +288,7 @@ namespace CongoGames.Core
                 if (order[k] == r.CorrectIndex) newCorrect = k;
             }
 
-            return new BlindRound(r.Prompt, o, newCorrect, r.SubLine, r.AudioFileBase, r.AudioUrl);
+            return new BlindRound(r.Prompt, o, newCorrect, r.SubLine, r.AudioFileBase, r.AudioUrl, r.CategoryLabel);
         }
 
         private static void RefillBlind()

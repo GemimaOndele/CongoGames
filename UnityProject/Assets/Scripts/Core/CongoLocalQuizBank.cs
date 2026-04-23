@@ -92,7 +92,15 @@ namespace CongoGames.Core
             T("La République du Congo a accédé à l’indépendance vis-à-vis de …", "La France (1960)", "Le Portugal (1822)", "Le Royaume-Uni (1776)", "L’Italie (1861)", 0, "histoire"),
             T("Quel océan borde Pointe-Noire ?", "Atlantique", "Indien", "Arctique", "Pacifique", 0, "géographie"),
             T("Le kwanga est surtout …", "Un aliment à base de manioc", "Un instrument à vent métallique", "Une danse bretonne", "Un jeu de cartes", 0, "culture"),
-            T("Parmi ces danses, laquelle est liée au Congo dans l’imaginaire populaire ?", "Ndombolo / mouvements de hanches", "Flamenco seul", "Polka alpine", "Claquettes irlandaises", 0, "musique")
+            T("Parmi ces danses, laquelle est liée au Congo dans l’imaginaire populaire ?", "Ndombolo / mouvements de hanches", "Flamenco seul", "Polka alpine", "Claquettes irlandaises", 0, "musique"),
+            T("En blind test, on demande en général de deviner le … (plusieurs bons) ?", "Titre, l’artiste/groupe, ou le style", "Soleil, la lune, la marée seuls", "Prix d’un billet d’avion", "N° de châssis du micro", 0, "musique"),
+            T("Un « orchestre à guitares » (soukous / rumba) met souvent en avant …", "Solo de guitare et chœurs", "Seulement de la flûte à bec", "Machine à café", "Chariot de golf", 0, "musique"),
+            T("La « seben » (fin de morceau, solo, danse) est surtout associée à …", "L’enchaînement final des parties africaines pop", "Le 1er mouvement d’un requiem", "Le silence de 10 minutes", "Un match de snooker", 0, "musique"),
+            T("Pour animer un live sur TikTok avec du Congo, on privilégie souvent …", "BPM souples, rythme dansant, titres mémorables", "Bruit blanc 20 min", "Opéra wagnérien intégral", "Conférence sur les impôts", 0, "musique"),
+            T("Pointe-Noire surnommée en partie pour … ?", "Pétrole, port, océan", "Fêtes vénitiennes de la neige", "Forêt tropicale pure sans côte", "Volcan actif 4000 m", 0, "géographie"),
+            T("Le département de la Cuvette est surtout plutôt …", "Forêts et zones humides intérieures", "Désert de glace", "Pôle industriel siderurgique alpin", "Archipel de 200 îles", 0, "géographie"),
+            T("« Pool » côté populaire : on parle souvent du …", "Bassin autour de Brazzaville", "Océan Indien seul", "Désert d’Atacama", "Canal de Suez", 0, "géographie"),
+            T("Un plat à base de feuille de manioc cuite : gombo / … ?", "Légumes locaux, sauce, accompagnement", "Sashimi de saumon norvégien", "Raclette végétalienne de ski", "Smoothie ananas uniquement", 0, "culture")
         };
 
         private static readonly Queue<int> DrawQueue = new Queue<int>();
