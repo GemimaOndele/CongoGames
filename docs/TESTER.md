@@ -2,6 +2,8 @@
 
 Ce guide finalise le flux **backend + WebSocket + TTS + Unity** décrit dans le README.
 
+**Unity — cache `Library`, premier lancement, ordre des étapes** : voir le guide dédié [UNITY_LIBRARY_AND_LAUNCH.md](UNITY_LIBRARY_AND_LAUNCH.md).
+
 ## 0. Tester en local **sans** TikTok
 
 Tu n’as **pas** besoin d’un live TikTok pour valider le jeu.
