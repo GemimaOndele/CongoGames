@@ -1,11 +1,19 @@
 {
   "cooldownMs": 8000,
-  "maxTriggersPerRound": 3,
+  "maxTriggersPerRound": 6,
   "gifts": {
-    "Rose": { "type": "points", "value": 50 },
-    "Finger Heart": { "type": "points", "value": 100 },
-    "Lion": { "type": "multiplier", "value": 2, "durationSec": 20 },
-    "Galaxy": { "type": "battle", "value": "randomTop2" },
-    "Universe": { "type": "bonusRound", "value": 1 }
+    "Rose": { "type": "points", "value": 50, "gameMode": "quiz" },
+    "Finger Heart": { "type": "points", "value": 100, "gameMode": "semantic" },
+    "Heart": { "type": "points", "value": 80, "gameMode": "word-scramble" },
+    "TikTok": { "type": "points", "value": 120, "gameMode": "blind-test" },
+    "Doughnut": { "type": "points", "value": 40, "gameMode": "mystery-word" },
+    "Confetti": { "type": "points", "value": 60, "gameMode": "memory" },
+    "Ice Cream Cone": { "type": "points", "value": 35, "gameMode": "image-guess" },
+    "GG": { "type": "points", "value": 45, "gameMode": "quiz" },
+    "Lion": { "type": "multiplier", "value": 2, "durationSec": 20, "gameMode": "semantic" },
+    "Galaxy": { "type": "battle", "value": 1, "gameMode": "crossword-lite" },
+    "Universe": { "type": "bonusRound", "value": 1, "gameMode": "speed-chrono" },
+    "Castle": { "type": "multiplier", "value": 3, "durationSec": 15, "gameMode": "word-scramble" },
+    "Fire": { "type": "points", "value": 150, "gameMode": "blind-test" }
   }
 }

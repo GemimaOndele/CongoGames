@@ -50,7 +50,8 @@ app.post("/events/gift", (req, res) => {
     accepted: Boolean(resolved.accepted),
     action: resolved.action || "",
     value: resolved.value || 0,
-    durationSec: resolved.durationSec || 0
+    durationSec: resolved.durationSec || 0,
+    gameMode: resolved.gameMode || ""
   };
   pushEvent("gift", payload);
   res.json({ ok: true, resolved: payload });

@@ -28,7 +28,6 @@ namespace CongoGames.Core
         public void SetQuestion(LiveQuestion question)
         {
             CurrentQuestion = question;
-            Debug.Log("New question: " + question?.question);
         }
 
         public bool ValidateAnswer(string answer)

@@ -1,0 +1,16 @@
+{
+  "entries": [
+    {
+      "modeId": "_global",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    },
+    {
+      "modeId": "quiz",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    }
+  ]
+}

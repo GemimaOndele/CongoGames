@@ -8,6 +8,8 @@ import { WebSocketServer } from "ws";
 import { GiftEngine } from "./services/giftEngine.js";
 import { QuestionGenerator } from "./services/questionGenerator.js";
 import { TikTokLiveBridge } from "./services/tiktokLiveBridge.js";
+import { isTtsConfigured, synthesizeToAudioBase64, isElevenLabsReady } from "./services/ttsService.js";
+import { isOpenAiSpeechReady } from "./services/openAiSpeechService.js";
 import { MessageType, createMessage } from "./protocol/messages.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,6 +17,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const PORT = Number(process.env.PORT || 3000);
 const WS_PORT = Number(process.env.WS_PORT || 8080);
@@ -106,11 +109,80 @@ function broadcast(type, payload) {
 }
 
 activeWss.on("connection", (ws) => {
-  ws.send(createMessage(MessageType.SYSTEM, { ok: true, text: "CongoGames WS connected" }));
+  ws.send(
+    createMessage(MessageType.SYSTEM, {
+      ok: true,
+      text: "CongoGames WS connected",
+      httpPort: boundHttpPort,
+      httpApiBase: process.env.PUBLIC_HTTP_BASE || ""
+    })
+  );
+});
+
+app.get("/", (_req, res) => {
+  res.type("html").send(`<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"/><title>CongoGames API</title>
+<style>body{font-family:system-ui,sans-serif;max-width:42rem;margin:2rem auto;padding:0 1rem;line-height:1.5}
+code{background:#f0f0f0;padding:2px 6px;border-radius:4px}a{color:#0a6}</style></head>
+<body>
+<h1>CongoGames — backend</h1>
+<p>Le serveur tourne. Il n’y a pas de page web de jeu ici : c’est une <strong>API</strong> pour Unity et les scripts.</p>
+<ul>
+<li><a href="/health"><code>/health</code></a> — ports HTTP / WS + TTS</li>
+<li><a href="/tts/status"><code>/tts/status</code></a> — TTS (OpenAI ou ElevenLabs) configuré ?</li>
+<li><code>POST /tts</code> — formulaire <code>text=…</code> (Unity)</li>
+<li><code>POST /events/chat</code>, <code>POST /events/gift</code>, <code>POST /question/generate</code></li>
+</ul>
+<p><strong>Ports actuels :</strong> HTTP <code>${boundHttpPort}</code>, WebSocket <code>${activeWsPort}</code></p>
+</body></html>`);
 });
 
 app.get("/health", (_req, res) => {
-  res.json({ ok: true, service: "congogames-backend" });
+  res.json({
+    ok: true,
+    service: "congogames-backend",
+    httpPort: boundHttpPort,
+    wsPort: activeWsPort,
+    ttsEnabled: isTtsConfigured()
+  });
+});
+
+app.get("/tts/status", (_req, res) => {
+  res.json({
+    ok: true,
+    enabled: isTtsConfigured(),
+    elevenLabs: isElevenLabsReady(),
+    openAi: isOpenAiSpeechReady()
+  });
+});
+
+app.post("/tts", async (req, res) => {
+  const text = req.body?.text ?? req.body?.message;
+  if (!text || typeof text !== "string") {
+    return res.status(400).json({ ok: false, error: "text (string) requis" });
+  }
+  if (!isTtsConfigured()) {
+    return res.status(503).json({
+      ok: false,
+      error:
+        "TTS non configuré : ajoute OPENAI_API_KEY (recommandé) ou ELEVENLABS_API_KEY + ELEVENLABS_VOICE_ID dans .env"
+    });
+  }
+  try {
+    const preferPcm = String(req.body?.prefer_pcm ?? "1") !== "0";
+    const audio = await synthesizeToAudioBase64(text, { preferPcm });
+    res.json({ ok: true, ...audio });
+  } catch (err) {
+    const status = Number(err?.status ?? err?.response?.status);
+    const httpStatus = status === 429 || status === 401 || status === 403 ? status : 502;
+    const message = err?.message || "tts_error";
+    console.error("[tts] POST /tts:", message);
+    res.status(httpStatus).json({
+      ok: false,
+      error: message,
+      code: status === 429 ? "openai_quota" : undefined
+    });
+  }
 });
 
 app.get("/metrics", (_req, res) => {
@@ -140,7 +212,8 @@ app.post("/events/gift", (req, res) => {
     accepted: Boolean(resolved.accepted),
     action: resolved.action || "",
     value: resolved.value || 0,
-    durationSec: resolved.durationSec || 0
+    durationSec: resolved.durationSec || 0,
+    gameMode: resolved.gameMode || ""
   };
   pushEvent(MessageType.GIFT, payload);
   broadcast(MessageType.GIFT, payload);
@@ -217,7 +290,8 @@ tiktokBridge.on("gift", (payload) => {
     accepted: Boolean(resolved.accepted),
     action: resolved.action || "",
     value: resolved.value || 0,
-    durationSec: resolved.durationSec || 0
+    durationSec: resolved.durationSec || 0,
+    gameMode: resolved.gameMode || ""
   };
   pushEvent(MessageType.GIFT, enriched);
   broadcast(MessageType.GIFT, enriched);

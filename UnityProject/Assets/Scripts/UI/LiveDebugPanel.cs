@@ -27,7 +27,7 @@ namespace CongoGames.UI
         {
             if (liveClient == null)
             {
-                liveClient = FindObjectOfType<LiveEventClient>();
+                liveClient = FindAnyObjectByType<LiveEventClient>();
             }
         }
 

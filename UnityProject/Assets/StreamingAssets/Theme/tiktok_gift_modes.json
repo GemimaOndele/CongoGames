@@ -1,0 +1,17 @@
+{
+  "mappings": [
+    { "tiktokGiftName": "Rose", "modeId": "quiz" },
+    { "tiktokGiftName": "Finger Heart", "modeId": "semantic" },
+    { "tiktokGiftName": "Heart", "modeId": "word-scramble" },
+    { "tiktokGiftName": "TikTok", "modeId": "blind-test" },
+    { "tiktokGiftName": "Doughnut", "modeId": "mystery-word" },
+    { "tiktokGiftName": "Confetti", "modeId": "memory" },
+    { "tiktokGiftName": "Ice Cream Cone", "modeId": "image-guess" },
+    { "tiktokGiftName": "GG", "modeId": "quiz" },
+    { "tiktokGiftName": "Lion", "modeId": "semantic" },
+    { "tiktokGiftName": "Galaxy", "modeId": "crossword-lite" },
+    { "tiktokGiftName": "Universe", "modeId": "speed-chrono" },
+    { "tiktokGiftName": "Castle", "modeId": "word-scramble" },
+    { "tiktokGiftName": "Fire", "modeId": "blind-test" }
+  ]
+}

@@ -3,10 +3,10 @@ import OpenAI from "openai";
 const fallbackQuestion = {
   category: "history",
   difficulty: "easy",
-  question: "Quelle est la capitale de la Republique du Congo ?",
+  question: "Quelle est la capitale du Congo ?",
   options: ["Pointe-Noire", "Brazzaville", "Dolisie", "Owando"],
   correctAnswer: "B",
-  explanation: "La capitale officielle de la Republique du Congo est Brazzaville."
+  explanation: "La capitale du Congo est Brazzaville."
 };
 
 export class QuestionGenerator {
@@ -19,7 +19,7 @@ export class QuestionGenerator {
     if (!this.enabled) return fallbackQuestion;
 
     const systemPrompt =
-      "You are a quiz generator for Republic of the Congo. Return strict JSON only.";
+      "You are a quiz generator for Congo (Brazzaville). Say Congo, not 'Republic of the Congo' in question wording. Return strict JSON only.";
     const userPrompt = `Generate one multiple-choice question in ${language} with this schema:
 {
   "category": "history|geography|music|science|culture|languages|people",

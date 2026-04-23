@@ -1,0 +1,1 @@
+Blind test: place .ogg/.mp3/.wav in Theme/BlindTest/ or Theme/ (see MiniGameDemoBanks BlindRound AudioFileBase, AudioUrl).

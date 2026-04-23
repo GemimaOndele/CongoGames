@@ -1,0 +1,17 @@
+Devine l’image — images optionnelles (PNG ou JPEG)
+==================================================
+
+Place les fichiers ici : UnityProject/Assets/StreamingAssets/Theme/ImageGuess/
+
+Noms attendus par la banque (sans extension, le code essaie .png puis .jpg puis .jpeg) :
+
+  brazzaville
+  pointe_noire
+  fleuve_congo
+  gorille
+  drapeau
+  parc
+
+Si un fichier est absent pour une manche, une image de secours est générée automatiquement (ciel + silhouette).
+
+Après ajout ou modification des fichiers, relance le jeu (Play) pour recharger.
