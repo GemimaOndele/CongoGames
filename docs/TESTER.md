@@ -6,6 +6,8 @@ Ce guide finalise le flux **backend + WebSocket + TTS + Unity** décrit dans le 
 
 **Play bloqué (0 erreur dans la Console, message « compiler errors… ») — version d’éditeur, `csc.rsp`, `Editor.log`, nettoyage `Library` :** [UNITY_TROUBLESHOOTING_PLAY.md](UNITY_TROUBLESHOOTING_PLAY.md).
 
+- **Chrono vitesse** : en mode *speed-chrono*, un compte à rebours 3-2-1 indique d’appuyer sur **1, 2, 3 ou 4** (clavier ou pavé) selon la cible affichée ; 3 vagues, score + bonus vitesse, puis passage auto au mode suivant. En **live** le timer principal continue parallèlement.
+
 ## 0. Tester en local **sans** TikTok
 
 Tu n’as **pas** besoin d’un live TikTok pour valider le jeu.

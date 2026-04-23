@@ -244,6 +244,10 @@ namespace CongoGames.Core
             bottomStrip?.ApplyGameMode("quiz");
 
             BuildSplashOverlay(canvasGo.transform, font);
+
+            GameObject roundVfx = new GameObject("RoundVictoryOverlay");
+            roundVfx.transform.SetParent(canvasGo.transform, false);
+            roundVfx.AddComponent<RoundVictoryOverlay>();
         }
 
         /// <summary>
@@ -287,7 +291,7 @@ namespace CongoGames.Core
             barImg.sprite = GetWhiteSprite();
             barImg.color = new Color(0f, 0.55f, 0.24f, 1f);
 
-            splash.AddComponent<BootstrapSplash>();
+            splash.AddComponent<IntroSplashController>();
         }
 
         private static Text CreateQuestionBody(Transform parent, Font font)

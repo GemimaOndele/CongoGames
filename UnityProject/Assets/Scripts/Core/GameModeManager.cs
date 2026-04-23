@@ -54,6 +54,9 @@ namespace CongoGames.Core
         private float displayedRoundDuration;
         private Coroutine scheduleNextCo;
 
+        /// <summary>Arg1 = mode quitté (vide si premier lancement), Arg2 = mode entrant — pour brefs overlays de transition.</summary>
+        public event Action<string, string> OnModeTransition;
+
         public float RoundDuration => displayedRoundDuration;
         public float RoundTimeRemaining => Mathf.Max(0f, timer);
 
@@ -188,6 +191,7 @@ namespace CongoGames.Core
                 scheduleNextCo = null;
             }
 
+            string fromId = activeMode != null ? activeMode.ModeId : "";
             activeMode?.End();
             activeMode = mode;
             float blockDuration = string.Equals(modeId, "quiz", StringComparison.OrdinalIgnoreCase)
@@ -198,6 +202,17 @@ namespace CongoGames.Core
             ModeSurfaceController.Instance?.Apply(modeId);
             activeMode.Begin();
             ThemeRuntime.NotifyModeStarted(modeId);
+            if (!string.IsNullOrEmpty(fromId) && fromId != modeId)
+            {
+                try
+                {
+                    OnModeTransition?.Invoke(fromId, modeId);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+            }
         }
 
         public void NextMode()

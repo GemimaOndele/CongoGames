@@ -42,6 +42,10 @@ namespace CongoGames.GameModes
         public void End()
         {
             GameSfxHub.Instance?.StopBlindDemoMusic();
+            if (MiniGamePanelContent.Instance != null)
+            {
+                MiniGamePanelContent.Instance.EndChronoMode();
+            }
         }
     }
 
@@ -66,9 +70,17 @@ namespace CongoGames.GameModes
     public class SpeedChronoMode : MonoBehaviour, IGameMode
     {
         public string ModeId => "speed-chrono";
-        public void Begin() { }
+
+        public void Begin()
+        {
+            if (MiniGamePanelContent.Instance != null)
+            {
+                MiniGamePanelContent.Instance.EnsureChronoIfNeeded();
+            }
+        }
 
         public void Tick(float deltaTime) { }
+
         public void End() { }
     }
 

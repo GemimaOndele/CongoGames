@@ -15,6 +15,8 @@ namespace CongoGames.Presentation
     [RequireComponent(typeof(ModeSurfaceController))]
     public class MiniGamePanelContent : MonoBehaviour
     {
+        public static MiniGamePanelContent Instance { get; private set; }
+
         private const int CrosswordCols = 7;
         private const int CrosswordTotalCells = CrosswordCols * CrosswordCols;
         private const float CrosswordCellPx = 48f;
@@ -90,6 +92,20 @@ namespace CongoGames.Presentation
         private bool secondaryPanelsEnsured;
         private int suppressGridTapUntilFrame;
 
+        private const int ChronoRoundsPerSession = 3;
+        private int chronoSessionRound;
+        private int chronoSessionScore;
+        private int chronoTargetSlot;
+        private float chronoStateUntil;
+        private int chronoPhase; // 0=countdown, 1=play, 2=round flash, 3=session end
+        private bool chronoModeActive;
+        private int chronoStreak;
+        private string chronoResultFlash;
+        private float chronoPlayWindowSec;
+        private int chronoRoundInSession; // 1..ChronoRoundsPerSession
+        private int chronoLastRoundPoints;
+        private int chronoCountdownIndex;
+
         private static void MaybeAdvanceMiniGameAfterResponse()
         {
             GameModeManager.Instance?.ScheduleNextMode(0.45f);
@@ -128,6 +144,11 @@ namespace CongoGames.Presentation
             if (bg != null) bg.color = new Color(0.32f, 0.38f, 0.48f, 1f);
         }
 
+        private void Awake()
+        {
+            Instance = this;
+        }
+
         private void OnEnable()
         {
             EnsureGridsIfMissing();
@@ -145,6 +166,8 @@ namespace CongoGames.Presentation
                 StopCoroutine(blindEmojiPulseCo);
                 blindEmojiPulseCo = null;
             }
+
+            if (Instance == this) Instance = null;
         }
 
         /// <summary>
@@ -169,9 +192,12 @@ namespace CongoGames.Presentation
             surf.Apply(surf.CurrentModeId);
         }
 
-        [Header("Chrono")]
+        [Header("Chrono vitesse (réaction)")]
         public Text chronoTitle;
         public Text chronoBig;
+        public Text chronoSub;
+        [Tooltip("Optionnel (créé au besoin) : numéro de bille / vague.")]
+        public Text chronoMeta;
 
         [Header("Image")]
         public Text imageTitle;
@@ -211,6 +237,11 @@ namespace CongoGames.Presentation
 
         public void Populate(string modeId)
         {
+            if (!string.Equals(modeId, "speed-chrono", StringComparison.OrdinalIgnoreCase))
+            {
+                chronoModeActive = false;
+            }
+
             switch (modeId)
             {
                 case "quiz":
@@ -878,24 +909,252 @@ namespace CongoGames.Presentation
 
         private void ApplyChronoDemo()
         {
-            if (chronoTitle != null) chronoTitle.text = "Chrono vitesse";
-            if (chronoBig != null)
+            EnsureChronoSubMeta();
+            chronoModeActive = true;
+            chronoSessionScore = 0;
+            chronoStreak = 0;
+            chronoRoundInSession = 0;
+            if (chronoTitle != null) chronoTitle.text = "Chrono vitesse — 3 vagues (réagis vite)";
+
+            StartChronoNewRound(1);
+        }
+
+        public void StartChronoNewRound(int roundN)
+        {
+            chronoModeActive = true;
+            chronoRoundInSession = Mathf.Clamp(roundN, 1, ChronoRoundsPerSession);
+            chronoTargetSlot = UnityEngine.Random.Range(0, 4);
+            chronoPlayWindowSec = 1.2f + (chronoRoundInSession * 0.12f) - (chronoStreak * 0.04f);
+            chronoPlayWindowSec = Mathf.Clamp(chronoPlayWindowSec, 0.7f, 1.6f);
+            chronoResultFlash = null;
+            chronoPhase = 0;
+            chronoCountdownIndex = 0;
+            chronoStateUntil = Time.unscaledTime + 0.5f;
+            if (chronoMeta != null)
             {
-                float t = Time.realtimeSinceStartup % 60f;
-                chronoBig.text = string.Format("{0:00}:{1:00}", Mathf.FloorToInt(t) / 60, Mathf.FloorToInt(t) % 60);
+                chronoMeta.text = "Manche " + chronoRoundInSession + " / " + ChronoRoundsPerSession
+                    + "  ·  Session " + chronoSessionScore + " pts";
+            }
+        }
+
+        public void OnChronoInput(int slot) // 0..3, ou <0 = temps écoulé
+        {
+            if (!chronoModeActive || chronoPhase != 1) return;
+            if (slot > 3) return;
+            bool timeUp = (slot < 0);
+            if (timeUp)
+            {
+                chronoStreak = 0;
+                chronoLastRoundPoints = 0;
+                chronoResultFlash = "Temps ! c’était " + (1 + chronoTargetSlot) + " / 4 (touche 1–4).";
+                GameSfxHub.Instance?.PlayResult(false);
+                chronoPhase = 2;
+                chronoStateUntil = Time.unscaledTime + 0.8f;
+                return;
+            }
+
+            bool hit = (slot == chronoTargetSlot);
+            float tLeft = Mathf.Max(0f, chronoStateUntil - Time.unscaledTime);
+            int speedBonus = hit ? Mathf.FloorToInt(tLeft / chronoPlayWindowSec * 18f) : 0;
+            chronoLastRoundPoints = 0;
+            if (hit)
+            {
+                chronoStreak++;
+                chronoLastRoundPoints = 20 + (chronoStreak * 2) + speedBonus;
+                chronoSessionScore += chronoLastRoundPoints;
+                if (ScoreManager.Instance != null)
+                {
+                    ScoreManager.Instance.AddPoints("joueur_local", chronoLastRoundPoints);
+                }
+            }
+            else
+            {
+                chronoStreak = 0;
+            }
+
+            if (hit)
+            {
+                GameSfxHub.Instance?.PlayResult(true);
+                chronoResultFlash = "Touché ! +" + chronoLastRoundPoints
+                    + (speedBonus > 0 ? " (bonus vitesse)" : "");
+            }
+            else
+            {
+                GameSfxHub.Instance?.PlayResult(false);
+                chronoResultFlash = "Raté ! c’était " + (1 + chronoTargetSlot) + " / 4";
+            }
+
+            chronoPhase = 2;
+            chronoStateUntil = Time.unscaledTime + 0.7f;
+        }
+
+        private void ChronoEndSession()
+        {
+            chronoModeActive = false;
+            if (chronoTitle != null) chronoTitle.text = "Chrono vitesse — fin !";
+            if (chronoSub != null) chronoSub.text = "Total de la manche chrono : " + chronoSessionScore + " pts. Enchaînement auto…";
+            if (chronoBig != null) chronoBig.text = "★ " + chronoSessionScore;
+            if (chronoMeta != null) chronoMeta.text = "Touches 1–4 : réagir vite à la cible 1/4. Score live = classement en haut.";
+            chronoPhase = 3;
+            chronoStateUntil = Time.unscaledTime + 0.5f;
+            GameModeManager.Instance?.ScheduleNextMode(1.4f);
+        }
+
+        public void ChronoUpdateUi()
+        {
+            if (!chronoModeActive || chronoBig == null) return;
+            if (chronoSub == null) EnsureChronoSubMeta();
+            if (chronoSub == null) return;
+            if (chronoPhase == 0)
+            {
+                if (chronoCountdownIndex < 3)
+                {
+                    chronoBig.text = (3 - chronoCountdownIndex).ToString();
+                }
+                else if (chronoCountdownIndex == 3)
+                {
+                    chronoBig.text = "GO !";
+                }
+                else
+                {
+                    chronoBig.text = "3";
+                }
+
+                chronoSub.text = "Cible cachée = touche " + (1 + chronoTargetSlot) + " / 4. Compte 3-2-1 puis chrono. Touches 1–4.";
+            }
+            else if (chronoPhase == 1)
+            {
+                float tLeft = Mathf.Max(0f, chronoStateUntil - Time.unscaledTime);
+                chronoBig.text = string.Format("{0:00.00}", tLeft);
+                chronoSub.text = "PRESSE " + (1 + chronoTargetSlot) + " — " + tLeft.ToString("0.00") + " s";
+            }
+            else if (chronoPhase == 2)
+            {
+                if (chronoSub != null && !string.IsNullOrEmpty(chronoResultFlash))
+                {
+                    chronoSub.text = chronoResultFlash;
+                }
+            }
+        }
+
+        public void EnsureChronoIfNeeded()
+        {
+            EnsureChronoSubMeta();
+        }
+
+        public void EndChronoMode()
+        {
+            if (!chronoModeActive) return;
+            chronoModeActive = false;
+        }
+
+        private void EnsureChronoSubMeta()
+        {
+            if (chronoSub != null && chronoMeta != null) return;
+            Transform host = chronoTitle != null ? chronoTitle.transform.parent : null;
+            if (host == null) return;
+            Font font = chronoTitle != null
+                ? chronoTitle.font
+                : (Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")
+                    ?? Resources.GetBuiltinResource<Font>("Arial.ttf"));
+            if (chronoSub == null)
+            {
+                GameObject sgo = new GameObject("ChronoSub");
+                sgo.transform.SetParent(host, false);
+                RectTransform srt = sgo.AddComponent<RectTransform>();
+                srt.anchorMin = new Vector2(0.5f, 0.5f);
+                srt.anchorMax = new Vector2(0.5f, 0.5f);
+                srt.pivot = new Vector2(0.5f, 0.5f);
+                srt.anchoredPosition = new Vector2(0f, 44f);
+                srt.sizeDelta = new Vector2(880f, 72f);
+                Text t = sgo.AddComponent<Text>();
+                t.font = font;
+                t.fontSize = 22;
+                t.alignment = TextAnchor.MiddleCenter;
+                t.color = new Color(0.9f, 0.9f, 0.88f, 0.95f);
+                t.raycastTarget = false;
+                chronoSub = t;
+            }
+
+            if (chronoMeta == null)
+            {
+                GameObject mgo = new GameObject("ChronoMeta");
+                mgo.transform.SetParent(host, false);
+                RectTransform mrt = mgo.AddComponent<RectTransform>();
+                mrt.anchorMin = new Vector2(0.5f, 0.5f);
+                mrt.anchorMax = new Vector2(0.5f, 0.5f);
+                mrt.pivot = new Vector2(0.5f, 0.5f);
+                mrt.anchoredPosition = new Vector2(0f, -52f);
+                mrt.sizeDelta = new Vector2(880f, 40f);
+                Text t = mgo.AddComponent<Text>();
+                t.font = font;
+                t.fontSize = 18;
+                t.alignment = TextAnchor.MiddleCenter;
+                t.color = new Color(0.7f, 0.9f, 0.7f, 0.9f);
+                t.raycastTarget = false;
+                chronoMeta = t;
             }
         }
 
         private void Update()
         {
-            if (chronoBig != null && chronoBig.gameObject.activeInHierarchy)
+            if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1)) OnChronoInput(0);
+            else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2)) OnChronoInput(1);
+            else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3)) OnChronoInput(2);
+            else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4)) OnChronoInput(3);
+
+            ChronoTick();
+        }
+
+        private void ChronoTick()
+        {
+            if (!chronoModeActive) return;
+            if (Time.unscaledTime < chronoStateUntil)
             {
-                float t = Time.realtimeSinceStartup;
-                chronoBig.text = string.Format(
-                    "{0:00}:{1:00}.{2:0}",
-                    Mathf.FloorToInt(t) / 60,
-                    Mathf.FloorToInt(t) % 60,
-                    Mathf.FloorToInt((t % 1f) * 10f));
+                ChronoUpdateUi();
+                return;
+            }
+
+            if (chronoPhase == 0)
+            {
+                chronoCountdownIndex++;
+                if (chronoCountdownIndex <= 2)
+                {
+                    chronoStateUntil = Time.unscaledTime + 0.42f;
+                }
+                else if (chronoCountdownIndex == 3)
+                {
+                    chronoStateUntil = Time.unscaledTime + 0.3f;
+                }
+                else
+                {
+                    chronoPhase = 1;
+                    chronoStateUntil = Time.unscaledTime + chronoPlayWindowSec;
+                }
+
+                ChronoUpdateUi();
+                return;
+            }
+
+            if (chronoPhase == 1)
+            {
+                OnChronoInput(-1);
+                ChronoUpdateUi();
+                return;
+            }
+
+            if (chronoPhase == 2)
+            {
+                if (chronoRoundInSession < ChronoRoundsPerSession)
+                {
+                    StartChronoNewRound(chronoRoundInSession + 1);
+                }
+                else
+                {
+                    ChronoEndSession();
+                }
+
+                ChronoUpdateUi();
             }
         }
 
