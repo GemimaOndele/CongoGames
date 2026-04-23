@@ -134,11 +134,23 @@ Depuis la racine:
 npm run start-all
 ```
 
+Modes:
+
+- `npm run start-all` : mode test local (TikTok bridge desactive)
+- `npm run start-all:live` : mode live TikTok (bridge actif)
+- `npm run start-all:prod` : mode production backend
+
 Ou sous PowerShell:
 
 ```powershell
 .\start-all.ps1 -Mode dev
 ```
+
+PowerShell:
+
+- `.\start-all.ps1 -Mode dev` -> test local sans TikTok
+- `.\start-all.ps1 -Mode live` -> connexion TikTok active
+- `.\start-all.ps1 -Mode prod` -> backend start standard
 
 ## Verification production (1 commande)
 

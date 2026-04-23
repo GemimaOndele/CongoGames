@@ -3,7 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "start-all": "npm --prefix Backend run dev",
+    "start-all": "set TIKTOK_BRIDGE_ENABLED=false&& npm --prefix Backend run dev",
+    "start-all:live": "set TIKTOK_BRIDGE_ENABLED=true&& npm --prefix Backend run dev",
     "start-all:prod": "npm --prefix Backend run start",
     "test:cloud": "node scripts/test-cloud.mjs",
     "smoke:live": "node scripts/smoke-test-live.mjs"

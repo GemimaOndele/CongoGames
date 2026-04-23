@@ -1,5 +1,5 @@
 param(
-  [ValidateSet("dev", "prod")]
+  [ValidateSet("dev", "live", "prod")]
   [string]$Mode = "dev"
 )
 
@@ -8,6 +8,10 @@ Set-Location "$PSScriptRoot\Backend"
 
 if ($Mode -eq "prod") {
   npm run start
+} elseif ($Mode -eq "live") {
+  $env:TIKTOK_BRIDGE_ENABLED = "true"
+  npm run dev
 } else {
+  $env:TIKTOK_BRIDGE_ENABLED = "false"
   npm run dev
 }

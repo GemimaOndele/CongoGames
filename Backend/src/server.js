@@ -19,6 +19,7 @@ app.use(express.json());
 const PORT = Number(process.env.PORT || 3000);
 const WS_PORT = Number(process.env.WS_PORT || 8080);
 const WS_SINGLE_PORT = String(process.env.WS_SINGLE_PORT || "false").toLowerCase() === "true";
+const TIKTOK_BRIDGE_ENABLED = String(process.env.TIKTOK_BRIDGE_ENABLED ?? "true").toLowerCase() === "true";
 const tiktokUsernames = [
   ...(process.env.TIKTOK_USERNAMES || "").split(","),
   process.env.TIKTOK_USERNAME || ""
@@ -193,7 +194,16 @@ async function connectTikTokWithRetry() {
   setTimeout(connectTikTokWithRetry, TIKTOK_RETRY_MS);
 }
 
-connectTikTokWithRetry();
+if (TIKTOK_BRIDGE_ENABLED) {
+  connectTikTokWithRetry();
+} else {
+  console.log("TikTok bridge disabled by TIKTOK_BRIDGE_ENABLED=false.");
+  broadcast(MessageType.SYSTEM, {
+    ok: false,
+    text: "TikTok bridge disabled (local test mode).",
+    source: "tiktok-bridge"
+  });
+}
 
 tiktokBridge.on("chat", (payload) => {
   pushEvent(MessageType.CHAT, payload);
