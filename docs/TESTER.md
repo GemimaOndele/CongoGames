@@ -4,6 +4,8 @@ Ce guide finalise le flux **backend + WebSocket + TTS + Unity** décrit dans le 
 
 **Unity — cache `Library`, premier lancement, ordre des étapes** : voir le guide dédié [UNITY_LIBRARY_AND_LAUNCH.md](UNITY_LIBRARY_AND_LAUNCH.md).
 
+**Play bloqué (0 erreur dans la Console, message « compiler errors… ») — version d’éditeur, `csc.rsp`, `Editor.log`, nettoyage `Library` :** [UNITY_TROUBLESHOOTING_PLAY.md](UNITY_TROUBLESHOOTING_PLAY.md).
+
 ## 0. Tester en local **sans** TikTok
 
 Tu n’as **pas** besoin d’un live TikTok pour valider le jeu.
