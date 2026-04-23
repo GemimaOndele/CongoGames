@@ -166,6 +166,24 @@ Le test valide:
 - WS cloud (connexion + reception d'au moins un message)
 - Flux d'evenement minimal live
 
+## Demo automatique (sans TikTok live)
+
+Pour voir le jeu bouger tout de suite sans attendre un live TikTok:
+
+1. Lancer le backend local:
+
+```bash
+npm run start-all
+```
+
+1. Dans un second terminal:
+
+```bash
+npm run demo:local
+```
+
+Ce script envoie 20 evenements (questions, chats, gifts, battle trigger) et anime l'UI en direct.
+
 ## Notes performance
 
 - Object pooling pour effets/UI repetitifs
