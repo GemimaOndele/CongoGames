@@ -33,6 +33,8 @@ CongoGames est un jeu live interactif concu pour TikTok Live, centre sur la cult
 - `Backend/` : serveur live Node.js (WebSocket + events TikTok)
 - `docs/` : documentation produit et technique
 
+**Branche à utiliser : `master` uniquement.** Tout le code utile s’y trouve. `git pull origin master` pour se mettre à jour. Branches `cursor/...` : anciennes PR ; contenu déjà dans `master` (vous pouvez les supprimer côté GitHub pour y voir clair, sans effet sur le projet). Rappel court : [`docs/PROJET_SIMPLE.md`](docs/PROJET_SIMPLE.md).
+
 ## Demarrage rapide
 
 Guide pas à pas (`.env`, ports, Unity, dépannage) : **`docs/TESTER.md`**.
