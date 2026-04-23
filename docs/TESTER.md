@@ -13,7 +13,7 @@ Tu n’as **pas** besoin d’un live TikTok pour valider le jeu.
 1. **Backend** : `npm run start-all` ou `.\start-all.ps1` — par défaut **`TIKTOK_BRIDGE_ENABLED=false`** (voir `package.json`) : pas de pont TikTok, seulement HTTP + WebSocket + TTS.
 2. **Variables** : `Backend/.env` avec au minimum ce qui active le TTS / les questions (souvent `OPENAI_API_KEY`) ; `TIKTOK_USERNAME` peut rester vide pour ce parcours.
 3. **Unity** : **Play** sur une scène vide ou la tienne ; le **RuntimeBootstrap** monte le HUD si besoin.
-4. **Simulation chat / scores** : dans un second terminal, `npm run demo:local` — le script envoie des événements comme un chat de test ; tu dois voir questions, scores, TTS si le backend l’expose.
+4. **Simulation chat / scores** : dans un second terminal, `npm run demo:local` — le script envoie des événements comme un chat de test ; tu dois voir questions, scores, TTS si le backend l’expose. *(Si « fetch failed » : le script contacte d’abord `127.0.0.1` puis `localhost` sur les ports 3000–3010. Garde `npm run start-all` lancé et regarde le **port HTTP** indiqué par le log du serveur.)*
 
 Pour un flux **avec** TikTok plus tard : `npm run start-all:live` et les identifiants documentés dans `TESTER.md` / `.env.example` (hors dépôt pour les secrets).
 
