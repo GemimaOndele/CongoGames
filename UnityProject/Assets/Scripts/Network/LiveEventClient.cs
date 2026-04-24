@@ -69,6 +69,15 @@ namespace CongoGames.Network
             questionUI = ui;
         }
 
+        private void Awake()
+        {
+            WebGlCloudEndpoints.TryLoadAndApply();
+            if (!string.IsNullOrEmpty(WebGlCloudEndpoints.LoadedWsUrl))
+            {
+                wsUrl = WebGlCloudEndpoints.LoadedWsUrl;
+            }
+        }
+
         private async void Start()
         {
             cts = new CancellationTokenSource();

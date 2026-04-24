@@ -24,6 +24,18 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// WebGL / navigateur : UnityWebRequest vers l’API déployée (HTTPS) exige CORS.
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
+
+  next();
+});
+
 const PORT = Number(process.env.PORT || 3000);
 const WS_PORT = Number(process.env.WS_PORT || 8080);
 const WS_SINGLE_PORT = String(process.env.WS_SINGLE_PORT || "false").toLowerCase() === "true";

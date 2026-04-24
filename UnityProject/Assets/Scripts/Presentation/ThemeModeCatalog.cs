@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using CongoGames.Core;
 
 namespace CongoGames.Presentation
 {
@@ -39,6 +40,26 @@ namespace CongoGames.Presentation
         {
             string id = string.IsNullOrEmpty(modeId) ? "default" : modeId.Trim();
             var list = new List<string>(24);
+            if (StreamingAssetsUrl.IsWebGlData)
+            {
+                foreach (string name in BackgroundVideoFileNames)
+                {
+                    list.Add(StreamingAssetsUrl.UrlForRelativePath("Theme/" + id + "/" + name));
+                }
+
+                foreach (string name in BackgroundVideoFileNames)
+                {
+                    list.Add(StreamingAssetsUrl.UrlForRelativePath("Theme/_dev_import/" + id + "/" + name));
+                }
+
+                foreach (string name in BackgroundVideoFileNames)
+                {
+                    list.Add(StreamingAssetsUrl.UrlForRelativePath("Theme/" + name));
+                }
+
+                return list;
+            }
+
             string root = Path.Combine(Application.streamingAssetsPath, "Theme");
             foreach (string name in BackgroundVideoFileNames)
             {

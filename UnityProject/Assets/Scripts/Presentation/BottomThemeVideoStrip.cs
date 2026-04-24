@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using CongoGames.Core;
 
 namespace CongoGames.Presentation
 {
@@ -66,6 +67,7 @@ namespace CongoGames.Presentation
 
         private IEnumerator PlayUrlRoutine(string url)
         {
+            yield return WebAudioGestureGate.CoWaitForUnlock();
             yield return null;
             if (raw == null) yield break;
 

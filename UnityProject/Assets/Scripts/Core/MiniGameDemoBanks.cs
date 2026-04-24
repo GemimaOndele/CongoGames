@@ -11,6 +11,17 @@ namespace CongoGames.Core
     /// </summary>
     public static class MiniGameDemoBanks
     {
+        private static string s_blindJsonWeb;
+        private static string s_imageJsonWeb;
+
+        /// <summary>WebGL : JSON récupérés par HTTP (préchauffage), avant ouverture des fichiers disque.</summary>
+        public static void IngestWebGlDatasetsJson(string blindJson, string imageJson)
+        {
+            s_blindJsonWeb = string.IsNullOrWhiteSpace(blindJson) ? null : blindJson;
+            s_imageJsonWeb = string.IsNullOrWhiteSpace(imageJson) ? null : imageJson;
+            blindRoundsRuntime = null;
+            imageGuessRoundsRuntime = null;
+        }
         public readonly struct BlindRound
         {
             public readonly string Prompt;
@@ -313,6 +324,18 @@ namespace CongoGames.Core
                 list.Add(r);
             }
 
+            if (!string.IsNullOrWhiteSpace(s_blindJsonWeb))
+            {
+                try
+                {
+                    AppendBlindExtrasFromJsonString(list, s_blindJsonWeb);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning("minigame_blind_extras (Web) : " + e.Message);
+                }
+            }
+
             string path = Path.Combine(Application.streamingAssetsPath, "Datasets", "minigame_blind_extras.json");
             if (File.Exists(path))
             {
@@ -321,28 +344,7 @@ namespace CongoGames.Core
                     string json = File.ReadAllText(path);
                     if (!string.IsNullOrWhiteSpace(json))
                     {
-                    BlindExtrasFile f = JsonUtility.FromJson<BlindExtrasFile>(json);
-                    if (f?.items != null)
-                    {
-                    foreach (BlindJsonItem row in f.items)
-                    {
-                        if (row == null || string.IsNullOrEmpty(row.prompt)) continue;
-                        string[] c = { row.a, row.b, row.c, row.d };
-                        if (c[0] == null) c[0] = "";
-                        if (c[1] == null) c[1] = "";
-                        if (c[2] == null) c[2] = "";
-                        if (c[3] == null) c[3] = "";
-                        int cor = Mathf.Clamp(row.correctIndex, 0, 3);
-                        list.Add(new BlindRound(
-                            row.prompt,
-                            c,
-                            cor,
-                            row.subLine ?? "",
-                            row.audioFileBase,
-                            row.audioUrl,
-                            row.categoryLabel));
-                    }
-                    }
+                    AppendBlindExtrasFromJsonString(list, json);
                     }
                 }
                 catch (Exception e)
@@ -352,6 +354,39 @@ namespace CongoGames.Core
             }
 
             blindRoundsRuntime = list.ToArray();
+        }
+
+        private static void AppendBlindExtrasFromJsonString(List<BlindRound> list, string json)
+        {
+            if (string.IsNullOrWhiteSpace(json) || list == null)
+            {
+                return;
+            }
+
+            BlindExtrasFile f = JsonUtility.FromJson<BlindExtrasFile>(json);
+            if (f?.items == null)
+            {
+                return;
+            }
+
+            foreach (BlindJsonItem row in f.items)
+            {
+                if (row == null || string.IsNullOrEmpty(row.prompt)) continue;
+                string[] c = { row.a, row.b, row.c, row.d };
+                if (c[0] == null) c[0] = "";
+                if (c[1] == null) c[1] = "";
+                if (c[2] == null) c[2] = "";
+                if (c[3] == null) c[3] = "";
+                int cor = Mathf.Clamp(row.correctIndex, 0, 3);
+                list.Add(new BlindRound(
+                    row.prompt,
+                    c,
+                    cor,
+                    row.subLine ?? "",
+                    row.audioFileBase,
+                    row.audioUrl,
+                    row.categoryLabel));
+            }
         }
 
         private static ImageGuessRound[] GetImageGuessRoundsMerged()
@@ -368,29 +403,27 @@ namespace CongoGames.Core
                 list.Add(r);
             }
 
-            string path = Path.Combine(Application.streamingAssetsPath, "Datasets", "minigame_image_guess_extras.json");
-            if (File.Exists(path))
+            if (!string.IsNullOrWhiteSpace(s_imageJsonWeb))
             {
                 try
                 {
-                    string json = File.ReadAllText(path);
+                    AppendImageExtrasFromJsonString(list, s_imageJsonWeb);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning("minigame_image_guess_extras (Web) : " + e.Message);
+                }
+            }
+
+            string pathI = Path.Combine(Application.streamingAssetsPath, "Datasets", "minigame_image_guess_extras.json");
+            if (File.Exists(pathI))
+            {
+                try
+                {
+                    string json = File.ReadAllText(pathI);
                     if (!string.IsNullOrWhiteSpace(json))
                     {
-                    ImageExtrasFile f = JsonUtility.FromJson<ImageExtrasFile>(json);
-                    if (f?.items != null)
-                    {
-                    foreach (ImageJsonItem row in f.items)
-                    {
-                        if (row == null || string.IsNullOrEmpty(row.hint) || string.IsNullOrEmpty(row.answerKey)) continue;
-                        list.Add(new ImageGuessRound(
-                            row.hint,
-                            row.answerKey,
-                            row.styleSeed,
-                            row.streamingFileBase,
-                            row.altAnswerKey,
-                            row.trivia));
-                    }
-                    }
+                    AppendImageExtrasFromJsonString(list, json);
                     }
                 }
                 catch (Exception e)
@@ -400,6 +433,32 @@ namespace CongoGames.Core
             }
 
             imageGuessRoundsRuntime = list.ToArray();
+        }
+
+        private static void AppendImageExtrasFromJsonString(List<ImageGuessRound> list, string json)
+        {
+            if (string.IsNullOrWhiteSpace(json) || list == null)
+            {
+                return;
+            }
+
+            ImageExtrasFile f = JsonUtility.FromJson<ImageExtrasFile>(json);
+            if (f?.items == null)
+            {
+                return;
+            }
+
+            foreach (ImageJsonItem row in f.items)
+            {
+                if (row == null || string.IsNullOrEmpty(row.hint) || string.IsNullOrEmpty(row.answerKey)) continue;
+                list.Add(new ImageGuessRound(
+                    row.hint,
+                    row.answerKey,
+                    row.styleSeed,
+                    row.streamingFileBase,
+                    row.altAnswerKey,
+                    row.trivia));
+            }
         }
 
         public static ImageGuessRound NextImageGuessRound()

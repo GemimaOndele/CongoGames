@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Networking;
 using CongoGames.Audio;
+using CongoGames.Core;
+using CongoGames.Network;
 
 namespace CongoGames.Presentation
 {
@@ -74,6 +76,19 @@ namespace CongoGames.Presentation
             {
                 NormalizedPhase01 = Mathf.Repeat(music.time / music.clip.length, 1f);
             }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // Les navigateurs bloquent l’autoplay audio tant qu’il n’y a pas de geste : on relance au 1er clic / toucher.
+            if (music == null || music.isPlaying || music.clip == null)
+            {
+                return;
+            }
+
+            if (Input.GetMouseButtonDown(0) || (Input.touchSupported && Input.touchCount > 0))
+            {
+                music.Play();
+            }
+#endif
         }
 
         public void ApplyGameMode(string modeId)
@@ -107,6 +122,9 @@ namespace CongoGames.Presentation
 
         private IEnumerator LoadMusicForMode(string modeId)
         {
+            yield return WebGlStreamingPrewarm.CoRunOnce();
+            yield return TikTokGiftModeRegistry.CoPrewarmIfWebGl();
+            yield return WebAudioGestureGate.CoWaitForUnlock();
             RemoteModeMediaEntry remote = RemoteThemeMediaConfig.Resolve(modeId);
             string bottomU = (remote.bottomVideoUrl ?? "").Trim();
             bool bottomProvidesAudio = !string.IsNullOrEmpty(bottomU) && !StreamingMediaUrlPolicy.IsNonStreamableContentPageUrl(bottomU);
@@ -138,64 +156,71 @@ namespace CongoGames.Presentation
             string root = Path.Combine(Application.streamingAssetsPath, "Theme");
             string folder = Path.Combine(root, modeId);
             List<string> trackPaths = new List<string>();
-            if (Directory.Exists(folder))
+            if (StreamingAssetsUrl.IsWebGlData)
             {
-                foreach (string ext in new[] { "ogg", "wav", "mp3" })
-                {
-                    try
-                    {
-                        trackPaths.AddRange(Directory.GetFiles(folder, "track*." + ext, SearchOption.TopDirectoryOnly));
-                    }
-                    catch (IOException)
-                    {
-                        // ignoré
-                    }
-                }
+                yield return CoProbeTracksForWebGl(modeId, trackPaths);
             }
-
-            if (string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase))
+            else
             {
-                string legacyBlind = Path.Combine(root, "BlindTest");
-                if (Directory.Exists(legacyBlind))
+                if (Directory.Exists(folder))
                 {
                     foreach (string ext in new[] { "ogg", "wav", "mp3" })
                     {
                         try
                         {
-                            trackPaths.AddRange(Directory.GetFiles(legacyBlind, "track*." + ext, SearchOption.TopDirectoryOnly));
+                            trackPaths.AddRange(Directory.GetFiles(folder, "track*." + ext, SearchOption.TopDirectoryOnly));
                         }
                         catch (IOException)
                         {
+                            // ignoré
                         }
                     }
                 }
-            }
 
-            if (trackPaths.Count < 2
-                || string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(modeId, "image-guess", StringComparison.OrdinalIgnoreCase))
-            {
-                TryAppendCongoleseRepoPlaylistFolder(trackPaths);
-            }
-
-            trackPaths = trackPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-            trackPaths.Sort(StringComparer.OrdinalIgnoreCase);
-
-            if (trackPaths.Count == 0 && Directory.Exists(root))
-            {
-                foreach (string ext in new[] { "ogg", "wav", "mp3" })
+                if (string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase))
                 {
-                    try
+                    string legacyBlind = Path.Combine(root, "BlindTest");
+                    if (Directory.Exists(legacyBlind))
                     {
-                        trackPaths.AddRange(Directory.GetFiles(root, "track*." + ext, SearchOption.TopDirectoryOnly));
-                    }
-                    catch (IOException)
-                    {
-                        // ignoré
+                        foreach (string ext in new[] { "ogg", "wav", "mp3" })
+                        {
+                            try
+                            {
+                                trackPaths.AddRange(Directory.GetFiles(legacyBlind, "track*." + ext, SearchOption.TopDirectoryOnly));
+                            }
+                            catch (IOException)
+                            {
+                            }
+                        }
                     }
                 }
 
+                if (trackPaths.Count < 2
+                    || string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(modeId, "image-guess", StringComparison.OrdinalIgnoreCase))
+                {
+                    TryAppendCongoleseRepoPlaylistFolder(trackPaths);
+                }
+
+                trackPaths = trackPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
                 trackPaths.Sort(StringComparer.OrdinalIgnoreCase);
+
+                if (trackPaths.Count == 0 && Directory.Exists(root))
+                {
+                    foreach (string ext in new[] { "ogg", "wav", "mp3" })
+                    {
+                        try
+                        {
+                            trackPaths.AddRange(Directory.GetFiles(root, "track*." + ext, SearchOption.TopDirectoryOnly));
+                        }
+                        catch (IOException)
+                        {
+                            // ignoré
+                        }
+                    }
+
+                    trackPaths.Sort(StringComparer.OrdinalIgnoreCase);
+                }
             }
 
             if (trackPaths.Count >= 2)
@@ -232,17 +257,39 @@ namespace CongoGames.Presentation
             foreach (string file in names)
             {
                 string sub = Path.Combine(folder, file);
-                if (!File.Exists(sub))
+                if (StreamingAssetsUrl.IsWebGlData)
                 {
-                    continue;
-                }
+                    string rel = "Theme/" + modeId + "/" + file;
+                    string u = StreamingAssetsUrl.UrlForRelativePath(rel);
+                    bool headOk = false;
+                    yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => headOk = b);
+                    if (!headOk)
+                    {
+                        continue;
+                    }
 
-                AudioClip subClip = null;
-                yield return DownloadClip(sub, file, c => subClip = c);
-                if (subClip != null)
+                    AudioClip subClip = null;
+                    yield return DownloadClip(u, file, c => subClip = c);
+                    if (subClip != null)
+                    {
+                        yield return CoPlayWithIntro(subClip, true);
+                        yield break;
+                    }
+                }
+                else
                 {
-                    yield return CoPlayWithIntro(subClip, true);
-                    yield break;
+                    if (!File.Exists(sub))
+                    {
+                        continue;
+                    }
+
+                    AudioClip subClip = null;
+                    yield return DownloadClip(sub, file, c => subClip = c);
+                    if (subClip != null)
+                    {
+                        yield return CoPlayWithIntro(subClip, true);
+                        yield break;
+                    }
                 }
             }
 
@@ -259,17 +306,38 @@ namespace CongoGames.Presentation
                 foreach (string file in names)
                 {
                     string globalPath = Path.Combine(root, file);
-                    if (!File.Exists(globalPath))
+                    if (StreamingAssetsUrl.IsWebGlData)
                     {
-                        continue;
-                    }
+                        string u = StreamingAssetsUrl.UrlForRelativePath("Theme/" + file);
+                        bool headOk = false;
+                        yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => headOk = b);
+                        if (!headOk)
+                        {
+                            continue;
+                        }
 
-                    AudioClip gClip = null;
-                    yield return DownloadClip(globalPath, file, c => gClip = c);
-                    if (gClip != null)
+                        AudioClip gClip = null;
+                        yield return DownloadClip(u, file, c => gClip = c);
+                        if (gClip != null)
+                        {
+                            yield return CoPlayWithIntro(gClip, true);
+                            yield break;
+                        }
+                    }
+                    else
                     {
-                        yield return CoPlayWithIntro(gClip, true);
-                        yield break;
+                        if (!File.Exists(globalPath))
+                        {
+                            continue;
+                        }
+
+                        AudioClip gClip = null;
+                        yield return DownloadClip(globalPath, file, c => gClip = c);
+                        if (gClip != null)
+                        {
+                            yield return CoPlayWithIntro(gClip, true);
+                            yield break;
+                        }
                     }
                 }
 
@@ -349,9 +417,11 @@ namespace CongoGames.Presentation
             }
         }
 
-        private IEnumerator DownloadClip(string fullPath, string fileName, Action<AudioClip> assign)
+        private IEnumerator DownloadClip(string fullPathOrUrl, string fileName, Action<AudioClip> assign)
         {
-            string uri = FileUrl(fullPath);
+            string uri = (fullPathOrUrl != null && fullPathOrUrl.IndexOf("://", StringComparison.Ordinal) >= 0)
+                ? fullPathOrUrl
+                : StreamingAssetsUrl.ToRequestUrl(fullPathOrUrl);
             AudioType audioType = GuessAudioType(fileName);
             yield return StartCoroutine(DownloadClipUriCo(uri, audioType, assign));
         }
@@ -393,9 +463,85 @@ namespace CongoGames.Presentation
             return AudioType.WAV;
         }
 
-        /// <summary>Dossier <c>Congogame/playlist</c> à la racine du dépôt (hors UnityProject).</summary>
+        private IEnumerator CoProbeTracksForWebGl(string modeId, List<string> trackPaths)
+        {
+            string m = (modeId ?? "default").Trim();
+            for (int n = 1; n <= 36; n++)
+            {
+                string prefix = "track" + n.ToString("D2");
+                foreach (string ext in new[] { "mp3", "ogg", "wav" })
+                {
+                    string rel = "Theme/" + m + "/" + prefix + "." + ext;
+                    string u = StreamingAssetsUrl.UrlForRelativePath(rel);
+                    bool ok = false;
+                    yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => ok = b);
+                    if (ok)
+                    {
+                        trackPaths.Add(u);
+                    }
+                }
+            }
+
+            if (string.Equals(m, "blind-test", StringComparison.OrdinalIgnoreCase))
+            {
+                for (int n = 1; n <= 36; n++)
+                {
+                    string prefix = "track" + n.ToString("D2");
+                    foreach (string ext in new[] { "mp3", "ogg", "wav" })
+                    {
+                        string rel = "Theme/BlindTest/" + prefix + "." + ext;
+                        string u = StreamingAssetsUrl.UrlForRelativePath(rel);
+                        bool ok = false;
+                        yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => ok = b);
+                        if (ok)
+                        {
+                            trackPaths.Add(u);
+                        }
+                    }
+                }
+            }
+
+            var uq = new List<string>();
+            uq.AddRange(trackPaths);
+            uq = uq.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            uq.Sort(StringComparer.OrdinalIgnoreCase);
+            trackPaths.Clear();
+            trackPaths.AddRange(uq);
+            if (trackPaths.Count > 0)
+            {
+                yield break;
+            }
+
+            for (int n = 1; n <= 36; n++)
+            {
+                string prefix = "track" + n.ToString("D2");
+                foreach (string ext in new[] { "mp3", "ogg", "wav" })
+                {
+                    string rel = "Theme/" + prefix + "." + ext;
+                    string u = StreamingAssetsUrl.UrlForRelativePath(rel);
+                    bool ok = false;
+                    yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => ok = b);
+                    if (ok)
+                    {
+                        trackPaths.Add(u);
+                    }
+                }
+            }
+
+            uq = trackPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            uq.Sort(StringComparer.OrdinalIgnoreCase);
+            trackPaths.Clear();
+            trackPaths.AddRange(uq);
+        }
+
+        /// <summary>Dossier <c>Congogame/playlist</c> à la racine du dépôt (hors UnityProject) — inutilisable en WebGL.</summary>
         private static void TryAppendCongoleseRepoPlaylistFolder(List<string> trackPaths)
         {
+            if (StreamingAssetsUrl.IsWebGlData)
+            {
+                return;
+            }
+
             string congo = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "playlist"));
             if (!Directory.Exists(congo))
             {
@@ -428,9 +574,5 @@ namespace CongoGames.Presentation
             return s.Length > 0 ? s : "default";
         }
 
-        private static string FileUrl(string path)
-        {
-            return "file:///" + Path.GetFullPath(path).Replace("\\", "/");
-        }
     }
 }

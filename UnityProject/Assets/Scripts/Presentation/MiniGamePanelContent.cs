@@ -490,7 +490,7 @@ namespace CongoGames.Presentation
                     ApplyChronoDemo();
                     break;
                 case "image-guess":
-                    ApplyImageDemo();
+                    StartCoroutine(CoApplyImageDemo());
                     break;
             }
         }
@@ -1542,7 +1542,7 @@ namespace CongoGames.Presentation
             }
         }
 
-        private void ApplyImageDemo()
+        private IEnumerator CoApplyImageDemo()
         {
             imageRevealEndUnscaled = 0f;
             if (imageRevealCo != null)
@@ -1579,9 +1579,11 @@ namespace CongoGames.Presentation
                     Destroy(old);
                 }
 
-                Texture2D tex = ImageGuessVisuals.ResolveTexture(
+                Texture2D tex = null;
+                yield return ImageGuessVisuals.CoResolveTexture(
                     CurrentImageGuessRound.StreamingFileBase,
-                    CurrentImageGuessRound.StyleSeed);
+                    CurrentImageGuessRound.StyleSeed,
+                    t => tex = t);
                 imagePlaceholder.texture = tex;
                 imagePlaceholder.uvRect = new Rect(0f, 0f, 1f, 1f);
                 imagePlaceholder.color = new Color(1f, 1f, 1f, ImageGuessRevealingAlpha);

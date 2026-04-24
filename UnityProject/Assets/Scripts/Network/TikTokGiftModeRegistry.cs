@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 using CongoGames.Core;
 
 namespace CongoGames.Network
@@ -27,6 +29,7 @@ namespace CongoGames.Network
 
         private static Dictionary<string, string> map;
         private static bool loadAttempted;
+        private static bool webPrewarmDone;
 
         public static string ResolveGameSwitchMode(LiveMessage msg)
         {
@@ -71,9 +74,74 @@ namespace CongoGames.Network
             return HeuristicFallback(msg);
         }
 
+        /// <summary>WebGL : JSON chargé par HTTP avant le premier <see cref="EnsureLoaded"/> fichier.</summary>
+        public static void IngestPrewarmJson(string json)
+        {
+            map = new Dictionary<string, string>(StringComparer.Ordinal);
+            loadAttempted = true;
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return;
+            }
+
+            try
+            {
+                FileDto dto = JsonUtility.FromJson<FileDto>(json);
+                if (dto?.mappings == null)
+                {
+                    return;
+                }
+
+                foreach (GiftRow row in dto.mappings)
+                {
+                    if (row == null || string.IsNullOrWhiteSpace(row.tiktokGiftName) || string.IsNullOrWhiteSpace(row.modeId))
+                    {
+                        continue;
+                    }
+
+                    map[row.tiktokGiftName.Trim()] = row.modeId.Trim();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning("TikTokGiftModeRegistry (Web) : " + ex.Message);
+            }
+        }
+
+        public static IEnumerator CoPrewarmIfWebGl()
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if (webPrewarmDone)
+            {
+                yield break;
+            }
+
+            string url = StreamingAssetsUrl.UrlForRelativePath("Theme/tiktok_gift_modes.json");
+            string text = null;
+            bool ok = false;
+            using (UnityWebRequest u = UnityWebRequest.Get(url))
+            {
+                u.timeout = 15;
+                yield return u.SendWebRequest();
+                ok = u.result == UnityWebRequest.Result.Success;
+                text = u.downloadHandler?.text;
+            }
+
+            IngestPrewarmJson(ok ? text : null);
+            webPrewarmDone = true;
+#else
+            yield break;
+#endif
+        }
+
         private static void EnsureLoaded()
         {
             if (loadAttempted) return;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            loadAttempted = true;
+            map = new Dictionary<string, string>(StringComparer.Ordinal);
+            return;
+#endif
             loadAttempted = true;
             map = new Dictionary<string, string>(StringComparer.Ordinal);
             try

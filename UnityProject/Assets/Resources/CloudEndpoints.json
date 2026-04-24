@@ -1,0 +1,4 @@
+{
+  "wsUrl": "wss://congogames-ws-production.up.railway.app",
+  "ttsHttpBase": "https://congogames-backend-cg.vercel.app"
+}

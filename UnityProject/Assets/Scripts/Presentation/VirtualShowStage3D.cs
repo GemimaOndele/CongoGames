@@ -75,7 +75,12 @@ namespace CongoGames.Presentation
             if (w < 256) w = 1280;
             if (h < 256) h = 720;
 
-            _rt = new RenderTexture(w, h, 24, RenderTextureFormat.ARGB32) { name = "VirtualShowStage_RT" };
+            int depthBits = 24;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // WebGL + URP : RT HDR / profondeur 24 peut donner un rendu noir ; sans ombres, plus fiable.
+            depthBits = 16;
+#endif
+            _rt = new RenderTexture(w, h, depthBits, RenderTextureFormat.ARGB32) { name = "VirtualShowStage_RT" };
             _rt.Create();
 
             _root = new GameObject("VirtualShowStage3D");
@@ -96,6 +101,10 @@ namespace CongoGames.Presentation
             _cam.allowHDR = true;
             _cam.depth = -4f;
             UrpSetup(_cam);
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _cam.allowHDR = false;
+            UadpWebGlSafeCamera(_cam);
+#endif
 
             BuildGeometry(modeId);
 
@@ -315,6 +324,10 @@ namespace CongoGames.Presentation
                     pc.color = Color.Lerp(c.Left, c.Right, p);
                 }
             }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if (_key != null) _key.shadows = LightShadows.None;
+#endif
         }
 
         private void MakePillar(string name, Color c, Vector3 pos, Shader sh)
@@ -369,6 +382,15 @@ namespace CongoGames.Presentation
             UniversalAdditionalCameraData d = c.GetUniversalAdditionalCameraData();
             d.renderType = CameraRenderType.Base;
         }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        private static void UadpWebGlSafeCamera(Camera c)
+        {
+            if (c == null) return;
+            UniversalAdditionalCameraData d = c.GetUniversalAdditionalCameraData();
+            d.renderPostProcessing = false;
+        }
+#endif
 
         private struct ColorSet
         {

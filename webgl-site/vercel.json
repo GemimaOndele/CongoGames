@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run vercel-build",
+  "buildCommand": "true",
   "outputDirectory": ".",
   "headers": [
     {
@@ -67,6 +67,40 @@
       "source": "/Build/(.*).data",
       "headers": [
         { "key": "Content-Type", "value": "application/octet-stream" }
+      ]
+    },
+    {
+      "source": "/StreamingAssets/(.*)\\.mp4",
+      "headers": [
+        { "key": "Content-Type", "value": "video/mp4" },
+        { "key": "Accept-Ranges", "value": "bytes" }
+      ]
+    },
+    {
+      "source": "/StreamingAssets/(.*)\\.webm",
+      "headers": [
+        { "key": "Content-Type", "value": "video/webm" },
+        { "key": "Accept-Ranges", "value": "bytes" }
+      ]
+    },
+    {
+      "source": "/StreamingAssets/(.*)\\.ogg",
+      "headers": [
+        { "key": "Content-Type", "value": "audio/ogg" },
+        { "key": "Accept-Ranges", "value": "bytes" }
+      ]
+    },
+    {
+      "source": "/StreamingAssets/(.*)\\.mp3",
+      "headers": [
+        { "key": "Content-Type", "value": "audio/mpeg" },
+        { "key": "Accept-Ranges", "value": "bytes" }
+      ]
+    },
+    {
+      "source": "/StreamingAssets/(.*)\\.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" }
       ]
     }
   ]

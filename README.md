@@ -104,6 +104,8 @@ Endpoints disponibles sur l'URL Vercel:
 
 Note: la version Vercel expose l'API HTTP stable. Le WebSocket live reste gere par le mode serveur Node local/dedie.
 
+**Jeu dans le navigateur (lien sur téléphone / n’importe quel appareil)** : ce n’est pas l’API Vercel seule — il faut un **build Unity WebGL** + hébergement des fichiers statiques (`index.html`, etc.), avec le client configuré en **HTTPS** / **WSS** (voir `UnityProject/Assets/Resources/CloudEndpoints.json` pour le build WebGL). Dossier prêt côté dépôt : [`webgl-site/`](webgl-site/) (script `copy-into-webgl-site.ps1` + `npm run webgl:vercel`). Guide : [`docs/WEBGL_LIEN_NAVIGATEUR.md`](docs/WEBGL_LIEN_NAVIGATEUR.md).
+
 ## WebSocket 24/7 (Railway)
 
 Le dossier `Backend/` est deja prepare pour Railway (`Dockerfile` + `railway.json`).

@@ -6,6 +6,7 @@ using UnityEngine.Audio;
 using UnityEngine.Networking;
 using CongoGames.AI;
 using CongoGames.Audio;
+using CongoGames.Core;
 
 namespace CongoGames.Presentation
 {
@@ -179,47 +180,77 @@ namespace CongoGames.Presentation
             if (loaded == null && !string.IsNullOrWhiteSpace(streamingFileBase))
             {
                 string baseClean = streamingFileBase.Trim();
-                string[] roots =
-                {
-                    Path.Combine(Application.streamingAssetsPath, "Theme", "BlindTest"),
-                    Path.Combine(Application.streamingAssetsPath, "Theme")
-                };
-
                 string[] exts = { ".ogg", ".mp3", ".wav" };
-                foreach (string root in roots)
+                if (StreamingAssetsUrl.IsWebGlData)
                 {
-                    foreach (string ext in exts)
+                    string[] relRoots = { "Theme/BlindTest", "Theme" };
+                    foreach (string r in relRoots)
                     {
-                        string full = Path.Combine(root, baseClean + ext);
-                        if (!File.Exists(full))
+                        foreach (string ext in exts)
                         {
-                            continue;
-                        }
-
-                        AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
-                        string uri = new Uri(full).AbsoluteUri;
-                        UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(uri, at);
-                        yield return uwr.SendWebRequest();
-                        if (uwr.result == UnityWebRequest.Result.Success)
-                        {
-                            loaded = DownloadHandlerAudioClip.GetContent(uwr);
-                            uwr.Dispose();
-                            if (loaded != null && loaded.loadState != AudioDataLoadState.Failed)
+                            string u = StreamingAssetsUrl.UrlForRelativePath(r + "/" + baseClean + ext);
+                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
+                            using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(u, at))
                             {
-                                break;
-                            }
+                                yield return uwr.SendWebRequest();
+                                if (uwr.result == UnityWebRequest.Result.Success)
+                                {
+                                    loaded = DownloadHandlerAudioClip.GetContent(uwr);
+                                    if (loaded != null && loaded.loadState != AudioDataLoadState.Failed)
+                                    {
+                                        break;
+                                    }
 
-                            loaded = null;
+                                    loaded = null;
+                                }
+                            }
                         }
-                        else
+
+                        if (loaded != null)
                         {
-                            uwr.Dispose();
+                            break;
                         }
                     }
-
-                    if (loaded != null)
+                }
+                else
+                {
+                    string[] rootFolders =
                     {
-                        break;
+                        Path.Combine(Application.streamingAssetsPath, "Theme", "BlindTest"),
+                        Path.Combine(Application.streamingAssetsPath, "Theme")
+                    };
+                    foreach (string root in rootFolders)
+                    {
+                        foreach (string ext in exts)
+                        {
+                            string full = Path.Combine(root, baseClean + ext);
+                            if (!File.Exists(full))
+                            {
+                                continue;
+                            }
+
+                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
+                            string uri = StreamingAssetsUrl.ToRequestUrl(full);
+                            using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(uri, at))
+                            {
+                                yield return uwr.SendWebRequest();
+                                if (uwr.result == UnityWebRequest.Result.Success)
+                                {
+                                    loaded = DownloadHandlerAudioClip.GetContent(uwr);
+                                    if (loaded != null && loaded.loadState != AudioDataLoadState.Failed)
+                                    {
+                                        break;
+                                    }
+
+                                    loaded = null;
+                                }
+                            }
+                        }
+
+                        if (loaded != null)
+                        {
+                            break;
+                        }
                     }
                 }
             }

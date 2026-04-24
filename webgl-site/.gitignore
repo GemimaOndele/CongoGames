@@ -2,8 +2,8 @@
 /Build/
 /TemplateData/
 /StreamingAssets/
-index.html
 *.html
+!index.html
 *.data
 *.wasm
 *.js

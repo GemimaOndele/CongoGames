@@ -1,0 +1,9 @@
+# Si `vercel` est lance par erreur a la racine du depot, ne pas lire/empaqueter
+# le projet Unity (fichiers dans Temp/ verrouilles par l'editor -> EBUSY) ni les deps.
+UnityProject/
+Builds/
+Backend/node_modules/
+node_modules/
+webgl-site/node_modules/
+playlist/
+.git/

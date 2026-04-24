@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using CongoGames.Core;
 
 namespace CongoGames.Presentation
 {
@@ -58,6 +59,13 @@ namespace CongoGames.Presentation
         public void ApplyGameMode(string modeId)
         {
             string id = string.IsNullOrEmpty(modeId) ? "default" : modeId.Trim().ToLowerInvariant();
+            StartCoroutine(CoApplyGameMode(id));
+        }
+
+        private IEnumerator CoApplyGameMode(string modeId)
+        {
+            yield return WebGlStreamingPrewarm.CoRunOnce();
+            string id = string.IsNullOrEmpty(modeId) ? "default" : modeId.Trim().ToLowerInvariant();
             activeModeId = id;
             StopEverything();
 
@@ -72,48 +80,96 @@ namespace CongoGames.Presentation
                 else
                 {
                     TryPlayVideoUrl(urlBg, muteVideoSound);
-                    return;
+                    yield break;
                 }
             }
 
             IReadOnlyList<string> candidates = ThemeModeCatalog.BuildLocalBackgroundCandidates(id);
             foreach (string path in candidates)
             {
-                if (File.Exists(path))
+                if (StreamingAssetsUrl.IsWebGlData)
                 {
-                    TryPlayVideo(path);
-                    return;
+                    string u = StreamingAssetsUrl.ToRequestUrl(path);
+                    bool ok = false;
+                    yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => ok = b);
+                    if (ok)
+                    {
+                        TryPlayVideoUrl(u, muteVideoSound);
+                        yield break;
+                    }
+                }
+                else
+                {
+                    if (File.Exists(path))
+                    {
+                        TryPlayVideo(StreamingAssetsUrl.ToRequestUrl(path));
+                        yield break;
+                    }
                 }
             }
 
-            StartSyntheticOrSlides(id);
+            yield return CoStartSyntheticOrSlides(id);
         }
 
         /// <summary>Sans fichier vidéo : plateau 3D (option) ; sinon slides ; sinon « clip » 2D procédural.</summary>
-        private void StartSyntheticOrSlides(string id)
+        private IEnumerator CoStartSyntheticOrSlides(string id)
         {
             if (PresentationConfig.UseVirtual3DShowStage && virtual3D != null)
             {
                 synthetic?.Stop();
                 virtual3D.RebuildForMode(id, raw);
-                return;
+                yield break;
             }
 
             virtual3D?.Teardown();
             string root = Path.Combine(Application.streamingAssetsPath, "Theme");
             string useSlidesFlag = Path.Combine(root, id, "use_slides.flag");
             string useSlidesGlobal = Path.Combine(root, "use_slides.flag");
-            if (File.Exists(useSlidesFlag) || File.Exists(useSlidesGlobal))
+            bool useSlides;
+            if (StreamingAssetsUrl.IsWebGlData)
             {
-                if (TryBuildSlideTextures(id, out List<Texture2D> slides))
+                string u1 = StreamingAssetsUrl.UrlForRelativePath("Theme/" + id + "/use_slides.flag");
+                string u2 = StreamingAssetsUrl.UrlForRelativePath("Theme/use_slides.flag");
+                bool o1 = false;
+                bool o2 = false;
+                yield return WebGlStreamingPrewarm.CoHttpHeadOk(u1, b => o1 = b);
+                yield return WebGlStreamingPrewarm.CoHttpHeadOk(u2, b => o2 = b);
+                useSlides = o1 || o2;
+            }
+            else
+            {
+                useSlides = File.Exists(useSlidesFlag) || File.Exists(useSlidesGlobal);
+            }
+
+            if (useSlides)
+            {
+                if (StreamingAssetsUrl.IsWebGlData)
                 {
-                    slideTextures.AddRange(slides);
-                    raw.texture = slideTextures[0];
-                    raw.color = Color.white;
-                    raw.uvRect = new Rect(0f, 0f, 1f, 1f);
-                    raw.rectTransform.localScale = Vector3.one;
-                    slideCo = StartCoroutine(SlideShowLoop());
-                    return;
+                    var slidesW = new List<Texture2D>();
+                    yield return CoBuildSlideTexturesWebGl(id, slidesW);
+                    if (slidesW.Count > 0)
+                    {
+                        slideTextures.AddRange(slidesW);
+                        raw.texture = slideTextures[0];
+                        raw.color = Color.white;
+                        raw.uvRect = new Rect(0f, 0f, 1f, 1f);
+                        raw.rectTransform.localScale = Vector3.one;
+                        slideCo = StartCoroutine(SlideShowLoop());
+                        yield break;
+                    }
+                }
+                else
+                {
+                    if (TryBuildSlideTextures(id, out List<Texture2D> slides))
+                    {
+                        slideTextures.AddRange(slides);
+                        raw.texture = slideTextures[0];
+                        raw.color = Color.white;
+                        raw.uvRect = new Rect(0f, 0f, 1f, 1f);
+                        raw.rectTransform.localScale = Vector3.one;
+                        slideCo = StartCoroutine(SlideShowLoop());
+                        yield break;
+                    }
                 }
             }
 
@@ -166,9 +222,9 @@ namespace CongoGames.Presentation
             StopEverything();
         }
 
-        private void TryPlayVideo(string path)
+        private void TryPlayVideo(string fileUrl)
         {
-            TryPlayVideoUrl(FileUrl(path), muteVideoSound);
+            TryPlayVideoUrl(fileUrl, muteVideoSound);
         }
 
         private void TryPlayVideoUrl(string url, bool mute)
@@ -205,7 +261,7 @@ namespace CongoGames.Presentation
         {
             string mode = activeModeId;
             StopEverything();
-            StartSyntheticOrSlides(mode);
+            StartCoroutine(CoStartSyntheticOrSlides(mode));
         }
 
         private bool TryBuildSlideTextures(string modeId, out List<Texture2D> textures)
@@ -267,6 +323,69 @@ namespace CongoGames.Presentation
             return textures.Count > 0;
         }
 
+        private IEnumerator CoBuildSlideTexturesWebGl(string modeId, List<Texture2D> textures)
+        {
+            string m = (modeId ?? "default").Trim();
+            var names = new List<string>(96);
+            for (int i = 1; i <= 32; i++)
+            {
+                names.Add("slide" + i + ".png");
+                names.Add("slide" + i + ".jpg");
+                names.Add("slide" + i + ".jpeg");
+                names.Add("slide" + i.ToString("D2") + ".png");
+                names.Add("slide" + i.ToString("D2") + ".jpg");
+                names.Add("bg_" + i + ".png");
+                names.Add("bg_" + i + ".jpg");
+                names.Add("bg_" + i.ToString("D2") + ".png");
+            }
+
+            names.Sort(StringComparer.OrdinalIgnoreCase);
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string fileName in names)
+            {
+                if (!seen.Add(fileName))
+                {
+                    continue;
+                }
+
+                string rel = "Theme/" + m + "/" + fileName;
+                string u = StreamingAssetsUrl.UrlForRelativePath(rel);
+                bool headOk = false;
+                yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => headOk = b);
+                if (!headOk)
+                {
+                    continue;
+                }
+
+                byte[] data = null;
+                bool dOk = false;
+                yield return WebGlStreamingPrewarm.CoHttpGetBytes(
+                    u,
+                    (b, ok) =>
+                    {
+                        data = b;
+                        dOk = ok;
+                    });
+                if (!dOk || data == null || data.Length < 8)
+                {
+                    continue;
+                }
+
+                Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                if (tex.LoadImage(data))
+                {
+                    tex.Apply(false, true);
+                    textures.Add(tex);
+                }
+                else
+                {
+                    Destroy(tex);
+                }
+            }
+
+            textures.Sort((a, b) => string.Compare(a.name, b.name, StringComparison.OrdinalIgnoreCase));
+        }
+
         private IEnumerator SlideShowLoop()
         {
             int i = 0;
@@ -295,11 +414,6 @@ namespace CongoGames.Presentation
             tex.SetPixels(new[] { col, col, col, col });
             tex.Apply(false, true);
             return tex;
-        }
-
-        private static string FileUrl(string path)
-        {
-            return "file:///" + Path.GetFullPath(path).Replace("\\", "/");
         }
     }
 }

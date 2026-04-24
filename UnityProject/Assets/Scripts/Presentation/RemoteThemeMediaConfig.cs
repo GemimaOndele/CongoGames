@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using CongoGames.Core;
 
 namespace CongoGames.Presentation
 {
@@ -47,6 +49,51 @@ namespace CongoGames.Presentation
         {
             cached = null;
             loadAttempted = false;
+        }
+
+        /// <summary>WebGL : charge <c>Theme/remote_media.json</c> par HTTP. Editor : appelle <see cref="EnsureLoaded"/> classique.</summary>
+        public static IEnumerator CoLoadFromWeb()
+        {
+#if UNITY_EDITOR
+            EnsureLoaded();
+            yield break;
+#elif UNITY_WEBGL
+            if (loadAttempted)
+            {
+                yield break;
+            }
+
+            string url = StreamingAssetsUrl.UrlForRelativePath("Theme/remote_media.json");
+            string text = null;
+            bool netOk = false;
+            yield return WebGlStreamingPrewarm.CoHttpGetText(
+                url,
+                (t, ok) =>
+                {
+                    text = t;
+                    netOk = ok;
+                });
+            loadAttempted = true;
+            if (netOk && !string.IsNullOrWhiteSpace(text))
+            {
+                try
+                {
+                    cached = JsonUtility.FromJson<RemoteThemeMediaFile>(WrapArray(text));
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning("remote_media.json (WebGL) : " + ex.Message);
+                    cached = null;
+                }
+            }
+            else
+            {
+                cached = null;
+            }
+#else
+            EnsureLoaded();
+            yield break;
+#endif
         }
 
         public static RemoteModeMediaEntry Resolve(string modeId)
@@ -120,6 +167,9 @@ namespace CongoGames.Presentation
         private static void EnsureLoaded()
         {
             if (loadAttempted) return;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return;
+#endif
             loadAttempted = true;
             string path = Path.Combine(Application.streamingAssetsPath, "Theme", "remote_media.json");
             if (!File.Exists(path))

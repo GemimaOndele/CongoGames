@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CongoGames.Core;
+using CongoGames.Network;
 using CongoGames.Perf;
 
 namespace CongoGames.AI
@@ -77,7 +79,13 @@ namespace CongoGames.AI
 
         private IEnumerator BootstrapTts()
         {
-            if (autoDiscoverLocalHttp)
+            WebGlCloudEndpoints.TryLoadAndApply();
+            if (Application.platform == RuntimePlatform.WebGLPlayer && !string.IsNullOrEmpty(WebGlCloudEndpoints.LoadedTtsBase))
+            {
+                ttsHttpBase = WebGlCloudEndpoints.LoadedTtsBase;
+                autoDiscoverLocalHttp = false;
+            }
+            else if (autoDiscoverLocalHttp)
             {
                 string found = null;
                 yield return TtsClient.DiscoverLocalHttpBase("127.0.0.1", discoverPortMin, discoverPortMax, b => found = b);
@@ -155,6 +163,8 @@ namespace CongoGames.AI
 
         private IEnumerator ProcessQueue()
         {
+            yield return WebAudioGestureGate.CoWaitForUnlock();
+
             speaking = true;
             SetSpeakingVisual(true);
 

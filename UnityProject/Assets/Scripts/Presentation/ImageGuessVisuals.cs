@@ -1,5 +1,8 @@
+using System.Collections;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
+using CongoGames.Core;
 
 namespace CongoGames.Presentation
 {
@@ -12,7 +15,7 @@ namespace CongoGames.Presentation
 
         public static Texture2D ResolveTexture(string fileNameWithoutExt, int styleSeed)
         {
-            if (!string.IsNullOrEmpty(fileNameWithoutExt))
+            if (!string.IsNullOrEmpty(fileNameWithoutExt) && !StreamingAssetsUrl.IsWebGlData)
             {
                 foreach (string ext in new[] { ".png", ".jpg", ".jpeg" })
                 {
@@ -29,6 +32,46 @@ namespace CongoGames.Presentation
             }
 
             return BuildProceduralScene(styleSeed);
+        }
+
+        /// <summary>WebGL : charge via HTTP ; Editor/standalone : appelle <see cref="ResolveTexture"/>.</summary>
+        public static IEnumerator CoResolveTexture(string fileNameWithoutExt, int styleSeed, System.Action<Texture2D> onDone)
+        {
+            if (onDone == null) yield break;
+            if (StreamingAssetsUrl.IsWebGlData)
+            {
+                if (!string.IsNullOrEmpty(fileNameWithoutExt))
+                {
+                    foreach (string ext in new[] { ".png", ".jpg", ".jpeg" })
+                    {
+                        string u = StreamingAssetsUrl.UrlForRelativePath(SubFolder + "/" + fileNameWithoutExt + ext);
+                        using (UnityWebRequest req = UnityWebRequest.Get(u))
+                        {
+                            req.timeout = 25;
+                            yield return req.SendWebRequest();
+                            if (req.result == UnityWebRequest.Result.Success && req.downloadHandler?.data != null
+                                && req.downloadHandler.data.Length > 0)
+                            {
+                                byte[] raw = req.downloadHandler.data;
+                                Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                                if (ImageConversion.LoadImage(tex, raw, false))
+                                {
+                                    tex.Apply(false, false);
+                                    onDone(tex);
+                                    yield break;
+                                }
+
+                                UnityEngine.Object.Destroy(tex);
+                            }
+                        }
+                    }
+                }
+
+                onDone(BuildProceduralScene(styleSeed));
+                yield break;
+            }
+
+            onDone(ResolveTexture(fileNameWithoutExt, styleSeed));
         }
 
         private static Texture2D BuildProceduralScene(int seed)
