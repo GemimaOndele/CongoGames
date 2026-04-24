@@ -2,6 +2,8 @@
 
 Les fichiers `track01.ogg` et `track02.ogg` proviennent de **Wikimedia Commons** et sont réutilisés conformément à leurs licences.
 
+> **Dépôt (copie de travail) :** les mêmes fichiers peuvent être dupliqués dans `Theme/blind-test/` pour la **playlist d’ambiance** du mode *blind-test* (voir `NOMS_AUDIO.txt`). L’URL directe du fichier a pu changer ; l’icône « Original file » sur la page Commons reste la référence.
+
 ## track01.ogg — tambour parlant
 
 - **Fichier source :** [The sound of the talking drum when its been played.ogg](https://commons.wikimedia.org/wiki/File:The_sound_of_the_talking_drum_when_its_been_played.ogg)  

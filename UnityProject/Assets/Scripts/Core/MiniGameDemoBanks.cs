@@ -166,7 +166,25 @@ namespace CongoGames.Core
                 new[] { "Rumba mélodique (ballade) type souvenirs congolais", "Techno hardcore 200 BPM", "Polka bavaroise seule", "Cours de boucherie (ASMR)" },
                 0,
                 "Indice : mélopée et guitare, plutôt que boucherie.",
-                "track01", null, "Ambiance / timbre")
+                "track01", null, "Ambiance / timbre"),
+            new BlindRound(
+                "Quel type de propos les textes de rumba mettent le plus en avant (thème) ?",
+                new[] { "Histoire, amour, société, fierté locale (thème) ", "Recettes d’hôtel 5 étoiles", "Code fiscal français", "Tableau périodique (chimie)" },
+                0,
+                "Indice : on écoute le sens, pas l’heure d’enregistrement exacte (démo).",
+                "track02", null, "Thème / lyrisme (texte)"),
+            new BlindRound(
+                "Dans l’esprit « fête congolaise », l’orchestrateur est souvent devant, avec …",
+                new[] { "Guitaristes, atalaku, seku / animation", "Hockey sur glace seul", "Cours d’alpinisme", "Conférence sur les taux" },
+                0,
+                "Indice : place du concert public (démo).",
+                "track01", null, "Cliché fête (place orchestre)"),
+            new BlindRound(
+                "Pour cadrer l’exercice, un blind test c’est surtout : on écoute, puis on répond sur … (plusieurs piste)",
+                new[] { "Rythme, mélodie, type de voix, parfois époque / style (indicatif) ", "La marque du câble USB seul", "N° de série de la chambre d’enregistrement", "L’heure d’ouverture du stade" },
+                0,
+                "Avec tes propres pistes licence OK dans Theme/blind-test/, les réponses colleraient au morceau.",
+                "track02", null, "Jeu pédago / cadrage")
         };
 
         private static readonly Queue<int> BlindOrder = new Queue<int>();
@@ -236,7 +254,9 @@ namespace CongoGames.Core
             new ImageGuessRound("Département au sud autour de Brazzaville (un mot) ?", "POOL", 1808, null, "DEPARTEMENT", null),
             new ImageGuessRound("Département du nord, marécages (un mot) ?", "LIKOUALA", 1909, null, "LIWILI", null),
             new ImageGuessRound("Département nord, Sanga, forêts (un mot) ?", "SANGHA", 2010, null, "OUANZA", null),
-            new ImageGuessRound("Danse de hanches, nom court, très présente en fête (Congo) ?", "NDOMBOLO", 2212, null, "NDOMBO", null)
+            new ImageGuessRound("Danse de hanches, nom court, très présente en fête (Congo) ?", "NDOMBOLO", 2212, null, "NDOMBO", null),
+            new ImageGuessRound("Grand ensemble sportif (aire des jeux africains) près de la capitale — toponyme souvent associé (un mot) ?", "KINTELE", 2313, "kintele", "STADE", "Place kintele.png (photo Commons sous licence) si besoin d’un visuel réel."),
+            new ImageGuessRound("Code IATA (3 lettres) de l’aéroport de Brazzaville-Maya-Maya ?", "BZV", 2414, null, "BRA", "Photo d’aéroport possible (Commons) renommée bzv.png en secours visuel local.")
         };
 
         private static readonly Queue<int> ImageGuessOrder = new Queue<int>();

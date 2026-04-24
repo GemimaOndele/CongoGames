@@ -105,7 +105,11 @@ namespace CongoGames.Core
             T("Pointe-Noire surnommée en partie pour … ?", "Pétrole, port, océan", "Fêtes vénitiennes de la neige", "Forêt tropicale pure sans côte", "Volcan actif 4000 m", 0, "géographie"),
             T("Le département de la Cuvette est surtout plutôt …", "Forêts et zones humides intérieures", "Désert de glace", "Pôle industriel siderurgique alpin", "Archipel de 200 îles", 0, "géographie"),
             T("« Pool » côté populaire : on parle souvent du …", "Bassin autour de Brazzaville", "Océan Indien seul", "Désert d’Atacama", "Canal de Suez", 0, "géographie"),
-            T("Un plat à base de feuille de manioc cuite : gombo / … ?", "Légumes locaux, sauce, accompagnement", "Sashimi de saumon norvégien", "Raclette végétalienne de ski", "Smoothie ananas uniquement", 0, "culture")
+            T("Un plat à base de feuille de manioc cuite : gombo / … ?", "Légumes locaux, sauce, accompagnement", "Sashimi de saumon norvégien", "Raclette végétalienne de ski", "Smoothie ananas uniquement", 0, "culture"),
+            T("Très gros stade de football (près de Brazzaville, grands jeux) : on le nomme le plus souvent … ?", "Stade de Kintélé", "Stade de France (Paris)", "Santiago Bernabéu (Madrid)", "Old Trafford (Manchester)", 0, "sport"),
+            T("Cathédrale de style néo-byzantin repérable à Brazzaville, dédiée à … (nom courant) ?", "Sainte-Anne (cathédrale de Brazzaville)", "Notre-Dame (Paris) copié", "Dôme d’Aix-la-Chapelle (titre court", "Cathédrale de Cologne (Allemagne)", 0, "culture"),
+            T("Pour un live (TikTok), la priorité n°1 pour rester lisible, c’est d’abord : … ?", "Gros caractères, contraste, son clair, peu d’effets sur le texte", "Texte 6 pt sur bande claire seulement", "Caméra tournante rapide 360° seulement", "Silence 5 min d’ouverture", 0, "jeu"),
+            T("Quand on distingue le Congo (capitale Brazzaville) de la RDC (capitale Kinshasa)…", "Sont deux pays distincts, deux capitales sur le fleuve, deux législations", "C’est le même drapeau exact", "Une seule monnaie officielle", "Même drapeau et même hymne seuls", 0, "culture")
         };
 
         private static readonly Queue<int> DrawQueue = new Queue<int>();

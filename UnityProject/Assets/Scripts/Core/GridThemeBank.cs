@@ -28,23 +28,31 @@ namespace CongoGames.Core
         {
             new Theme("geo", "Géo & lieux (Congo)", new[]
             {
-                "BRAZZA", "POINTE", "CUVETTE", "LIKOUALA", "SANGHA", "POOL", "LEFINI", "NIARI", "LOANGO", "OUESSO", "BETOU", "IMPFONDO", "BANIO", "MAYOMBE", "LESTUAIRE"
+                "BRAZZA", "POINTE", "CUVETTE", "LIKOUALA", "SANGHA", "POOL", "LEFINI", "NIARI", "LOANGO", "OUESSO", "BETOU", "IMPFON", "BANIO", "MAYOMB", "ESTUA", "BASSA", "MFOUA", "LOUBO", "KINKA", "NOIRE"
             }),
             new Theme("nature", "Forêts, fleuve, faune", new[]
             {
-                "FLEUVE", "CONGO", "GORILLE", "SANGA", "FORET", "PARC", "EQUATEUR", "PLUIE", "RIVIERE", "OCEAN", "COCOTIER", "MANGROVE", "BASSIN", "FLORE", "FAUNE"
+                "FLEUVE", "CONGO", "GORIL", "SANGA", "FORET", "PARC", "EQUATE", "PLUIE", "OCEAN", "RIVIERE", "COCOTI", "MANGROV", "BASSIN", "FLORE", "FAUNE", "SAHBI", "HERBE", "BOISE", "PLAGE", "CRABE"
             }),
             new Theme("culture", "Culture, fête, drapeau", new[]
             {
-                "BANTOU", "RUMBA", "NGOMA", "NDOMBO", "SEBEN", "DANSE", "CHANT", "BRAZZA", "MBOTE", "FETE", "AOUT", "CULTURE", "FOULE", "KERMES", "DANJAR"
+                "BANTOU", "RUMBA", "NGOMA", "NDOMBO", "SEBEN", "DANSE", "CHANT", "BRAZZA", "MBOTE", "FETE", "AOUT", "CULTUR", "FOULE", "KERMES", "DANJAR", "FOYER", "GLOIRE", "HONOR", "SCENE", "HABIT"
             }),
             new Theme("lang", "Lingala & kituba (mots usités)", new[]
             {
-                "MELESI", "MBOTE", "MALAMU", "MOTEMA", "MWANA", "KOKO", "BISO", "MANGI", "LIBOSO", "SIMBA", "MOSALA", "NDAKISA", "NZOTO", "MABOKO", "MPONDO"
+                "MELESI", "MBOTE", "MALAMU", "MOTEMA", "MWANA", "KOKO", "BISO", "MANGI", "LIBOSO", "SIMBA", "MOSALA", "NDAKISA", "NZOTO", "MABOKO", "MPONDO", "BOKET", "LOKOLA", "PEKO", "ZALA", "SALUT"
             }),
             new Theme("sport", "Stade, foot, ferveur", new[]
             {
-                "BUTEUR", "STADE", "EQUIPE", "BALLON", "VICTO", "COUPE", "FOULE", "BRAZZA", "BANC", "TALENT", "ESSAI", "JOUER", "MATCH", "GAGNE", "BUTS"
+                "BUTEUR", "STADE", "EQUIPE", "BALLON", "VICTO", "COUPE", "FOULE", "BRAZZA", "BANC", "TALENT", "ESSAI", "JOUER", "MATCH", "GAGNE", "BUTS", "BLESS", "TIR", "BUT", "CARTO", "MEDAL"
+            }),
+            new Theme("histoire", "Indépendance, symboles", new[]
+            {
+                "AOUT", "ANNEE", "DROIT", "LIBRE", "PAIX", "UNION", "ORDRE", "TRAVAI", "PROGRE", "ECOLE", "VOTER", "LECONS", "TEMPO", "BRAZZA", "AVANT", "APRES", "EPOPEE", "PATRIO", "STATUE", "GLOIRE"
+            }),
+            new Theme("eco", "Commerce & vie quotidienne", new[]
+            {
+                "MARCHE", "VENTE", "POIDS", "PRIX", "KIOSK", "CAFE", "PAIN", "SABLE", "ROUTE", "GARES", "TAXES", "PRIME", "SALAIRE", "OFFRE", "ACHAT", "BUDGET", "CREDIT", "STOCKS", "BOUTIK", "CAISSE"
             }),
         };
 
