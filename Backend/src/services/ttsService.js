@@ -1,6 +1,6 @@
 /**
- * Synthèse vocale (priorité) : TTS Edge gratuit (sans clé) → OpenAI (PCM) → ElevenLabs.
- * Les comptes ElevenLabs gratuits ne peuvent pas utiliser les voix « bibliothèque » via l’API sans abonnement payant.
+ * Synthèse vocale : ElevenLabs (voix pro) → OpenAI (PCM) → Edge TTS (gratuit, repli fiable).
+ * Si crédits / erreur sur les moteurs payants, le repli Edge reste disponible (navigateur / API).
  */
 
 import { isOpenAiSpeechReady, synthesizeOpenAiSpeechToPcm } from "./openAiSpeechService.js";
@@ -115,46 +115,40 @@ export async function synthesizeToAudioBase64(text, opts = {}) {
     throw new Error("texte vide");
   }
 
-  const preferPcm = Boolean(opts.preferPcm);
   const errors = [];
-
-  if (isEdgeTtsEnabled()) {
-    try {
-      return await synthesizeEdgeToPcm(clean);
-    } catch (e) {
-      const msg = e?.message || String(e);
-      errors.push(msg);
-      console.warn("[tts] Edge (gratuit) indisponible:", msg.slice(0, 160));
-    }
-  }
-
-  /** Unity lit mal certains MP3 : avec prefer_pcm, OpenAI (PCM brut) en premier si les deux sont configurés. */
-  if (preferPcm && isOpenAiSpeechReady() && isElevenLabsReady()) {
-    try {
-      return await synthesizeOpenAiSpeechToPcm(clean);
-    } catch (e) {
-      const msg = e?.message || String(e);
-      errors.push(msg);
-      console.warn("[tts] OpenAI (PCM) indisponible, essai ElevenLabs:", msg.slice(0, 120));
-    }
-  }
 
   if (isElevenLabsReady()) {
     try {
       return await synthesizeElevenLabsOnly(clean, opts);
     } catch (e) {
       const msg = e?.message || String(e);
-      errors.push(msg);
-      console.warn("[tts] ElevenLabs abandonné, repli OpenAI si disponible:", msg.slice(0, 120));
+      errors.push("ElevenLabs: " + msg);
+      console.warn("[tts] ElevenLabs indisponible, repli suivant:", msg.slice(0, 160));
     }
   }
 
   if (isOpenAiSpeechReady()) {
-    return await synthesizeOpenAiSpeechToPcm(clean);
+    try {
+      return await synthesizeOpenAiSpeechToPcm(clean);
+    } catch (e) {
+      const msg = e?.message || String(e);
+      errors.push("OpenAI: " + msg);
+      console.warn("[tts] OpenAI (PCM) indisponible, repli Edge:", msg.slice(0, 120));
+    }
+  }
+
+  if (isEdgeTtsEnabled()) {
+    try {
+      return await synthesizeEdgeToPcm(clean);
+    } catch (e) {
+      const msg = e?.message || String(e);
+      errors.push("Edge: " + msg);
+      console.warn("[tts] Edge (gratuit) indisponible:", msg.slice(0, 160));
+    }
   }
 
   throw new Error(
     errors.join(" | ") ||
-      "Aucun TTS disponible : active Edge (TTS_EDGE_ENABLED=1 par défaut) ou ajoute OPENAI_API_KEY / ElevenLabs."
+      "Aucun TTS disponible : configurez ElevenLabs, OPENAI_API_KEY, ou laissez Edge actif (TTS_EDGE_ENABLED=1)."
   );
 }

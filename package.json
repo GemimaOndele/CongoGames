@@ -14,6 +14,7 @@
     "smoke:live": "node scripts/smoke-test-live.mjs",
     "dataset:commons": "node scripts/fetch-commons-assets.mjs",
     "theme:import-youtube": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/fetch-youtube-theme.ps1",
+    "unity:copy-playlist": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/copy-playlist-to-streamingassets.ps1",
     "webgl:vercel": "npx --yes vercel@latest deploy --prod",
     "backend:vercel": "node scripts/vercel-backend.mjs",
     "backend:vercel:env": "node scripts/vercel-env-from-dotenv.mjs",

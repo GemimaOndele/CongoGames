@@ -25,7 +25,7 @@ namespace CongoGames.Presentation
             if (!visible) return;
 
             float w = 340f;
-            GUILayout.BeginArea(new Rect(Screen.width - w - 12f, 72f, w, 300f), GUI.skin.box);
+            GUILayout.BeginArea(new Rect(Screen.width - w - 12f, 72f, w, 380f), GUI.skin.box);
             GUILayout.Label("URLs médias — F10 masque/affiche");
             GUILayout.Label("(session, priorité sur JSON)");
             GUILayout.Space(4f);
@@ -43,6 +43,17 @@ namespace CongoGames.Presentation
             }
 
             GUILayout.Space(6f);
+#if UNITY_WEBGL && !UNITY_EDITOR
+            GUILayout.Label("Zoom interface (WebGL — F10)");
+            float z = WebGlCanvasTuning.GetUserScale();
+            float z2 = GUILayout.HorizontalSlider(z, 0.72f, 1.55f);
+            if (Mathf.Abs(z2 - z) > 0.001f)
+            {
+                WebGlCanvasTuning.SetUserScale(z2);
+            }
+
+            GUILayout.Space(4f);
+#endif
             GUILayout.Label("Vider = laisser le JSON / défaut");
             if (GUILayout.Button("Effacer surcharges", GUILayout.Height(28f)))
             {

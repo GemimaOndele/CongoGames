@@ -392,6 +392,9 @@ namespace CongoGames.Presentation
             }
         }
 
+        /// <summary>Durée max d’écoute par piste en boucle (le morceau complet peut être plus long sur disque).</summary>
+        private const float PlaylistSegmentMaxSeconds = 60f;
+
         private IEnumerator PlayPlaylistLoop()
         {
             bool needIntro = true;
@@ -411,8 +414,9 @@ namespace CongoGames.Presentation
                     music.Play();
                 }
 
-                float len = c != null && c.length > 0.1f ? c.length : 120f;
-                yield return new WaitForSeconds(len * 0.995f);
+                float full = c != null && c.length > 0.1f ? c.length : 120f;
+                float wait = Mathf.Min(full, PlaylistSegmentMaxSeconds);
+                yield return new WaitForSeconds(wait * 0.995f);
                 i++;
             }
         }
@@ -501,6 +505,23 @@ namespace CongoGames.Presentation
                 }
             }
 
+            // Même contenu que Congogame/playlist/ côté PC : copier les .mp3 dans StreamingAssets/Theme/playlist/ (track01…)
+            for (int n = 1; n <= 36; n++)
+            {
+                string prefix = "track" + n.ToString("D2");
+                foreach (string ext in new[] { "mp3", "ogg", "wav" })
+                {
+                    string rel = "Theme/playlist/" + prefix + "." + ext;
+                    string u = StreamingAssetsUrl.UrlForRelativePath(rel);
+                    bool ok = false;
+                    yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => ok = b);
+                    if (ok)
+                    {
+                        trackPaths.Add(u);
+                    }
+                }
+            }
+
             var uq = new List<string>();
             uq.AddRange(trackPaths);
             uq = uq.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
@@ -534,7 +555,10 @@ namespace CongoGames.Presentation
             trackPaths.AddRange(uq);
         }
 
-        /// <summary>Dossier <c>Congogame/playlist</c> à la racine du dépôt (hors UnityProject) — inutilisable en WebGL.</summary>
+        /// <summary>
+        /// Dossier <c>Congogame/playlist</c> à la racine du dépôt (hors UnityProject), éditeur / binaires seulement.
+        /// WebGL : mêmes fichiers attendus sous <c>StreamingAssets/Theme/playlist/</c> (track01.mp3…), voir <see cref="CoProbeTracksForWebGl"/>.
+        /// </summary>
         private static void TryAppendCongoleseRepoPlaylistFolder(List<string> trackPaths)
         {
             if (StreamingAssetsUrl.IsWebGlData)

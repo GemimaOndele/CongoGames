@@ -63,7 +63,11 @@ namespace CongoGames.Core
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.55f;
+            WebGlCanvasTuning.ApplyToScaler(scaler);
             canvasGo.AddComponent<GraphicRaycaster>();
+#if UNITY_WEBGL && !UNITY_EDITOR
+            canvasGo.AddComponent<WebGlUiScaleRuntime>();
+#endif
 
             GameObject es = new GameObject("EventSystem");
             es.AddComponent<EventSystem>();
@@ -337,6 +341,57 @@ namespace CongoGames.Core
             MiniGamePanelContent panel = root.GetComponent<MiniGamePanelContent>();
             panel.EnsureGridsIfMissing();
             surf.Apply(surf.CurrentModeId);
+
+            EnsureThemeMusicForCustomScene(surf);
+            PatchAllCanvasScalersForWebGl();
+            Canvas modeCanvas = surf.GetComponentInParent<Canvas>();
+            if (modeCanvas != null && modeCanvas.GetComponent<ThemeUrlDebugBar>() == null)
+            {
+                modeCanvas.gameObject.AddComponent<ThemeUrlDebugBar>();
+            }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if (Object.FindAnyObjectByType<WebGlUiScaleRuntime>() == null)
+            {
+                GameObject z = new GameObject("CongoWebGlUiServices");
+                z.AddComponent<WebGlUiScaleRuntime>();
+                Object.DontDestroyOnLoad(z);
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Scène perso avec <see cref="ModeSurfaceController"/> : le bootstrap court-circuite avant de créer ThemeMusic.
+        /// </summary>
+        private static void EnsureThemeMusicForCustomScene(ModeSurfaceController surf)
+        {
+            if (Object.FindAnyObjectByType<ThemeMusicPlayer>() != null)
+            {
+                return;
+            }
+
+            GameObject host = new GameObject("ThemeMusic");
+            host.AddComponent<ThemeMusicPlayer>();
+            if (Object.FindAnyObjectByType<AudioListener>() == null)
+            {
+                new GameObject("CongoGames_AudioListener").AddComponent<AudioListener>();
+            }
+
+            string id = surf != null && !string.IsNullOrEmpty(surf.CurrentModeId) ? surf.CurrentModeId : "quiz";
+            ThemeMusicPlayer tmp = host.GetComponent<ThemeMusicPlayer>();
+            if (tmp != null)
+            {
+                tmp.ApplyGameMode(id);
+            }
+        }
+
+        private static void PatchAllCanvasScalersForWebGl()
+        {
+            CanvasScaler[] scalers = Object.FindObjectsByType<CanvasScaler>(FindObjectsSortMode.None);
+            for (int i = 0; i < scalers.Length; i++)
+            {
+                WebGlCanvasTuning.ApplyToScaler(scalers[i]);
+            }
         }
 
         private static void BuildSplashOverlay(Transform canvas, Font font)
