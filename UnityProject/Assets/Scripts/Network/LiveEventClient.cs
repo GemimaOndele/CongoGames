@@ -268,7 +268,6 @@ namespace CongoGames.Network
             if (msg.action == "battle")
             {
                 BattleManager.Instance.StartBattleFromTop(ScoreManager.Instance.GetTopPlayers());
-                AIHostManager.Instance?.Speak("Battle declenchee.");
                 return;
             }
 

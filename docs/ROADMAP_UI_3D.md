@@ -1,6 +1,8 @@
 # Après le MVP (interface « type PS5 / TikTok live »)
 
-Le client actuel est un **HUD 2D** (texte, grilles, fond animé `SyntheticVideoBackground`, révélation d’image en shader léger) branché WebSocket + TTS — c’est volontaire pour valider la boucle live. Un **rendu « jeu console 3D » complet** (personnages, scène 3D) demande **d’autres pipelines** (assets, rigging) :
+Le client actuel est un **HUD 2D** (texte, grilles, fond animé `SyntheticVideoBackground`, révélation d’image en shader léger) branché WebSocket + TTS — c’est volontaire pour valider la boucle live. En complément (sans scène 3D), le dépôt ajoute un **ressenti « console »** léger : `Ps5HudParallax` + `Ps5ModeVisualRig` + `Ps5CanvasBackdropRig` sur le bootstrap (mouvement 2,5D, légère variation d’échelle par `modeId`, vignette animée). Ce n’est **pas** un remplacement d’une vraie scène 3D.
+
+Un **rendu « jeu console 3D » complet** (personnages, scène 3D) demande **d’autres pipelines** (assets, rigging) :
 
 - **Modèles 3D** (robot, plateau, public), **éclairage**, **post-process** (URP), **caméras** cinématiques.
 - **Animations** (Timeline, Animator, VFX Shader Graph), **UI** World Space ou mix **Screen Space** + rendu 3D.

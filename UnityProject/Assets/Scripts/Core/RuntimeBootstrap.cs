@@ -50,6 +50,7 @@ namespace CongoGames.Core
             services.AddComponent<BattleManager>();
             services.AddComponent<AIHostManager>();
             services.AddComponent<BroadcastAudioMixCoordinator>();
+            services.AddComponent<LiveHostDirector>();
             services.AddComponent<IntroDirector>();
             LiveEventClient live = services.AddComponent<LiveEventClient>();
 
@@ -86,6 +87,7 @@ namespace CongoGames.Core
             bg.sprite = GetWhiteSprite();
             bg.color = new Color(0.02f, 0.05f, 0.09f, 0.22f);
             bg.raycastTarget = false;
+            backdrop.AddComponent<Ps5CanvasBackdropRig>();
 
             GameObject topBar = CreateUiRect(canvasGo.transform, "TopBar", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -6f), new Vector2(0f, 88f));
             Image bar = topBar.AddComponent<Image>();
@@ -160,6 +162,8 @@ namespace CongoGames.Core
             modeRoot.AddComponent<ModeSurfaceController>();
             modeRoot.AddComponent<MiniGamePanelContent>();
             modeRoot.AddComponent<HudPanelAnimator>();
+            modeRoot.AddComponent<Ps5HudParallax>();
+            modeRoot.AddComponent<Ps5ModeVisualRig>();
 
             GameObject panelQuiz = CreateUiRect(modeRoot.transform, "PanelQuiz", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 

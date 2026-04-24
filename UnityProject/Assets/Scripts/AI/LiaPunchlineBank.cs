@@ -1,62 +1,139 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using CongoGames.Core;
 
 namespace CongoGames.AI
 {
     /// <summary>
-    /// Répliques aléatoires pour Lia (hôte) — fiche virale, sans SFX de rire (voir GameSfxHub).
-    /// Resources/LiaPunchlines.txt : blocs <c> / <w> (une phrase par ligne), ou tout dans &lt;c&gt; seul = tout mélangé.
+    /// Répliques Lia — Resources/LiaPunchlines.txt avec blocs : &lt;c&gt; &lt;w&gt; &lt;b&gt; &lt;t&gt; &lt;v&gt; &lt;cta&gt; (ou tout dans &lt;c&gt; = mélangé).
+    /// Anti-répétition : file d’attente des N derniers index par catégorie.
     /// </summary>
     public static class LiaPunchlineBank
     {
+        private const int AvoidRecent = 6;
         private static string[] _correct;
         private static string[] _wrong;
-        private static int _iCorrect;
-        private static int _iWrong;
-        private static int _iTrans;
+        private static string[] _battle;
+        private static string[] _trans;
+        private static string[] _viral;
+        private static string[] _cta;
+        private static readonly Queue<string> _rc = new Queue<string>(AvoidRecent + 1);
+        private static readonly Queue<string> _rw = new Queue<string>(AvoidRecent + 1);
+        private static readonly Queue<string> _rb = new Queue<string>(AvoidRecent + 1);
+        private static readonly Queue<string> _rt = new Queue<string>(AvoidRecent + 1);
+        private static readonly Queue<string> _rv = new Queue<string>(AvoidRecent + 1);
+        private static readonly Queue<string> _rcta = new Queue<string>(AvoidRecent + 1);
 
         private static void EnsureLoaded()
         {
-            if (_correct != null && _correct.Length > 0 && _wrong != null && _wrong.Length > 0) return;
+            if (_correct != null && _correct.Length > 0) return;
             TextAsset ta = Resources.Load<TextAsset>("LiaPunchlines");
             if (ta != null && !string.IsNullOrEmpty(ta.text))
             {
                 var c = new List<string>();
                 var w = new List<string>();
-                var mixed = new List<string>();
-                int section = 0; // 0=mixed, 1=c, 2=w
-                foreach (string line in ta.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                var b = new List<string>();
+                var t = new List<string>();
+                var v = new List<string>();
+                var cta = new List<string>();
+                int section = 0;
+                foreach (string raw in ta.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    string t = line.Trim();
-                    if (t.Length == 0) continue;
-                    if (t.StartsWith("#", StringComparison.Ordinal)) continue;
-                    if (t.Equals("<c>", StringComparison.OrdinalIgnoreCase)) { section = 1; continue; }
-                    if (t.Equals("<w>", StringComparison.OrdinalIgnoreCase)) { section = 2; continue; }
-                    if (section == 1) c.Add(t);
-                    else if (section == 2) w.Add(t);
-                    else mixed.Add(t);
+                    string line0 = raw.Trim();
+                    if (line0.Length == 0) continue;
+                    if (line0.StartsWith("#", StringComparison.Ordinal)) continue;
+                    if (line0.Equals("<c>", StringComparison.OrdinalIgnoreCase)) { section = 1; continue; }
+                    if (line0.Equals("<w>", StringComparison.OrdinalIgnoreCase)) { section = 2; continue; }
+                    if (line0.Equals("<b>", StringComparison.OrdinalIgnoreCase)) { section = 3; continue; }
+                    if (line0.Equals("<t>", StringComparison.OrdinalIgnoreCase)) { section = 4; continue; }
+                    if (line0.Equals("<v>", StringComparison.OrdinalIgnoreCase)) { section = 5; continue; }
+                    if (line0.Equals("<cta>", StringComparison.OrdinalIgnoreCase)) { section = 6; continue; }
+                    if (line0.Length >= 2 && char.IsLetter(line0[0]) && line0[1] == ':')
+                    {
+                        char k = char.ToLowerInvariant(line0[0]);
+                        string rest = line0.Substring(2).Trim();
+                        rest = CleanForTts(rest);
+                        if (string.IsNullOrEmpty(rest)) continue;
+                        if (k == 'c') c.Add(rest);
+                        else if (k == 'w') w.Add(rest);
+                        else if (k == 'b') b.Add(rest);
+                        else if (k == 't') t.Add(rest);
+                        else if (k == 'v') v.Add(rest);
+                        else if (k == 'a') cta.Add(rest);
+                        continue;
+                    }
+
+                    string line = CleanForTts(line0);
+                    if (string.IsNullOrEmpty(line)) continue;
+                    if (section == 1) c.Add(line);
+                    else if (section == 2) w.Add(line);
+                    else if (section == 3) b.Add(line);
+                    else if (section == 4) t.Add(line);
+                    else if (section == 5) v.Add(line);
+                    else if (section == 6) cta.Add(line);
                 }
 
-                if (c.Count == 0 && w.Count == 0 && mixed.Count > 0)
+                if (c.Count == 0 && w.Count == 0)
                 {
-                    _correct = _wrong = mixed.ToArray();
+                    _correct = _wrong = BuildFallbackCorrect();
                 }
                 else
                 {
                     _correct = c.Count > 0 ? c.ToArray() : BuildFallbackCorrect();
                     _wrong = w.Count > 0 ? w.ToArray() : BuildFallbackWrong();
                 }
+
+                _battle = b.Count > 0 ? b.ToArray() : new[] { "Combat en place — chaud chaud !" };
+                _trans = t.Count > 0 ? t.ToArray() : new[] { "On enchaîne !" };
+                _viral = v.Count > 0 ? v.ToArray() : new[] { "C’est chaud ici, fais un effort !" };
+                _cta = cta.Count > 0 ? cta.ToArray() : BuildDefaultCta();
             }
             else
             {
                 _correct = BuildFallbackCorrect();
                 _wrong = BuildFallbackWrong();
+                _battle = new[] { "Duel en cours !" };
+                _trans = new[] { "Nouveau défi !" };
+                _viral = new[] { "Ici, on joue sérieux !" };
+                _cta = BuildDefaultCta();
             }
 
             Shuffle(_correct);
             Shuffle(_wrong);
+            Shuffle(_battle);
+            Shuffle(_trans);
+            Shuffle(_viral);
+            Shuffle(_cta);
+        }
+
+        public static string CleanForTts(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return "";
+            s = s.Trim();
+            s = Regex.Replace(s, "^[0-9]+[.)]\\s*", "");
+            s = s.Trim(' ', '"', '«', '»', '“', '”', '\'');
+            var sb = new StringBuilder(s.Length);
+            for (int i = 0; i < s.Length;)
+            {
+                int cp = char.ConvertToUtf32(s, i);
+                int adv = char.IsHighSurrogate(s[i]) && i + 1 < s.Length ? 2 : 1;
+                if (IsEmojiOrPicSymbol(cp)) { i += adv; continue; }
+
+                sb.Append(char.ConvertFromUtf32(cp));
+                i += adv;
+            }
+
+            s = sb.ToString().Trim();
+            s = Regex.Replace(s, @"\s+", " ");
+            return s;
+        }
+
+        private static bool IsEmojiOrPicSymbol(int cp)
+        {
+            return (cp is >= 0x1f300 and <= 0x1faff) || (cp is >= 0x2600 and <= 0x27bf) || (cp is >= 0xfe00 and <= 0xfe0f);
         }
 
         private static void Shuffle(string[] a)
@@ -69,27 +146,63 @@ namespace CongoGames.AI
             }
         }
 
-        private static string[] BuildFallbackCorrect()
-        {
-            return new[] { "Bien vu !", "C’est validé !", "Tu t’y connais !", "Yes !", "Boom, c’est bon !", "Malamu !" };
-        }
+        private static string[] BuildFallbackCorrect() =>
+            new[] { "Bien vu !", "C'est validé !", "Très propre !", "Malamu !" };
 
-        private static string[] BuildFallbackWrong()
-        {
-            return new[] { "Aïe, pas ça !", "Essaie encore !", "Presque, mais non !", "Raté, on continue !", "Bof bof…", "Même moi j’ai mal !" };
-        }
+        private static string[] BuildFallbackWrong() =>
+            new[] { "Aïe, pas ça !", "Essaie encore !", "Raté, on continue !" };
 
-        public static string PickCorrect()
+        private static string[] BuildDefaultCta() => new[]
+        {
+            "Pense à t'abonner et à partager le live, ça booste le CongoGames !",
+            "Si t'aimes le show, abonne-toi, republie, et envoie un petit cadeau pour soutenir !",
+            "N'oublie pas de suivre, partager et repartager, et d'offrir un cadeau si tu kiffes l'énergie !"
+        };
+
+        private static string PickFromPool(string[] pool, Queue<string> recent)
         {
             EnsureLoaded();
-            return _correct[(_iCorrect++) % _correct.Length];
+            if (pool == null || pool.Length == 0) return "";
+            for (int attempt = 0; attempt < 48; attempt++)
+            {
+                int idx = UnityEngine.Random.Range(0, pool.Length);
+                string s = (pool[idx] ?? "").Trim();
+                if (s.Length < 1) continue;
+                if (IsRecent(recent, s)) continue;
+                EnqueueRecent(recent, s);
+                return s;
+            }
+
+            int fb = UnityEngine.Random.Range(0, pool.Length);
+            string t = (pool[fb] ?? "").Trim();
+            EnqueueRecent(recent, t);
+            return t;
         }
 
-        public static string PickWrong()
+        private static bool IsRecent(Queue<string> recent, string s)
         {
-            EnsureLoaded();
-            return _wrong[(_iWrong++) % _wrong.Length];
+            if (recent == null || s == null) return false;
+            foreach (string x in recent)
+            {
+                if (string.Equals(x, s, StringComparison.OrdinalIgnoreCase)) return true;
+            }
+
+            return false;
         }
+
+        private static void EnqueueRecent(Queue<string> recent, string s)
+        {
+            if (recent == null || AvoidRecent <= 0) return;
+            while (recent.Count >= AvoidRecent) recent.Dequeue();
+            recent.Enqueue(s);
+        }
+
+        public static string PickCorrect() => PickFromPool(_correct, _rc);
+        public static string PickWrong() => PickFromPool(_wrong, _rw);
+        public static string PickBattle() => PickFromPool(_battle, _rb);
+        public static string PickTransition() => PickFromPool(_trans, _rt);
+        public static string PickViral() => PickFromPool(_viral, _rv);
+        public static string PickCta() => PickFromPool(_cta, _rcta);
 
         public static string BuildModeIntroLine(string modeId)
         {
@@ -102,20 +215,25 @@ namespace CongoGames.AI
             EnsureLoaded();
             string a = string.IsNullOrEmpty(fromId) ? "ici" : GameModeManager.GetModeDisplayName(fromId);
             string b = GameModeManager.GetModeDisplayName(toId);
-            return "On laisse " + a + " — place à : " + b + " ! " + _correct[_iTrans++ % _correct.Length];
+            return "On laisse " + a + " — place à : " + b + " ! " + PickTransition();
         }
 
-        /// <summary>Règles + transition — une seule phrase TTS au début de chaque mode.</summary>
         public static string BuildTransitionWithRules(string fromId, string toId)
         {
             string name = GameModeManager.GetModeDisplayName(toId);
             string r = ModeRulesOneLiner(toId);
+            string baseLine;
             if (string.IsNullOrEmpty(fromId) || fromId == toId)
             {
-                return name + " — " + r;
+                baseLine = name + " — " + r;
+            }
+            else
+            {
+                baseLine = "On quitte " + GameModeManager.GetModeDisplayName(fromId) + " pour " + name + ". " + r;
             }
 
-            return "On quitte " + GameModeManager.GetModeDisplayName(fromId) + " pour " + name + ". " + r;
+            if (UnityEngine.Random.value < 0.4f) baseLine = baseLine + " " + PickTransition();
+            return baseLine;
         }
 
         public static string ModeRulesOneLiner(string modeId)
@@ -123,19 +241,18 @@ namespace CongoGames.AI
             switch (modeId)
             {
                 case "quiz": return "lis la question, appuie sur A, B, C ou D (bandeau du bas), puis écoute Lia.";
-                case "semantic": return "relie l’idée, tape le mot clé, Valider.";
-                case "word-scramble": return "thème affiché : trouve les mots (ordre libre) — la ligne jaune t’aide ; tape ou clique les lettres, Valider.";
-                case "crossword-lite": return "mots cachés dans la grande grille (H/V/diagonales) — cherche n’importe lequel de la liste, tape le mot, Valider.";
-                case "blind-test": return "écoutes la musique, puis choisis A–D quand c’est actif.";
+                case "semantic": return "relie l'idée, tape le mot clé, Valider.";
+                case "word-scramble": return "thème affiché : trouve les mots (ordre libre) — la ligne jaune t'aide ; tape ou clique les lettres, Valider.";
+                case "crossword-lite": return "mots cachés dans la grande grille (H/V/diagonales) — cherche n'importe lequel de la liste, tape le mot, Valider.";
+                case "blind-test": return "écoutes la musique, puis choisis A–D quand c'est actif.";
                 case "mystery-word": return "devine le mot complet : champ en bas, Valider.";
-                case "memory": return "ouvre deux cartes : s’il y a la même lettre, la paire reste.";
+                case "memory": return "ouvre deux cartes : s'il y a la même lettre, la paire reste.";
                 case "speed-chrono": return "3-2-1 — une cible 1/2/3/4 cachée : au GO, appuie vite sur la touche 1, 2, 3 ou 4 (même chiffre en live dans le chat).";
-                case "image-guess": return "l’image se révèle : écris ce que tu vois, Valider.";
-                default: return "suis l’indication à l’écran, Valider si besoin.";
+                case "image-guess": return "l'image se révèle : écris ce que tu vois, Valider.";
+                default: return "suis l'indication à l'écran, Valider si besoin.";
             }
         }
 
-        /// <summary>Voix courte de Lia après bon / mauvais choix (TTS — la musique baisse via ducking).</summary>
         public static void SpeakResultReaction(bool correct)
         {
             AIHostManager.Instance?.Speak(correct ? PickCorrect() : PickWrong());

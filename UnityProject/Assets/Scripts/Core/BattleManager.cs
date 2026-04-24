@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using CongoGames.AI;
 
 namespace CongoGames.Core
 {
@@ -26,6 +27,9 @@ namespace CongoGames.Core
             playerA = p1;
             playerB = p2;
             Debug.Log($"Battle started: {p1} vs {p2}");
+            string v = LiaPunchlineBank.PickViral();
+            AIHostManager.Instance?.Speak(
+                "Battle : " + p1 + " contre " + p2 + ". " + LiaPunchlineBank.PickBattle() + " " + v);
         }
 
         public void StartBattleFromTop(List<PlayerData> top)

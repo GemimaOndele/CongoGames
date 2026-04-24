@@ -7,6 +7,8 @@ namespace CongoGames.Presentation
     /// </summary>
     public static class ThemeRuntime
     {
+        public static event System.Action<string> OnModeStarted;
+
         public static void NotifyModeStarted(string modeId)
         {
             string id = string.IsNullOrEmpty(modeId) ? "default" : modeId.Trim().ToLowerInvariant();
@@ -26,6 +28,15 @@ namespace CongoGames.Presentation
             if (strip != null)
             {
                 strip.ApplyGameMode(id);
+            }
+
+            try
+            {
+                OnModeStarted?.Invoke(id);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
             }
         }
     }
