@@ -63,11 +63,13 @@ function renderTtsStatusPage(payload, o) {
     "</style></head><body><div class=wrap><div class=card><h1><span>🎮🔊</span> Statut TTS</h1><p class=sub>" +
     baseNote +
     "</p><ul>" +
-    ttsStatusHtmlRow("TTS prêt (enabled)", payload.enabled, "Au moins un moteur (Edge / OpenAI / ElevenLabs) est configuré côté Vercel.") +
-    ttsStatusHtmlRow("edge-tts (gratuit, démo)", payload.edge, "TTS en ligne de ce type, souvent utilisé pour les essais sans clé payante lourde.") +
-    ttsStatusHtmlRow("ElevenLabs", payload.elevenLabs, "Voix pro ; nécessite ELEVENLABS_API_KEY dans l’environnement Vercel du backend.") +
-    ttsStatusHtmlRow("OpenAI Speech", payload.openAi, "TTS via OpenAI si clés et modèle de parole configurés.") +
-    `</ul><p class=sub>📋 JSON brut (pour intégrations) : <a href="?format=json">?format=json</a></p><pre>${j.replace(/</g, "\\u003c")}</pre>` +
+    ttsStatusHtmlRow("TTS prêt (enabled)", payload.enabled, "Au moins un moteur (Edge / OpenAI / ElevenLabs) est configuré côté Vercel (projet congogames-backend-cg).") +
+    ttsStatusHtmlRow("edge-tts (gratuit, démo)", payload.edge, "TTS en ligne sans clé lourde ; c’est souvent le seul nécessaire pour des démos. ⬆️ Si c’est seul : les cases ElevenLabs / OpenAI peuvent rester vides, ce n’est pas un bug.") +
+    ttsStatusHtmlRow("ElevenLabs", payload.elevenLabs, "⬜ = non configuré. Pour activer : Vercel → congogames-backend-cg → Environment Variables : <code>ELEVENLABS_API_KEY</code> + <code>ELEVENLABS_VOICE_ID</code> (les deux requis), puis <code>npm run backend:vercel</code> ou redeploy Git.") +
+    ttsStatusHtmlRow("OpenAI Speech", payload.openAi, "⬜ = pas de clé. Pour activer : <code>OPENAI_API_KEY</code> sur le même projet Vercel. Optionnel : <code>OPENAI_TTS_MODEL</code> (défaut tts-1), <code>OPENAI_TTS_VOICE</code> (défaut alloy).") +
+    "</ul><p class=sub>⬜ indique <strong>optionnel / non branché</strong> — le jeu parle dès qu’<strong>un</strong> moteur est prêt (souvent Edge seul, ✅).</p><p class=sub>📋 JSON : <a href=\"?format=json\">?format=json</a></p><pre>" +
+    j.replace(/</g, "\\u003c") +
+    "</pre>" +
     '<p class=foot>👉 <strong>Pour tester le jeu en ligne</strong> : ouvre <a href="https://congogames.vercel.app/">congogames.vercel.app</a> — c’est le build WebGL, pas l’écran d’API.</p></div></div></body></html>'
   );
 }
