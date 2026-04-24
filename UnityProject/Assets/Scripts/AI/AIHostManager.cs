@@ -28,6 +28,7 @@ namespace CongoGames.AI
         private AudioSource audioSource;
         private AudioCacheManager cache;
         private readonly Queue<string> speechQueue = new Queue<string>();
+        private Coroutine processCo;
         private bool speaking;
         private bool ttsProbeDone;
         private bool ttsAvailable;
@@ -129,8 +130,27 @@ namespace CongoGames.AI
             speechQueue.Enqueue(line.Trim());
             if (!speaking)
             {
-                StartCoroutine(ProcessQueue());
+                processCo = StartCoroutine(ProcessQueue());
             }
+        }
+
+        /// <summary>Stop la voix en cours, vide la file — pour éviter chevauchement avec SFX d’action (quiz, chrono, etc.).</summary>
+        public void InterruptSpeech()
+        {
+            speechQueue.Clear();
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
+
+            if (processCo != null)
+            {
+                StopCoroutine(processCo);
+                processCo = null;
+            }
+
+            speaking = false;
+            SetSpeakingVisual(false);
         }
 
         private IEnumerator ProcessQueue()
@@ -194,6 +214,7 @@ namespace CongoGames.AI
 
             speaking = false;
             SetSpeakingVisual(false);
+            processCo = null;
         }
 
         private sealed class PhrasePlayState

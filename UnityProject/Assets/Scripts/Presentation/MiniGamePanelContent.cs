@@ -1266,8 +1266,9 @@ namespace CongoGames.Presentation
             {
                 chronoStreak = 0;
                 chronoLastRoundPoints = 0;
-                chronoResultFlash = "Temps ! c’était " + (1 + chronoTargetSlot) + " / 4 (touche 1–4).";
-                GameSfxHub.Instance?.PlayResult(false);
+                chronoResultFlash = "Temps ! c’était " + (1 + chronoTargetSlot) + " (touches 1–4). Aucun point : tu n’as pas appuyé à temps — ce n’est pas une « mauvaise réponse ».";
+                // Pas de buzz « faux » ni punchline négative : l’utilisateur n’a pas saisi d’action volontaire.
+                GameSfxHub.Instance?.PlayResult(false, hostVoiceCommentary: false, neutralNoWrongTone: true);
                 chronoPhase = 2;
                 chronoStateUntil = Time.unscaledTime + 0.8f;
                 return;
@@ -1318,9 +1319,9 @@ namespace CongoGames.Presentation
             }
 
             if (chronoTitle != null) chronoTitle.text = "Chrono vitesse — fin !";
-            if (chronoSub != null) chronoSub.text = "Total de la manche chrono : " + chronoSessionScore + " pts. Enchaînement auto…";
+            if (chronoSub != null) chronoSub.text = "Total : " + chronoSessionScore + " pts. Prochain mini-jeu…";
             if (chronoBig != null) chronoBig.text = "★ " + chronoSessionScore;
-            if (chronoMeta != null) chronoMeta.text = "Touches 1–4 : réagir vite à la cible 1/4. " + ScoreHistoryStore.BuildSummaryLine();
+            if (chronoMeta != null) chronoMeta.text = "Manche chrono terminée.";
             chronoPhase = 3;
             chronoStateUntil = Time.unscaledTime + 0.5f;
             GameModeManager.Instance?.ScheduleNextMode(1.4f);
@@ -1430,6 +1431,9 @@ namespace CongoGames.Presentation
                 chronoMeta = t;
             }
         }
+
+        /// <summary>Chrono vitesse actif (réaction 1–4) : le minuteur rond en bas s’affiche ailleurs pour éviter la superposition.</summary>
+        public bool IsChronoRoundActive => chronoModeActive;
 
         private void Update()
         {

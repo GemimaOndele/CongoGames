@@ -110,13 +110,9 @@ namespace CongoGames.Core
             modeLabel.horizontalOverflow = HorizontalWrapMode.Overflow;
             modeLabel.verticalOverflow = VerticalWrapMode.Overflow;
 
-            GameObject timerBlock = CreateUiRect(canvasGo.transform, "TimerBlock", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            GameObject timerBlock = CreateUiRect(canvasGo.transform, "TimerBlock", new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-20f, -128f), new Vector2(100f, 100f));
             RectTransform timerRt = timerBlock.GetComponent<RectTransform>();
-            timerRt.anchorMin = new Vector2(0f, 0f);
-            timerRt.anchorMax = new Vector2(0f, 0f);
-            timerRt.pivot = new Vector2(0f, 0f);
-            timerRt.anchoredPosition = new Vector2(18f, 18f);
-            timerRt.sizeDelta = new Vector2(120f, 120f);
+            timerRt.pivot = new Vector2(1f, 1f);
             Image ringBg = timerBlock.AddComponent<Image>();
             ringBg.sprite = GetWhiteSprite();
             ringBg.color = new Color(0.15f, 0.15f, 0.18f, 0.9f);
@@ -145,15 +141,17 @@ namespace CongoGames.Core
             lbTitle.color = new Color(1f, 0.85f, 0.15f);
             lbTitle.text = "Classement";
 
-            Text lbBody = CreateText(lbPanel.transform, "LbBody", font, 22, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(12f, -52f), new Vector2(-24f, 400f));
+            Text lbBody = CreateText(lbPanel.transform, "LbBody", font, 16, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(10f, -48f), new Vector2(-20f, 360f));
             lbBody.color = new Color(0.95f, 0.95f, 0.95f);
             lbBody.alignment = TextAnchor.UpperLeft;
+            lbBody.horizontalOverflow = HorizontalWrapMode.Wrap;
+            lbBody.verticalOverflow = VerticalWrapMode.Overflow;
             RectTransform lbRt = lbBody.rectTransform;
             lbRt.anchorMin = new Vector2(0f, 1f);
             lbRt.anchorMax = new Vector2(0f, 1f);
             lbRt.pivot = new Vector2(0f, 1f);
-            lbRt.anchoredPosition = new Vector2(12f, -52f);
-            lbRt.sizeDelta = new Vector2(320f, 420f);
+            lbRt.anchoredPosition = new Vector2(10f, -48f);
+            lbRt.sizeDelta = new Vector2(300f, 360f);
 
             LeaderboardUI lbUi = lbPanel.AddComponent<LeaderboardUI>();
             lbUi.BindRuntime(lbBody);

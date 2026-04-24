@@ -47,14 +47,16 @@ namespace CongoGames.UI
         {
             if (leaderboardText == null) return;
             var sb = new StringBuilder();
-            string today = DateTime.Now.ToString("d MMMM yyyy", CultureInfo.GetCultureInfo("fr-FR"));
-            sb.Append("Aujourd’hui : ").Append(today).Append('\n');
+            string today = DateTime.Now.ToString("d MMM yy", CultureInfo.GetCultureInfo("fr-FR"));
+            sb.Append(today).Append(" · ");
             int n = ScoreManager.Instance != null ? ScoreManager.Instance.GetRegisteredPlayerCount() : players.Count;
-            sb.Append("Joueurs (scores) : ").Append(n).Append("\n");
-            sb.Append(ScoreHistoryStore.BuildSummaryLine()).Append("\n\n");
+            sb.Append(n).Append(" joueur(s)\n");
+            sb.Append(ScoreHistoryStore.BuildSummaryLine()).Append("\n—\n");
             for (int i = 0; i < players.Count; i++)
             {
-                sb.Append(i + 1).Append(". ").Append(players[i].Username).Append(" - ").Append(players[i].Score).Append('\n');
+                string u = players[i].Username;
+                if (u != null && u.Length > 14) u = u.Substring(0, 12) + "…";
+                sb.Append(i + 1).Append(". ").Append(u).Append(" ").Append(players[i].Score).Append('\n');
             }
 
             leaderboardText.text = sb.ToString();

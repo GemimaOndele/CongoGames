@@ -222,34 +222,28 @@ namespace CongoGames.AI
         {
             string name = GameModeManager.GetModeDisplayName(toId);
             string r = ModeRulesOneLiner(toId);
-            string baseLine;
             if (string.IsNullOrEmpty(fromId) || fromId == toId)
             {
-                baseLine = name + " — " + r;
-            }
-            else
-            {
-                baseLine = "On quitte " + GameModeManager.GetModeDisplayName(fromId) + " pour " + name + ". " + r;
+                return name + ". " + r;
             }
 
-            if (UnityEngine.Random.value < 0.4f) baseLine = baseLine + " " + PickTransition();
-            return baseLine;
+            return "Place à " + name + ". " + r;
         }
 
         public static string ModeRulesOneLiner(string modeId)
         {
             switch (modeId)
             {
-                case "quiz": return "lis la question, appuie sur A, B, C ou D (bandeau du bas), puis écoute Lia.";
-                case "semantic": return "relie l'idée, tape le mot clé, Valider.";
-                case "word-scramble": return "thème affiché : trouve les mots (ordre libre) — la ligne jaune t'aide ; tape ou clique les lettres, Valider.";
-                case "crossword-lite": return "mots cachés dans la grande grille (H/V/diagonales) — cherche n'importe lequel de la liste, tape le mot, Valider.";
-                case "blind-test": return "écoutes la musique, puis choisis A–D quand c'est actif.";
-                case "mystery-word": return "devine le mot complet : champ en bas, Valider.";
-                case "memory": return "ouvre deux cartes : s'il y a la même lettre, la paire reste.";
-                case "speed-chrono": return "3-2-1 — une cible 1/2/3/4 cachée : au GO, appuie vite sur la touche 1, 2, 3 ou 4 (même chiffre en live dans le chat).";
-                case "image-guess": return "l'image se révèle : écris ce que tu vois, Valider.";
-                default: return "suis l'indication à l'écran, Valider si besoin.";
+                case "quiz": return "Question : choisis A, B, C ou D en bas.";
+                case "semantic": return "Tape le mot, puis Valider.";
+                case "word-scramble": return "Trouve les mots du thème — Valider.";
+                case "crossword-lite": return "Trouve des mots dans la grille — Valider.";
+                case "blind-test": return "Écoute, puis A à D.";
+                case "mystery-word": return "Tape le mot, Valider.";
+                case "memory": return "Deux cartes identiques = paire.";
+                case "speed-chrono": return "3, 2, 1, GO : touche 1 à 4 vite !";
+                case "image-guess": return "Regarde l’image, tape un mot, Valider.";
+                default: return "Suis l’écran, Valider.";
             }
         }
 

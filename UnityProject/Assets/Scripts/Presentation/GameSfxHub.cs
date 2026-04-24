@@ -234,13 +234,17 @@ namespace CongoGames.Presentation
             if (crowdSource != null) crowdSource.Stop();
         }
 
-        public void PlayResult(bool correct, bool hostVoiceCommentary = true)
+        public void PlayResult(bool correct, bool hostVoiceCommentary = true, bool neutralNoWrongTone = false)
         {
             if (source == null) return;
+            AIHostManager.Instance?.InterruptSpeech();
             StopFeedbackOneShots();
             if (hostVoiceCommentary)
             {
-                LiaPunchlineBank.SpeakResultReaction(correct);
+                if (!neutralNoWrongTone || correct)
+                {
+                    LiaPunchlineBank.SpeakResultReaction(correct);
+                }
             }
 
             if (correct)
@@ -252,6 +256,10 @@ namespace CongoGames.Presentation
                 }
 
                 FeedbackVfxController.Instance?.PlayCorrect();
+            }
+            else if (neutralNoWrongTone)
+            {
+                if (tapClip != null) source.PlayOneShot(tapClip, 0.28f);
             }
             else
             {

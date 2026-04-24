@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using CongoGames.Core;
+using CongoGames.Presentation;
 
 namespace CongoGames.UI
 {
@@ -30,6 +31,19 @@ namespace CongoGames.UI
                 return;
             }
 
+            if (modeLabel != null)
+            {
+                modeLabel.text = "Mode : " + gmm.ActiveModeDisplayName;
+            }
+
+            bool chronoUi = string.Equals(gmm.ActiveModeId, "speed-chrono", System.StringComparison.Ordinal)
+                            && (MiniGamePanelContent.Instance == null || MiniGamePanelContent.Instance.IsChronoRoundActive);
+            if (timerRing != null) timerRing.enabled = !chronoUi;
+            if (timerRing != null && timerRing.transform.parent != null) timerRing.transform.parent.gameObject.SetActive(!chronoUi);
+            if (timerSeconds != null) timerSeconds.enabled = !chronoUi;
+
+            if (chronoUi) return;
+
             float d = Mathf.Max(0.01f, gmm.RoundDuration);
             float t = Mathf.Max(0f, gmm.RoundTimeRemaining);
             if (timerRing != null)
@@ -42,14 +56,9 @@ namespace CongoGames.UI
                 timerSeconds.text = Mathf.Ceil(t).ToString("0");
             }
 
-            if (modeLabel != null)
-            {
-                modeLabel.text = "Mode : " + gmm.ActiveModeDisplayName;
-            }
-
             if (brandLine != null && string.IsNullOrEmpty(brandLine.text))
             {
-                brandLine.text = "Congo · V·J·R · FR · Lingala · Kituba";
+                brandLine.text = "Congo · tricolore · FR · Lingala · Kituba";
             }
         }
     }
