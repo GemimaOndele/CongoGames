@@ -66,41 +66,75 @@ namespace CongoGames.Core
             return false;
         }
 
+        private static readonly int[,] Dirs =
+        {
+            { 0, 1 },
+            { 0, -1 },
+            { 1, 0 },
+            { -1, 0 },
+            { 1, 1 },
+            { 1, -1 },
+            { -1, 1 },
+            { -1, -1 }
+        };
+
+        private static bool WordFitsBounds(int size, int len, int r, int c, int dr, int dc)
+        {
+            for (int i = 0; i < len; i++)
+            {
+                int rr = r + dr * i;
+                int cc = c + dc * i;
+                if (rr < 0 || cc < 0 || rr >= size || cc >= size)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private static bool PlaceOneWord(char[,] g, int size, string w)
         {
             int len = w.Length;
             if (len > size) return false;
-            int tries = 500;
-            while (tries-- > 0)
+            int nDir = Dirs.GetLength(0);
+            for (int tries = 0; tries < 900; tries++)
             {
-                // droite (0,1) ou bas (1,0)
-                int di = Random.Range(0, 2);
-                int r;
-                int c;
-                if (di == 0)
+                int di = Random.Range(0, nDir);
+                int dr = Dirs[di, 0];
+                int dc = Dirs[di, 1];
+                int r = Random.Range(0, size);
+                int c = Random.Range(0, size);
+                if (!WordFitsBounds(size, len, r, c, dr, dc))
                 {
-                    r = Random.Range(0, size);
-                    c = Random.Range(0, size - len + 1);
-                    if (FitsLine(g, size, r, c, 0, 1, w)) { ApplyLine(g, r, c, 0, 1, w); return true; }
+                    continue;
                 }
-                else
+
+                if (FitsLine(g, size, r, c, dr, dc, w))
                 {
-                    r = Random.Range(0, size - len + 1);
-                    c = Random.Range(0, size);
-                    if (FitsLine(g, size, r, c, 1, 0, w)) { ApplyLine(g, r, c, 1, 0, w); return true; }
+                    ApplyLine(g, r, c, dr, dc, w);
+                    return true;
                 }
             }
 
-            for (int r = 0; r < size; r++)
-            for (int c = 0; c <= size - len; c++)
+            for (int di = 0; di < nDir; di++)
             {
-                if (FitsLine(g, size, r, c, 0, 1, w)) { ApplyLine(g, r, c, 0, 1, w); return true; }
-            }
+                int dr = Dirs[di, 0];
+                int dc = Dirs[di, 1];
+                for (int r = 0; r < size; r++)
+                for (int c = 0; c < size; c++)
+                {
+                    if (!WordFitsBounds(size, len, r, c, dr, dc))
+                    {
+                        continue;
+                    }
 
-            for (int r = 0; r <= size - len; r++)
-            for (int c = 0; c < size; c++)
-            {
-                if (FitsLine(g, size, r, c, 1, 0, w)) { ApplyLine(g, r, c, 1, 0, w); return true; }
+                    if (FitsLine(g, size, r, c, dr, dc, w))
+                    {
+                        ApplyLine(g, r, c, dr, dc, w);
+                        return true;
+                    }
+                }
             }
 
             return false;

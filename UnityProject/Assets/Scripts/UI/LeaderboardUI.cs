@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -45,6 +47,11 @@ namespace CongoGames.UI
         {
             if (leaderboardText == null) return;
             var sb = new StringBuilder();
+            string today = DateTime.Now.ToString("d MMMM yyyy", CultureInfo.GetCultureInfo("fr-FR"));
+            sb.Append("Aujourd’hui : ").Append(today).Append('\n');
+            int n = ScoreManager.Instance != null ? ScoreManager.Instance.GetRegisteredPlayerCount() : players.Count;
+            sb.Append("Joueurs (scores) : ").Append(n).Append("\n");
+            sb.Append(ScoreHistoryStore.BuildSummaryLine()).Append("\n\n");
             for (int i = 0; i < players.Count; i++)
             {
                 sb.Append(i + 1).Append(". ").Append(players[i].Username).Append(" - ").Append(players[i].Score).Append('\n');

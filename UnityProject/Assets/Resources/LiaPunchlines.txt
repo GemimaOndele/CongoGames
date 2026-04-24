@@ -1,0 +1,205 @@
+# Lia — <c> bonnes / <w> mauvaises (CongoGames). Personnalise ce fichier.
+
+<c>
+C’est chaud, t’es dans le thème !
+Bien vu, expert Congo !
+Là t’as mis le feu !
+OK, t’es pas venu en touriste !
+Boom, validé !
+Nickel, t’as visé juste !
+Malamu, on continue !
+Mbote du bon côté !
+Cœur sur toi, c’est propre !
+J’aime quand c’est propre !
+Tu fais honneur au live !
+Les autres ont vu ça, hein !
+OK champion(ne) !
+Tu carbures !
+C’est propre, respect !
+C’est chaud, t’es dans le thème !
+Bien vu, expert Congo !
+Là t’as mis le feu !
+OK, t’es pas venu en touriste !
+Boom, validé !
+Nickel, t’as visé juste !
+Malamu, on continue !
+Mbote du bon côté !
+Cœur sur toi, c’est propre !
+J’aime quand c’est propre !
+Tu fais honneur au live !
+Les autres ont vu ça, hein !
+OK champion(ne) !
+Tu carbures !
+C’est propre, respect !
+C’est chaud, t’es dans le thème !
+Bien vu, expert Congo !
+Là t’as mis le feu !
+OK, t’es pas venu en touriste !
+Boom, validé !
+Nickel, t’as visé juste !
+Malamu, on continue !
+Mbote du bon côté !
+Cœur sur toi, c’est propre !
+J’aime quand c’est propre !
+Tu fais honneur au live !
+Les autres ont vu ça, hein !
+OK champion(ne) !
+Tu carbures !
+C’est propre, respect !
+C’est chaud, t’es dans le thème !
+Bien vu, expert Congo !
+Là t’as mis le feu !
+OK, t’es pas venu en touriste !
+Boom, validé !
+Nickel, t’as visé juste !
+Malamu, on continue !
+Mbote du bon côté !
+Cœur sur toi, c’est propre !
+J’aime quand c’est propre !
+Tu fais honneur au live !
+Les autres ont vu ça, hein !
+OK champion(ne) !
+Tu carbures !
+C’est propre, respect !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+Encore un point de culture en plus, bravo !
+
+<w>
+Aïe, pas cette fois !
+Essaie encore, t’y es presque !
+Bof bof… on se refait un tour !
+Raté, mais j’aime l’énergie !
+Euh, on remet les idées !
+Coup d’œil, on respire, on relance !
+Pas piqué des hannetons, mais non !
+On va pas se mentir, c’était la mauvaise !
+Petit rappel : le Congo te regarde !
+C’est le live, ça arrive !
+C’est pas fini, reviens !
+Presque, mais l’Histoire a dit non !
+J’avais le doigt sur la gâchette, pas toi !
+Bien tenté, mauvais réglage !
+J’entends l’hésitation, c’est mignon !
+Aïe, pas cette fois !
+Essaie encore, t’y es presque !
+Bof bof… on se refait un tour !
+Raté, mais j’aime l’énergie !
+Euh, on remet les idées !
+Coup d’œil, on respire, on relance !
+Pas piqué des hannetons, mais non !
+On va pas se mentir, c’était la mauvaise !
+Petit rappel : le Congo te regarde !
+C’est le live, ça arrive !
+C’est pas fini, reviens !
+Presque, mais l’Histoire a dit non !
+J’avais le doigt sur la gâchette, pas toi !
+Bien tenté, mauvais réglage !
+J’entends l’hésitation, c’est mignon !
+Aïe, pas cette fois !
+Essaie encore, t’y es presque !
+Bof bof… on se refait un tour !
+Raté, mais j’aime l’énergie !
+Euh, on remet les idées !
+Coup d’œil, on respire, on relance !
+Pas piqué des hannetons, mais non !
+On va pas se mentir, c’était la mauvaise !
+Petit rappel : le Congo te regarde !
+C’est le live, ça arrive !
+C’est pas fini, reviens !
+Presque, mais l’Histoire a dit non !
+J’avais le doigt sur la gâchette, pas toi !
+Bien tenté, mauvais réglage !
+J’entends l’hésitation, c’est mignon !
+Aïe, pas cette fois !
+Essaie encore, t’y es presque !
+Bof bof… on se refait un tour !
+Raté, mais j’aime l’énergie !
+Euh, on remet les idées !
+Coup d’œil, on respire, on relance !
+Pas piqué des hannetons, mais non !
+On va pas se mentir, c’était la mauvaise !
+Petit rappel : le Congo te regarde !
+C’est le live, ça arrive !
+C’est pas fini, reviens !
+Presque, mais l’Histoire a dit non !
+J’avais le doigt sur la gâchette, pas toi !
+Bien tenté, mauvais réglage !
+J’entends l’hésitation, c’est mignon !
+Aïe, pas cette fois !
+Essaie encore, t’y es presque !
+Bof bof… on se refait un tour !
+Raté, mais j’aime l’énergie !
+Euh, on remet les idées !
+Coup d’œil, on respire, on relance !
+Pas piqué des hannetons, mais non !
+On va pas se mentir, c’était la mauvaise !
+Petit rappel : le Congo te regarde !
+C’est le live, ça arrive !
+C’est pas fini, reviens !
+Presque, mais l’Histoire a dit non !
+J’avais le doigt sur la gâchette, pas toi !
+Bien tenté, mauvais réglage !
+J’entends l’hésitation, c’est mignon !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !
+Nope — on garde le sourire !

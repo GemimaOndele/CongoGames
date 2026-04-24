@@ -40,7 +40,7 @@ namespace CongoGames.Core
             }),
             new Theme("lang", "Lingala & kituba (mots usités)", new[]
             {
-                "MELESI", "MBOTE", "MALAMU", "MOTEMA", "MWANA", "KOKO", "BISO", "MANGI", "LIBOSO", "SIMBA", "MOSALA", "NDAKISA", "NZOTO", "MABOKO", "MPONDO", "BOKET", "LOKOLA", "PEKO", "ZALA", "SALUT"
+                "MELESI", "MBOTE", "MALAMU", "MOTEMA", "MWANA", "MAIE", "KOKO", "BISO", "MANGI", "LIBOSO", "SIMBA", "MOSALA", "NDAKISA", "NZOTO", "MABOKO", "MPONDO", "BOKET", "LOKOLA", "PEKO", "ZALA", "SALUT"
             }),
             new Theme("sport", "Stade, foot, ferveur", new[]
             {
@@ -102,6 +102,12 @@ namespace CongoGames.Core
                 if (seen.Add(fallback)) picked.Add(fallback);
             }
 
+            for (int i = picked.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (picked[i], picked[j]) = (picked[j], picked[i]);
+            }
+
             words = picked;
         }
 
@@ -115,6 +121,34 @@ namespace CongoGames.Core
                 .Replace("'", "");
             if (s.Length > 12) s = s.Substring(0, 12);
             return s;
+        }
+
+        /// <summary>Glose FR optionnelle (thème langues / démo) — vide si inconnu.</summary>
+        public static string TryGlossFr(string word)
+        {
+            string k = SanitizeForGrid(word ?? "");
+            switch (k)
+            {
+                case "MELESI": return "merci";
+                case "MBOTE": return "salut";
+                case "MALAMU": return "bien";
+                case "MOTEMA": return "cœur";
+                case "MWANA": return "enfant";
+                case "MAIE": return "eau";
+                case "KOKO": return "grand-père";
+                case "BISO": return "nous";
+                case "MANGI": return "faim";
+                case "LIBOSO": return "devant";
+                case "SIMBA": return "lion";
+                case "MOSALA": return "travail";
+                case "NDAKISA": return "aider";
+                case "NZOTO": return "corps";
+                case "MABOKO": return "mains";
+                case "PEKO": return "un peu";
+                case "ZALA": return "être";
+                case "SALUT": return "salut";
+                default: return "";
+            }
         }
     }
 }

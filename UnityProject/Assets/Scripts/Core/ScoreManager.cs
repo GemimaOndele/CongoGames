@@ -75,6 +75,11 @@ namespace CongoGames.Core
                 .ToList();
         }
 
+        public int GetRegisteredPlayerCount()
+        {
+            return players.Count;
+        }
+
         public int GetHighestScoreAmongPlayers()
         {
             if (players.Count == 0) return 0;

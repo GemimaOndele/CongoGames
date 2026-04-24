@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using CongoGames.AI;
 using CongoGames.Core;
 using CongoGames.Network;
 
@@ -17,10 +18,10 @@ namespace CongoGames.Presentation
     {
         public static MiniGamePanelContent Instance { get; private set; }
 
-        private const int CrosswordCols = 7;
+        private const int CrosswordCols = 10;
         private const int CrosswordTotalCells = CrosswordCols * CrosswordCols;
-        private const float CrosswordCellPx = 48f;
-        private const float CrosswordGapPx = 6f;
+        private const float CrosswordCellPx = 36f;
+        private const float CrosswordGapPx = 5f;
         private const float ScrambleCellPx = 46f;
         private const float ScrambleGapPx = 6f;
         [Header("Mots mélangés")]
@@ -46,9 +47,15 @@ namespace CongoGames.Presentation
         /// <summary>Mot attendu pour la démo « associations » (sans l’afficher si faux).</summary>
         public string CurrentSemanticTarget { get; private set; } = "CON";
 
+        [Header("Mots — historique (grilles)")]
+        [Tooltip("Liste des mots déjà validés (mots mélangés).")]
+        public Text gridFoundList;
+        [Tooltip("Même liste pour mots cachés (grille 10×10).")]
+        public Text gridFoundListCross;
+
         [Header("Mots croisés")]
         public Text crosswordTitle;
-        public Text[] crosswordCells = new Text[CrosswordTotalCells];
+        public Text[] crosswordCells = new Text[100];
         public InputField crosswordAnswerInput;
         public Button crosswordClearButton;
         public Button crosswordSubmitButton;
@@ -125,37 +132,76 @@ namespace CongoGames.Presentation
         private string currentGridThemeLabel = "";
         private System.Collections.Generic.List<string> currentGridAllWords;
         private System.Collections.Generic.HashSet<string> currentGridSolved;
+        private readonly System.Collections.Generic.List<string> gridFoundHistory = new System.Collections.Generic.List<string>();
         [Tooltip("Cible active (mots mélangés + mots cachés) — rétro compatible avec CurrentScrambleAnswer.")]
         public string CurrentScrambleTargetWord { get; private set; } = "CONGO";
         [Tooltip("Dernier(s) mots reconnus sur mots cachés (séparateur « · »)")]
         public string LastCrosswordGuessed { get; private set; } = "";
-        [Tooltip("7×7 (remplissage type chasse aux mots)")]
-        private const int WordSearchSize = 7;
+        [Tooltip("Grille mots cachés : 10×10 (H/V/diagonales, mots moins « alignés » visuellement).")]
+        private const int WordSearchSize = 10;
         private char[,] lastWordSearchGrid;
         private string lastPopulatedModeId = "";
+
+        private void RefreshGridFoundPanel()
+        {
+            if (gridFoundHistory == null || gridFoundHistory.Count == 0)
+            {
+                string empty = "— Aucun mot validé encore —";
+                if (gridFoundList != null) gridFoundList.text = empty;
+                if (gridFoundListCross != null) gridFoundListCross.text = empty;
+                return;
+            }
+
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < gridFoundHistory.Count; i++)
+            {
+                if (i > 0) sb.Append("\n");
+                sb.Append("• ").Append(gridFoundHistory[i]);
+            }
+
+            string block = sb.ToString();
+            if (gridFoundList != null) gridFoundList.text = block;
+            if (gridFoundListCross != null) gridFoundListCross.text = block;
+        }
+
+        private void RecordGridWordFound(string wordUpper)
+        {
+            if (string.IsNullOrEmpty(wordUpper)) return;
+            string gloss = GridThemeBank.TryGlossFr(wordUpper);
+            string line = string.IsNullOrEmpty(gloss)
+                ? wordUpper
+                : wordUpper + " — " + gloss + " (FR)";
+            gridFoundHistory.Add(line);
+            RefreshGridFoundPanel();
+        }
 
         private void AdvanceGridMotsJeu()
         {
             if (currentGridAllWords == null || currentGridSolved == null) return;
+            var pick = new System.Collections.Generic.List<string>();
             for (int i = 0; i < currentGridAllWords.Count; i++)
             {
                 string w = currentGridAllWords[i];
                 if (string.IsNullOrEmpty(w)) continue;
                 if (currentGridSolved.Contains(w)) continue;
-                CurrentScrambleTargetWord = w;
-                CurrentScrambleAnswer = w;
-                gridMotsJeuSessionIndex = i + 1;
-                if (wordHint != null)
-                {
-                    wordHint.text = "Thème : " + (currentGridThemeLabel ?? "—")
-                        + " — mot " + gridMotsJeuSessionIndex + " / " + currentGridAllWords.Count
-                        + " — " + w.Length + " lettres (réorganise le mot de la ligne jaune, hors lettres leurre).";
-                }
-
-                if (wordAnswerInput != null) wordAnswerInput.text = "";
-                if (crosswordAnswerInput != null) crosswordAnswerInput.text = "";
-                return;
+                pick.Add(w);
             }
+
+            if (pick.Count == 0) return;
+            int j = UnityEngine.Random.Range(0, pick.Count);
+            string chosen = pick[j];
+            CurrentScrambleTargetWord = chosen;
+            CurrentScrambleAnswer = chosen;
+            gridMotsJeuSessionIndex = Mathf.Max(1, currentGridSolved.Count + 1);
+            if (wordHint != null)
+            {
+                wordHint.text = "Thème : " + (currentGridThemeLabel ?? "—")
+                    + " — " + pick.Count + " mot(s) encore à trouver (ordre libre) — "
+                    + chosen.Length + " lettres : réorganise la ligne jaune (leurres autour), Valider.";
+            }
+
+            if (wordAnswerInput != null) wordAnswerInput.text = "";
+            if (crosswordAnswerInput != null) crosswordAnswerInput.text = "";
         }
 
         private static void MaybeAdvanceMiniGameAfterResponse()
@@ -186,6 +232,8 @@ namespace CongoGames.Presentation
             currentGridSolved = null;
             LastCrosswordGuessed = "";
             lastWordSearchGrid = null;
+            gridFoundHistory.Clear();
+            RefreshGridFoundPanel();
         }
 
         private void NewThematicSession()
@@ -196,6 +244,8 @@ namespace CongoGames.Presentation
             currentGridSolved = new System.Collections.Generic.HashSet<string>(StringComparer.Ordinal);
             gridMotsJeuSessionIndex = 0;
             LastCrosswordGuessed = "";
+            gridFoundHistory.Clear();
+            RefreshGridFoundPanel();
             AdvanceGridMotsJeu();
         }
 
@@ -351,6 +401,8 @@ namespace CongoGames.Presentation
         public Text chronoTitle;
         public Text chronoBig;
         public Text chronoSub;
+        [Tooltip("Règles complètes — affiché à côté du compte à rebours pour ne pas masquer le texte.")]
+        public Text chronoInstruction;
         [Tooltip("Optionnel (créé au besoin) : numéro de bille / vague.")]
         public Text chronoMeta;
 
@@ -558,8 +610,13 @@ namespace CongoGames.Presentation
 
             CurrentScrambleAnswer = target;
             CurrentScrambleTargetWord = target;
-            int seed = (target + gridThematicBlockRound).GetHashCode() ^ 0x5a5a5a5a;
+            int seed = (target + gridThematicBlockRound + Time.frameCount).GetHashCode() ^ 0x5a5a5a5a;
             string scrambled = ScrambleWord(target, seed);
+            for (int guard = 0; guard < 8 && string.Equals(scrambled, target, StringComparison.Ordinal) && target.Length > 1; guard++)
+            {
+                seed = seed * 31 + 7;
+                scrambled = ScrambleWord(target, seed);
+            }
             if (wordScrambleLetters != null)
             {
                 wordScrambleLetters.gameObject.SetActive(false);
@@ -1187,8 +1244,8 @@ namespace CongoGames.Presentation
             chronoModeActive = true;
             chronoRoundInSession = Mathf.Clamp(roundN, 1, ChronoRoundsPerSession);
             chronoTargetSlot = UnityEngine.Random.Range(0, 4);
-            chronoPlayWindowSec = 1.7f + (chronoRoundInSession * 0.2f) - (chronoStreak * 0.05f);
-            chronoPlayWindowSec = Mathf.Clamp(chronoPlayWindowSec, 1.1f, 2.2f);
+            chronoPlayWindowSec = 2.1f + (chronoRoundInSession * 0.45f) - (chronoStreak * 0.06f);
+            chronoPlayWindowSec = Mathf.Clamp(chronoPlayWindowSec, 1.5f, 3.2f);
             chronoResultFlash = null;
             chronoPhase = 0;
             chronoCountdownIndex = 0;
@@ -1289,13 +1346,22 @@ namespace CongoGames.Presentation
                     chronoBig.text = "3";
                 }
 
-                chronoSub.text = "Cible cachée = touche " + (1 + chronoTargetSlot) + " / 4. Compte 3-2-1 puis chrono. Touches 1–4.";
+                chronoSub.text = "3 · 2 · 1 — la cible reste cachée jusqu’au GO";
+                if (chronoInstruction != null)
+                {
+                    chronoInstruction.text = LiaPunchlineBank.ModeRulesOneLiner("speed-chrono");
+                }
             }
             else if (chronoPhase == 1)
             {
                 float tLeft = Mathf.Max(0f, chronoStateUntil - Time.unscaledTime);
-                chronoBig.text = string.Format("{0:00.00}", tLeft);
-                chronoSub.text = "PRESSE " + (1 + chronoTargetSlot) + " — " + tLeft.ToString("0.00") + " s";
+                chronoBig.text = string.Format("{0:0.0}", tLeft);
+                chronoSub.text = "Cible 1-4  ·  " + tLeft.ToString("0.0") + " s";
+                if (chronoInstruction != null)
+                {
+                    chronoInstruction.text = LiaPunchlineBank.ModeRulesOneLiner("speed-chrono")
+                        + "\n\nEn live : envoie 1, 2, 3 ou 4 dans le chat. Local : pavé 1-4 ou touches du haut.";
+                }
             }
             else if (chronoPhase == 2)
             {
@@ -1702,7 +1768,20 @@ namespace CongoGames.Presentation
             GameObject word = PanelShell(modeRoot, "PanelWordScramble", "word-scramble", new Color(0.08f, 0.08f, 0.14f, 0.96f), white, surf);
             demo.wordScrambleTitle = Title(word.transform, font, "WTitle", "Mots mélangés", new Vector2(0f, -28f));
             demo.wordScrambleLetters = null;
-            Transform wordHost = CreateGridHost(word.transform, "WordGridHost", 0.52f, new Vector2(0f, 116f), new Vector2(960f, 412f));
+            GameObject wordSide = CreateRect(word.transform, "WordFoundSide", new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-8f, 0f), new Vector2(220f, 480f));
+            Image wsBg = wordSide.AddComponent<Image>();
+            wsBg.sprite = white;
+            wsBg.color = new Color(0.05f, 0.1f, 0.12f, 0.9f);
+            Text wsTitle = CreateText(wordSide.transform, "FoundTitle", font, 20, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(8f, -8f), new Vector2(-16f, 32f));
+            wsTitle.fontStyle = FontStyle.Bold;
+            wsTitle.color = new Color(0.4f, 0.95f, 0.55f, 1f);
+            wsTitle.text = "Déjà trouvés";
+            demo.gridFoundList = CreateText(wordSide.transform, "FoundList", font, 16, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(8f, -40f), new Vector2(-12f, 400f));
+            demo.gridFoundList.color = new Color(0.9f, 0.95f, 0.75f, 1f);
+            demo.gridFoundList.alignment = TextAnchor.UpperLeft;
+            demo.gridFoundList.horizontalOverflow = HorizontalWrapMode.Wrap;
+            demo.gridFoundList.text = "—";
+            Transform wordHost = CreateGridHost(word.transform, "WordGridHost", 0.52f, new Vector2(-100f, 116f), new Vector2(700f, 412f));
             BuildScrambleLetterGrid(wordHost, font, 7, 7, ScrambleCellPx, ScrambleGapPx, Vector2.zero, demo);
             WireLetterGridDrag(wordHost, demo, false, demo.wordScrambleTiles);
 
@@ -1720,8 +1799,21 @@ namespace CongoGames.Presentation
             demo.wordFeedback = Sub(wordFoot.transform, font, "WordFb", new Vector2(0f, -162f));
 
             GameObject cross = PanelShell(modeRoot, "PanelCrossword", "crossword-lite", new Color(0.05f, 0.1f, 0.12f, 0.96f), white, surf);
-            demo.crosswordTitle = Title(cross.transform, font, "CTitle", "Mots croisés", new Vector2(0f, -28f));
-            Transform crossHost = CreateGridHost(cross.transform, "CrossGridHost", 0.52f, new Vector2(0f, 122f), new Vector2(940f, 400f));
+            demo.crosswordTitle = Title(cross.transform, font, "CTitle", "Mots cachés 10×10", new Vector2(0f, -28f));
+            GameObject crossSide = CreateRect(cross.transform, "CrossFoundSide", new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-8f, 0f), new Vector2(220f, 480f));
+            Image crBg = crossSide.AddComponent<Image>();
+            crBg.sprite = white;
+            crBg.color = new Color(0.04f, 0.1f, 0.12f, 0.9f);
+            Text crTi = CreateText(crossSide.transform, "CFoundTitle", font, 20, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(8f, -8f), new Vector2(-16f, 32f));
+            crTi.fontStyle = FontStyle.Bold;
+            crTi.color = new Color(0.5f, 0.9f, 0.95f, 1f);
+            crTi.text = "Déjà trouvés";
+            demo.gridFoundListCross = CreateText(crossSide.transform, "CFoundList", font, 16, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(8f, -40f), new Vector2(-12f, 400f));
+            demo.gridFoundListCross.color = new Color(0.85f, 0.95f, 0.98f, 1f);
+            demo.gridFoundListCross.alignment = TextAnchor.UpperLeft;
+            demo.gridFoundListCross.horizontalOverflow = HorizontalWrapMode.Wrap;
+            demo.gridFoundListCross.text = "—";
+            Transform crossHost = CreateGridHost(cross.transform, "CrossGridHost", 0.52f, new Vector2(-100f, 122f), new Vector2(700f, 400f));
             demo.crosswordCells = CrosswordLetterGrid(crossHost, font, CrosswordCols, CrosswordCols, CrosswordCellPx, CrosswordGapPx, Vector2.zero, demo);
             WireLetterGridDrag(crossHost, demo, true, demo.crosswordCells);
 
@@ -1777,9 +1869,25 @@ namespace CongoGames.Presentation
             demo.memorySubtitle.rectTransform.sizeDelta = new Vector2(900f, 76f);
 
             GameObject chrono = PanelShell(modeRoot, "PanelChrono", "speed-chrono", new Color(0.12f, 0.07f, 0.06f, 0.96f), white, surf);
-            demo.chronoTitle = Title(chrono.transform, font, "ChTitle", "Chrono", new Vector2(0f, -32f));
-            Transform chronoHost = CreateGridHost(chrono.transform, "ChronoHost", 0.48f, new Vector2(0f, 0f), new Vector2(800f, 220f));
-            demo.chronoBig = BigLettersCentered(chronoHost, font, "ChBig", 96);
+            demo.chronoTitle = Title(chrono.transform, font, "ChTitle", "Chrono vitesse", new Vector2(0f, -32f));
+            GameObject chronoRule = CreateRect(chrono.transform, "ChronoRules", new Vector2(0f, 0.5f), new Vector2(0.55f, 0.5f), new Vector2(24f, 0f), new Vector2(480f, 360f));
+            Image chRuleBg = chronoRule.AddComponent<Image>();
+            chRuleBg.sprite = white;
+            chRuleBg.color = new Color(0.04f, 0.04f, 0.08f, 0.6f);
+            chRuleBg.raycastTarget = false;
+            demo.chronoInstruction = CreateText(chronoRule.transform, "ChronoInstr", font, 19, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(10f, -10f), new Vector2(-20f, 320f));
+            demo.chronoInstruction.color = new Color(0.9f, 0.9f, 0.88f, 0.95f);
+            demo.chronoInstruction.alignment = TextAnchor.UpperLeft;
+            demo.chronoInstruction.horizontalOverflow = HorizontalWrapMode.Wrap;
+            demo.chronoInstruction.text = "";
+            GameObject chronoNumHost = CreateRect(chrono.transform, "ChronoNumHost", new Vector2(0.6f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-8f, 0f), new Vector2(400f, 220f));
+            demo.chronoBig = BigLettersCentered(chronoNumHost.transform, font, "ChBig", 86);
+            demo.chronoSub = CreateText(chronoNumHost.transform, "ChSub", font, 22, TextAnchor.LowerCenter, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(360f, 64f));
+            demo.chronoSub.color = new Color(1f, 0.9f, 0.3f, 1f);
+            demo.chronoSub.alignment = TextAnchor.MiddleCenter;
+            demo.chronoMeta = CreateText(chronoNumHost.transform, "ChMeta", font, 16, TextAnchor.UpperCenter, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -4f), new Vector2(360f, 40f));
+            demo.chronoMeta.color = new Color(0.75f, 0.9f, 0.8f, 0.95f);
+            if (chronoNumHost.GetComponent<RectTransform>() == null) chronoNumHost.AddComponent<RectTransform>();
 
             GameObject img = PanelShell(modeRoot, "PanelImageGuess", "image-guess", new Color(0.08f, 0.09f, 0.11f, 0.96f), white, surf);
             demo.imageTitle = Title(img.transform, font, "ImgTitle", "Devine l’image", new Vector2(0f, -24f));
@@ -1840,6 +1948,7 @@ namespace CongoGames.Presentation
             if (ok && demo.currentGridSolved != null && !string.IsNullOrEmpty(target))
             {
                 demo.currentGridSolved.Add(target);
+                demo.RecordGridWordFound(target);
             }
 
             if (ok) MaybeAdvanceMiniGameAfterResponse();
@@ -1867,6 +1976,7 @@ namespace CongoGames.Presentation
             {
                 if (demo.currentGridSolved != null) demo.currentGridSolved.Add(a);
                 demo.LastCrosswordGuessed = string.IsNullOrEmpty(demo.LastCrosswordGuessed) ? a : (demo.LastCrosswordGuessed + " · " + a);
+                demo.RecordGridWordFound(a);
             }
 
             if (ok) MaybeAdvanceMiniGameAfterResponse();

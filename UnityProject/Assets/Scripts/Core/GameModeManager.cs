@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using CongoGames.AI;
 using CongoGames.GameModes;
 using CongoGames.Network;
 using CongoGames.Presentation;
@@ -256,6 +257,12 @@ namespace CongoGames.Core
                 {
                     Debug.LogException(e);
                 }
+            }
+
+            string liaLine = LiaPunchlineBank.BuildTransitionWithRules(fromId, modeId);
+            if (!string.IsNullOrEmpty(liaLine))
+            {
+                AIHostManager.Instance?.Speak(liaLine);
             }
         }
 

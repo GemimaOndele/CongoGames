@@ -4,6 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Networking;
+using CongoGames.AI;
 using CongoGames.Audio;
 
 namespace CongoGames.Presentation
@@ -32,7 +33,6 @@ namespace CongoGames.Presentation
         private AudioClip okClip;
         private AudioClip badClip;
         private AudioClip cheerClip;
-        private AudioClip laughClip;
 
         private void Awake()
         {
@@ -69,7 +69,6 @@ namespace CongoGames.Presentation
             okClip = Resources.Load<AudioClip>("Audio/sfx_correct") ?? ProceduralClips.BuildCorrectChime();
             badClip = Resources.Load<AudioClip>("Audio/sfx_wrong") ?? ProceduralClips.BuildWrongBuzz();
             cheerClip = Resources.Load<AudioClip>("Audio/sfx_cheer") ?? ProceduralClips.BuildCrowdCheer();
-            laughClip = Resources.Load<AudioClip>("Audio/sfx_laugh") ?? ProceduralClips.BuildMockingLaugh();
         }
 
         public void SetBroadcastDuckMultiplier(float linear01)
@@ -235,10 +234,15 @@ namespace CongoGames.Presentation
             if (crowdSource != null) crowdSource.Stop();
         }
 
-        public void PlayResult(bool correct)
+        public void PlayResult(bool correct, bool hostVoiceCommentary = true)
         {
             if (source == null) return;
             StopFeedbackOneShots();
+            if (hostVoiceCommentary)
+            {
+                LiaPunchlineBank.SpeakResultReaction(correct);
+            }
+
             if (correct)
             {
                 source.PlayOneShot(okClip, 1.12f);
@@ -252,11 +256,6 @@ namespace CongoGames.Presentation
             else
             {
                 source.PlayOneShot(badClip, 1.05f);
-                if (laughClip != null && crowdSource != null)
-                {
-                    crowdSource.PlayOneShot(laughClip, 1.02f);
-                }
-
                 FeedbackVfxController.Instance?.PlayWrong();
             }
         }

@@ -49,6 +49,7 @@ namespace CongoGames.Core
             services.AddComponent<GameModeManager>();
             services.AddComponent<BattleManager>();
             services.AddComponent<AIHostManager>();
+            services.AddComponent<BroadcastAudioMixCoordinator>();
             services.AddComponent<IntroDirector>();
             LiveEventClient live = services.AddComponent<LiveEventClient>();
 
