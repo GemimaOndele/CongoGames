@@ -9,6 +9,7 @@ const v = path.join(backend, ".vercel", "project.json");
 
 if (!existsSync(v)) {
   console.error("Manque le lien Vercel : cd Backend && npx vercel link  (projet congogames-backend-cg).");
+  console.error("Monorepo (1 Git, 2 projets Vercel) : docs/VERCEL_MONOREPO.md");
   process.exit(1);
 }
 
@@ -26,4 +27,5 @@ console.error("");
 console.error("Si l erreur contient  Backend\\Backend  : Vercel -> congogames-backend-cg -> Settings ->");
 console.error("  General -> Root Directory : VIDER le champ (laisser vide) puis reessayer ce script.");
 console.error("  (Avec un sous-dossier  Backend  dans les reglages, ne pas lancer  vercel  depuis  Backend. )");
+console.error("Voir aussi : docs/VERCEL_MONOREPO.md (branche master, depot GemimaOndele/CongoGames).");
 process.exit(r.status ?? 1);

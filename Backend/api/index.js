@@ -5,11 +5,42 @@ import { fileURLToPath } from "node:url";
 import { GiftEngine } from "../src/services/giftEngine.js";
 import { QuestionGenerator } from "../src/services/questionGenerator.js";
 import { isTtsConfigured } from "../src/services/ttsService.js";
+import ttsApi from "./tts/index.js";
+import ttsStatusApi from "./tts/status.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/** Page d’accueil HTML (même contenu qu’avant) — servie aussi via GET / après normalisation. */
+const API_HOME_HTML =
+  "<!DOCTYPE html><html lang=fr><head><meta charset=utf-8><title>CongoGames API</title>" +
+  "<style>body{font-family:system-ui,sans-serif;max-width:36rem;margin:2rem auto;padding:0 1rem;line-height:1.5}" +
+  "a{color:#0a6}code{background:#eee;padding:2px 6px;border-radius:4px}</style></head><body>" +
+  "<h1>API CongoGames (backend)</h1>" +
+  "<p>Il n’y a pas d’interface web ici. Points utiles : " +
+  "<a href=\"/health\">/health</a>, " +
+  "<a href=\"/tts/status\">/tts/status</a>, " +
+  "<a href=\"/metrics\">/metrics</a> — " +
+  "POST <code>/tts</code> (TTS, formulaire <code>text=…</code>).</p></body></html>";
+
+function pathnameOnly(u) {
+  if (u == null || u === "") return "/";
+  const s = String(u);
+  const q = s.indexOf("?");
+  return (q >= 0 ? s.slice(0, q) : s) || "/";
+}
+
 const app = express();
+
+// Vercel : req.url est parfois "" ou non relié à Express — normaliser pour que GET / atteigne la page d’accueil.
+app.use((req, res, next) => {
+  if (req.url == null || req.url === "") {
+    req.url = "/";
+  } else if (typeof req.url === "string" && !req.url.startsWith("/")) {
+    req.url = `/${req.url}`;
+  }
+  next();
+});
 
 // Vercel : chemin reçu parfois en /api/tts/... — normaliser vers /tts/... pour les routes Express.
 app.use((req, res, next) => {
@@ -33,21 +64,21 @@ app.use((req, res, next) => {
   next();
 });
 
-// Évite « Cannot GET / » dans l’aperçu Vercel ; l’app Unity utilise /tts, /health, etc.
-app.get("/", (_req, res) => {
-  res
-    .type("html")
-    .send(
-      "<!DOCTYPE html><html lang=fr><head><meta charset=utf-8><title>CongoGames API</title>" +
-        "<style>body{font-family:system-ui,sans-serif;max-width:36rem;margin:2rem auto;padding:0 1rem;line-height:1.5}" +
-        "a{color:#0a6}code{background:#eee;padding:2px 6px;border-radius:4px}</style></head><body>" +
-        "<h1>API CongoGames (backend)</h1>" +
-        "<p>Il n’y a pas d’interface web ici. Points utiles : " +
-        "<a href=\"/health\">/health</a>, " +
-        "<a href=\"/tts/status\">/tts/status</a>, " +
-        "<a href=\"/metrics\">/metrics</a> — " +
-        "POST <code>/tts</code> (TTS, formulaire <code>text=…</code>).</p></body></html>"
-    );
+// TTS (même binaire que Vercel : les routes `dest` vers plusieurs `api/tts/*.js` ne ciblent pas toujours la bonne lambda).
+app.use("/tts/status", ttsStatusApi);
+app.use("/tts", ttsApi);
+
+// Évite « Cannot GET / » (Vercel : req.url/req.originalUrl hors cas « / » standard) — middleware avant les routes.
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    return next();
+  }
+  const pU = pathnameOnly(req.url);
+  const pO = pathnameOnly(req.originalUrl);
+  if (pU === "/" || pU === "" || pO === "/" || pO === "" || pO === "/api") {
+    return res.type("html").send(API_HOME_HTML);
+  }
+  next();
 });
 
 const giftEngine = new GiftEngine(path.join(__dirname, "..", "src", "config", "gift-balance.json"));

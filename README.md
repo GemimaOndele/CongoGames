@@ -32,6 +32,7 @@ CongoGames est un jeu live interactif concu pour TikTok Live, centre sur la cult
 - `UnityProject/` : client 3D Unity
 - `Backend/` : serveur live Node.js (WebSocket + events TikTok)
 - `docs/` : documentation produit et technique
+- **Vercel (2 projets, 1 dépôt Git)** : ne pas dupliquer un second dépôt « backend » ; config et branche `master` → [`docs/VERCEL_MONOREPO.md`](docs/VERCEL_MONOREPO.md).
 
 **Branche à utiliser : `master` uniquement.** Tout le code utile s’y trouve. `git pull origin master` pour se mettre à jour. Branches `cursor/...` : anciennes PR ; contenu déjà dans `master` (vous pouvez les supprimer côté GitHub pour y voir clair, sans effet sur le projet). Rappel court : [`docs/PROJET_SIMPLE.md`](docs/PROJET_SIMPLE.md).
 
@@ -144,7 +145,8 @@ Le script tente ensuite automatiquement les fallbacks locaux (`8080/8081/8082`) 
 
 ### Endpoints cloud actifs (CongoGames)
 
-- API HTTP (Vercel): `https://congogames-backend-cg.vercel.app`
+- API HTTP (même origine que le WebGL) : `https://congogames.vercel.app` (proxy Vercel vers l’API Node ; déploiement de l’API : `npm run backend:vercel` depuis la racine).
+- Si **congogames-backend-cg** affiche « No Production Deployment » : voir [`docs/VERCEL_MONOREPO.md`](docs/VERCEL_MONOREPO.md) (même dépôt **`GemimaOndele/CongoGames`**, **Root Directory** = `Backend`, branche **`master`**). Sinon : `npm run backend:vercel` depuis la racine du clone.
 - WS 24/7 (Railway): `wss://congogames-ws-production.up.railway.app`
 - Health WS service: `https://congogames-ws-production.up.railway.app/health`
 

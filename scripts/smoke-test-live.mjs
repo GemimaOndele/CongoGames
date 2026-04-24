@@ -1,4 +1,4 @@
-const API_URL = process.env.CLOUD_API_URL || "https://congogames-backend-cg.vercel.app";
+const API_URL = process.env.CLOUD_API_URL || "https://congogames.vercel.app";
 const WS_URL = process.env.CLOUD_WS_URL || "wss://congogames-ws-production.up.railway.app";
 
 async function postJson(url, payload) {

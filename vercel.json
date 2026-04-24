@@ -1,6 +1,6 @@
 {
   "buildCommand": "true",
-  "outputDirectory": ".",
+  "outputDirectory": "webgl-site",
   "rewrites": [
     {
       "source": "/health",

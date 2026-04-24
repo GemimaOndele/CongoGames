@@ -1,4 +1,4 @@
-const base = process.env.CLOUD_API_URL || "https://congogames-backend-cg.vercel.app";
+const base = process.env.CLOUD_API_URL || "https://congogames.vercel.app";
 
 async function ping(path, init) {
   const res = await fetch(`${base}${path}`, init);

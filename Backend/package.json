@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "API Node (TTS, events). Lier à congogames-backend-cg (pas congogames). Erreur …\\\\Backend\\\\Backend : dans Vercel, vider le champ « Root Directory » POUR ce projet, ou lancer npx vercel deploy --prod depuis C:\\\\Congogame (racine du dépôt) au lieu de ce dossier.",
+  "description": "API Node (TTS, events). Déploiement : depuis la racine du dépôt, npm run backend:vercel. URL publique Unity : https://congogames.vercel.app (proxy dans webgl-site/vercel.json). Vercel : projet congogames-backend-cg, Root Directory vide, lien depuis Backend. Erreur Backend\\\\Backend : ne pas lancer vercel dans Backend si le réglage Vercel duplique déjà le dossier.",
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",

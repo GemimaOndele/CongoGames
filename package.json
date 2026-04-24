@@ -16,6 +16,6 @@
     "theme:import-youtube": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/fetch-youtube-theme.ps1",
     "webgl:vercel": "npx --yes vercel@latest --prod webgl-site",
     "backend:vercel": "node scripts/vercel-backend.mjs",
-    "webgl:help": "node -e \"console.log('WebGL: npm run webgl:vercel. API: npm run backend:vercel (a la racine du depot) si Vercel Root Directory = Backend — pas de vercel depuis C:\\\\Congogame\\\\Backend sinon erreur Backend\\\\Backend. Alternative: vider Root Directory sur le projet API, puis vercel --prod dans Backend.')\""
+    "webgl:help": "node -e \"console.log('WebGL: npm run webgl:vercel -> congogames.vercel.app. API: npm run backend:vercel. Si l URL d API directe (rewrites) change, editer webgl-site/vercel.json (destination https://...). Root Directory congogames-backend-cg: vide, deploy depuis le depot avec le script, pas de doublon Backend/Backend.')\""
   }
 }

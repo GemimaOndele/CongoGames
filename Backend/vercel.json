@@ -1,15 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "api/index.js", "use": "@vercel/node" },
-    { "src": "api/tts/index.js", "use": "@vercel/node" },
-    { "src": "api/tts/status.js", "use": "@vercel/node" }
-  ],
+  "builds": [{ "src": "api/index.js", "use": "@vercel/node" }],
   "routes": [
-    { "src": "^/tts/status$", "dest": "/api/tts/status.js" },
-    { "src": "^/api/tts/status$", "dest": "/api/tts/status.js" },
-    { "src": "^/tts$", "dest": "/api/tts/index.js" },
-    { "src": "^/api/tts$", "dest": "/api/tts/index.js" },
+    { "src": "^/?$", "dest": "/api/index.js" },
     { "src": "/(.*)", "dest": "/api/index.js" }
   ]
 }

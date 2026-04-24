@@ -37,14 +37,14 @@ Dans le navigateur, **`http://127.0.0.1`** n’existe pas sur le téléphone : l
 
 À faire **avant** ou **après** le build :
 
-- Sur **Railway** : `PUBLIC_HTTP_BASE=https://ton-api-vercel.vercel.app` (sans slash final) pour que le message système WS donne la bonne base au client.
-- Dans **Unity** : sur `LiveEventClient`, `wsUrl` = ton `wss://` Railway ; sur `AIHostManager`, `ttsHttpBase` = ton `https://` Vercel (ou laisser la découverte si le WS envoie déjà `httpApiBase`).
+- Sur **Railway** : `PUBLIC_HTTP_BASE=https://congogames.vercel.app` (sans slash final) pour que le message système WS donne la bonne base au client — même hôte que le build WebGL (proxy Vercel → API Node).
+- Dans **Unity** : sur `LiveEventClient`, `wsUrl` = ton `wss://` Railway ; sur `AIHostManager` / `CloudEndpoints.json`, `ttsHttpBase` = `https://congogames.vercel.app` (ou laisser la découverte si le WS envoie déjà `httpApiBase`).
 
 Sinon le jeu se lance « à vide » côté voix / live.
 
 **Contenu mixte** : la page du jeu doit être en **HTTPS** si l’API est en HTTPS (sinon le navigateur peut bloquer les requêtes).
 
-**CORS** : le backend Node (`server.js` et `api/index.js`) envoie `Access-Control-Allow-Origin: *` pour que `UnityWebRequest` (build WebGL) puisse appeler `/tts` depuis un domaine Vercel différent. Redéploie le backend après mise à jour si besoin.
+**CORS** : en prod, le jeu appelle TTS en **même origine** (`congogames.vercel.app` → rewrites Vercel vers l’API). Le backend reste en `Access-Control-Allow-Origin: *` si un autre domaine l’appelle.
 
 ---
 
