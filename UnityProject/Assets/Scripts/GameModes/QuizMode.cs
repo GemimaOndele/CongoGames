@@ -103,9 +103,10 @@ namespace CongoGames.GameModes
             ui.AnswerChosen -= OnAnswerChosen;
             bool correct = !string.IsNullOrEmpty(pendingPick) &&
                            string.Equals(pendingPick?.Trim(), q.correctAnswer?.Trim(), System.StringComparison.OrdinalIgnoreCase);
-            if (ScoreManager.Instance != null)
+            if (ScoreManager.Instance != null && !PlayerProfileStore.IsLiveTiktokSession())
             {
-                ScoreManager.Instance.RegisterAnswer(LocalPlayer, correct, false);
+                string who = PlayerProfileStore.ScoreUsernameForLocalPlay() ?? LocalPlayer;
+                ScoreManager.Instance.RegisterAnswer(who, correct, false);
             }
 
             ui.ShowQuizOutcome(correct, pendingPick, q);

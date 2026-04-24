@@ -24,6 +24,7 @@ namespace CongoGames.Presentation
         private float duckMultiplier = 1f;
 
         private AudioSource source;
+        private AudioSource crowdSource;
         private AudioSource blindLoop;
         private AudioClip blindLoopClip;
         private Coroutine blindMusicCo;
@@ -42,6 +43,14 @@ namespace CongoGames.Presentation
             if (sfxOutputGroup != null)
             {
                 source.outputAudioMixerGroup = sfxOutputGroup;
+            }
+
+            crowdSource = gameObject.AddComponent<AudioSource>();
+            crowdSource.playOnAwake = false;
+            crowdSource.spatialBlend = 0f;
+            if (sfxOutputGroup != null)
+            {
+                crowdSource.outputAudioMixerGroup = sfxOutputGroup;
             }
 
             blindLoop = gameObject.AddComponent<AudioSource>();
@@ -74,6 +83,11 @@ namespace CongoGames.Presentation
             if (source != null)
             {
                 source.volume = volume * duckMultiplier;
+            }
+
+            if (crowdSource != null)
+            {
+                crowdSource.volume = volume * duckMultiplier;
             }
 
             if (blindLoop != null)
@@ -214,15 +228,23 @@ namespace CongoGames.Presentation
             return AudioType.MPEG;
         }
 
+        /// <summary>Stop acclamations / rires (appelé avant la question suivante pour ne pas chevaucher le son).</summary>
+        public void StopFeedbackOneShots()
+        {
+            if (source != null) source.Stop();
+            if (crowdSource != null) crowdSource.Stop();
+        }
+
         public void PlayResult(bool correct)
         {
             if (source == null) return;
+            StopFeedbackOneShots();
             if (correct)
             {
                 source.PlayOneShot(okClip, 1.12f);
-                if (cheerClip != null)
+                if (cheerClip != null && crowdSource != null)
                 {
-                    source.PlayOneShot(cheerClip, 1.08f);
+                    crowdSource.PlayOneShot(cheerClip, 1.08f);
                 }
 
                 FeedbackVfxController.Instance?.PlayCorrect();
@@ -230,9 +252,9 @@ namespace CongoGames.Presentation
             else
             {
                 source.PlayOneShot(badClip, 1.05f);
-                if (laughClip != null)
+                if (laughClip != null && crowdSource != null)
                 {
-                    source.PlayOneShot(laughClip, 1.02f);
+                    crowdSource.PlayOneShot(laughClip, 1.02f);
                 }
 
                 FeedbackVfxController.Instance?.PlayWrong();

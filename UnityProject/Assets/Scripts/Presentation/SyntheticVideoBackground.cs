@@ -257,10 +257,11 @@ namespace CongoGames.Presentation
         private static Color BaseTint(string modeId)
         {
             int h = string.IsNullOrEmpty(modeId) ? 0 : Mathf.Abs(modeId.GetHashCode());
-            float hue = (h % 997) / 997f;
-            float sat = 0.28f + ((h >> 5) % 5) * 0.04f;
-            float val = 0.08f + ((h >> 9) % 6) * 0.028f;
-            return Color.HSVToRGB(hue, sat, val);
+            int kind = (h % 7);
+            float hue = (0.08f + kind * 0.12f + (h % 50) * 0.002f) % 1f;
+            float sat = 0.22f + (kind * 0.05f);
+            float val = 0.06f + ((h >> 4) % 8) * 0.035f;
+            return Color.HSVToRGB(hue, Mathf.Clamp01(sat), Mathf.Clamp01(val));
         }
 
         private static Texture2D BuildStripeTexture(string modeId, int stripeIndex, int seed)

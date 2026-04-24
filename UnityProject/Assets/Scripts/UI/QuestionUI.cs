@@ -103,6 +103,7 @@ namespace CongoGames.UI
         /// <summary>Prépare une manche quiz (texte + labels) sans révéler les réponses tout de suite.</summary>
         public void SetupQuizRound(LiveQuestion q)
         {
+            GameSfxHub.Instance?.StopFeedbackOneShots();
             currentQuestion = q;
             ClearFeedbackVisuals();
             if (q == null) return;

@@ -924,8 +924,8 @@ namespace CongoGames.Presentation
             chronoModeActive = true;
             chronoRoundInSession = Mathf.Clamp(roundN, 1, ChronoRoundsPerSession);
             chronoTargetSlot = UnityEngine.Random.Range(0, 4);
-            chronoPlayWindowSec = 1.2f + (chronoRoundInSession * 0.12f) - (chronoStreak * 0.04f);
-            chronoPlayWindowSec = Mathf.Clamp(chronoPlayWindowSec, 0.7f, 1.6f);
+            chronoPlayWindowSec = 1.7f + (chronoRoundInSession * 0.2f) - (chronoStreak * 0.05f);
+            chronoPlayWindowSec = Mathf.Clamp(chronoPlayWindowSec, 1.1f, 2.2f);
             chronoResultFlash = null;
             chronoPhase = 0;
             chronoCountdownIndex = 0;
@@ -964,7 +964,8 @@ namespace CongoGames.Presentation
                 chronoSessionScore += chronoLastRoundPoints;
                 if (ScoreManager.Instance != null)
                 {
-                    ScoreManager.Instance.AddPoints("joueur_local", chronoLastRoundPoints);
+                    string u = PlayerProfileStore.ScoreUsernameForLocalPlay() ?? "démo";
+                    ScoreManager.Instance.AddPoints(u, chronoLastRoundPoints);
                 }
             }
             else
@@ -991,10 +992,15 @@ namespace CongoGames.Presentation
         private void ChronoEndSession()
         {
             chronoModeActive = false;
+            if (chronoSessionScore > 0)
+            {
+                ScoreHistoryStore.RegisterHighWaterIfNeeded(chronoSessionScore);
+            }
+
             if (chronoTitle != null) chronoTitle.text = "Chrono vitesse — fin !";
             if (chronoSub != null) chronoSub.text = "Total de la manche chrono : " + chronoSessionScore + " pts. Enchaînement auto…";
             if (chronoBig != null) chronoBig.text = "★ " + chronoSessionScore;
-            if (chronoMeta != null) chronoMeta.text = "Touches 1–4 : réagir vite à la cible 1/4. Score live = classement en haut.";
+            if (chronoMeta != null) chronoMeta.text = "Touches 1–4 : réagir vite à la cible 1/4. " + ScoreHistoryStore.BuildSummaryLine();
             chronoPhase = 3;
             chronoStateUntil = Time.unscaledTime + 0.5f;
             GameModeManager.Instance?.ScheduleNextMode(1.4f);
