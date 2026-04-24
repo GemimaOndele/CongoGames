@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Networking;
@@ -107,16 +108,25 @@ namespace CongoGames.Presentation
         private IEnumerator LoadMusicForMode(string modeId)
         {
             RemoteModeMediaEntry remote = RemoteThemeMediaConfig.Resolve(modeId);
-            bool bottomProvidesAudio = !string.IsNullOrWhiteSpace(remote.bottomVideoUrl);
+            string bottomU = (remote.bottomVideoUrl ?? "").Trim();
+            bool bottomProvidesAudio = !string.IsNullOrEmpty(bottomU) && !StreamingMediaUrlPolicy.IsNonStreamableContentPageUrl(bottomU);
 
             if (!bottomProvidesAudio && !string.IsNullOrWhiteSpace(remote.musicUrl))
             {
-                AudioClip httpClip = null;
-                yield return DownloadClipFromHttp(remote.musicUrl.Trim(), c => httpClip = c);
-                if (httpClip != null)
+                string mUrl = remote.musicUrl.Trim();
+                if (StreamingMediaUrlPolicy.IsNonStreamableContentPageUrl(mUrl))
                 {
-                    yield return CoPlayWithIntro(httpClip, true);
-                    yield break;
+                    StreamingMediaUrlPolicy.LogOnceRejected("Thème (musicUrl)", mUrl);
+                }
+                else
+                {
+                    AudioClip httpClip = null;
+                    yield return DownloadClipFromHttp(mUrl, c => httpClip = c);
+                    if (httpClip != null)
+                    {
+                        yield return CoPlayWithIntro(httpClip, true);
+                        yield break;
+                    }
                 }
             }
 
@@ -161,6 +171,14 @@ namespace CongoGames.Presentation
                 }
             }
 
+            if (trackPaths.Count < 2
+                || string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(modeId, "image-guess", StringComparison.OrdinalIgnoreCase))
+            {
+                TryAppendCongoleseRepoPlaylistFolder(trackPaths);
+            }
+
+            trackPaths = trackPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
             trackPaths.Sort(StringComparer.OrdinalIgnoreCase);
 
             if (trackPaths.Count == 0 && Directory.Exists(root))
@@ -373,6 +391,27 @@ namespace CongoGames.Presentation
             }
 
             return AudioType.WAV;
+        }
+
+        /// <summary>Dossier <c>Congogame/playlist</c> à la racine du dépôt (hors UnityProject).</summary>
+        private static void TryAppendCongoleseRepoPlaylistFolder(List<string> trackPaths)
+        {
+            string congo = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "playlist"));
+            if (!Directory.Exists(congo))
+            {
+                return;
+            }
+
+            foreach (string ext in new[] { "ogg", "wav", "mp3" })
+            {
+                try
+                {
+                    trackPaths.AddRange(Directory.GetFiles(congo, "*." + ext, SearchOption.TopDirectoryOnly));
+                }
+                catch (IOException)
+                {
+                }
+            }
         }
 
         private static string SanitizeForResources(string modeId)

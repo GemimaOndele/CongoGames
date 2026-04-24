@@ -56,6 +56,12 @@ namespace CongoGames.Audio
             return clip;
         }
 
+        /// <summary>Bip court pour le compte à rebours (HUD / phases écoute ou image).</summary>
+        public static AudioClip BuildChronoTick()
+        {
+            return BuildToneBurst(1180f, 0.085f, 0.11f);
+        }
+
         public static AudioClip BuildUiTap()
         {
             return BuildToneBurst(880f, 0.06f, 0.12f);

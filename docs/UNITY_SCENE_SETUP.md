@@ -73,3 +73,14 @@ Puis tester:
 
 Si `8080` est occupe, le backend prend automatiquement `8081`, `8082`, etc.
 Dans ce cas, mettre la meme URL dans `LiveEventClient.wsUrl`.
+
+## 6. Fond 3D « show TV » (VirtualShowStage3D) vs décor perso dans la scène
+
+Le jeu peut générer le canvas au lancement via **`RuntimeBootstrap`** : le fond 3D procédural (**primitives + lumières**, pas de mesh d’artiste / pas de public 3D / pas d’avatar dans ce pipeline) est rendu par **`VirtualShowStage3D`** → **RenderTexture** sur le `RawImage` du thème (`ThemeBackgroundController`), sauf si une vidéo `StreamingAssets/Theme/...` est trouvée.
+
+Si vous avez **en parallèle** un GameObject de scène (ex. sol coloré, objet nommé *VirtualShowStage* fait à la main), vous pouvez avoir **deux** sources visuelles ou un conflit de lisibilité. Options :
+
+- **Cohérence avec le produit** : s’appuyer sur le flux documenté (un fond RT + UI 2D) — voir [ROADMAP_UI_3D.md](ROADMAP_UI_3D.md) et [3D_PRODUCTION_ITERATION.md](3D_PRODUCTION_ITERATION.md).
+- **Scène 100 % perso** sans `RuntimeBootstrap` : assurer quand même `ThemeBackgroundController` + `RawImage` si vous voulez le même contrat 3D → texture ; ou intégrer vos assets en **itération** (`.fbx`, scène dédiée) comme dans la checklist **Phase B** de `3D_PRODUCTION_ITERATION.md`.
+
+Rappel option joueur : `PlayerPrefs` **`CongoUseVirtual3D`** ; dans le jeu, **F9** permet d’appliquer le choix 3D / 2D sans quitter le Play.

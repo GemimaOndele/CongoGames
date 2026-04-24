@@ -99,10 +99,12 @@ namespace CongoGames.Presentation
             {
                 Vector2 o = shakeTarget.anchoredPosition;
                 float s = 0f;
-                while (s < 0.52f)
+                const float dur = 0.34f;
+                while (s < dur)
                 {
                     s += Time.deltaTime;
-                    shakeTarget.anchoredPosition = o + new Vector2(Mathf.Sin(s * 88f) * 9f, Mathf.Cos(s * 71f) * 6f);
+                    float k = 1f - s / dur;
+                    shakeTarget.anchoredPosition = o + new Vector2(Mathf.Sin(s * 68f) * 3.5f * k, Mathf.Cos(s * 54f) * 2.5f * k);
                     yield return null;
                 }
 

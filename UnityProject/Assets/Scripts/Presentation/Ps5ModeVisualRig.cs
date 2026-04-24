@@ -39,7 +39,7 @@ namespace CongoGames.Presentation
             {
                 case "quiz": f = 0.99f; break;
                 case "blind-test": f = 1.03f; break;
-                case "speed-chrono": f = 1.02f; break;
+                case "speed-chrono": f = 1f; break;
                 case "word-scramble":
                 case "crossword-lite": f = 0.98f; break;
                 case "image-guess": f = 1.01f; break;

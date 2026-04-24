@@ -1,5 +1,7 @@
 === CongoGames — thèmes par type de jeu ===
 
+Référence à jour (priorités, noms de fichiers vidéo, 3D) : voir à la racine du dépôt **docs/THEME_BACKGROUNDS.md**
+
 --- Médias par LIEN (sans gros fichiers dans le build) ---
 
 Fichier optionnel : Theme/remote_media.json (copie remote_media.example.json et renomme).
@@ -12,11 +14,13 @@ Format JSON : tableau "entries" avec des objets { "modeId", "musicUrl", "bottomV
 • musicUrl : musique seule par lien (si bottomVideoUrl est vide pour ce mode).
 • backgroundVideoUrl : fond plein écran (son coupé comme les background locaux).
 
-Pour chaque mini-jeu, tu peux créer un sous-dossier avec le même nom que le ModeId (voir liste ci-dessous).
+Pour chaque mini-jeu, crée un sous-dossier avec le même nom que le ModeId (voir liste ; dossiers fournis + LISEZMOI_fond_video.txt).
 Priorité de chargement (fond) :
-1) Theme/<mode>/background.mp4 ou background.webm
-2) Plusieurs images : Theme/<mode>/bg_*.png|.jpg ou slide*.png|.jpg (diaporama en boucle)
-3) sinon animation couleur procédurale
+1) backgroundVideoUrl (remote + F10) si rempli
+2) Theme/<mode> ou Theme/ : background / loop / theatre / show en .mp4 ou .webm (voir ThemeModeCatalog.cs)
+3) si CongoUseVirtual3D=1 : fond 3D animé (VirtualShowStage) par mode
+4) use_slides + images bg_ / slide* si drapeau activé
+5) sinon bandes 2D (SyntheticVideoBackground)
 
 Musique :
 1) Playlist : plusieurs fichiers track01.ogg, track02.wav, track03.mp3, … (tous les track* triés par nom, lecture en boucle) dans Theme/<mode>/

@@ -58,12 +58,27 @@ namespace CongoGames.UI
             GUILayout.Space(8f);
             useVirtual3dDraft = GUILayout.Toggle(
                 useVirtual3dDraft,
-                "Fond 3D « plateau TV » (RenderTexture) — redémarrer Play si tu changes");
+                "Fond 3D « plateau TV » (URP → RenderTexture) — Appliquer pour reconstruire");
             if (GUILayout.Button("Appliquer affichage 3D", GUILayout.Height(28f)))
             {
                 PlayerPrefs.SetInt(PresentationConfig.PrefsUseVirtual3D, useVirtual3dDraft ? 1 : 0);
                 PlayerPrefs.Save();
                 PresentationConfig.UseVirtual3DShowStage = useVirtual3dDraft;
+                string modeId = "quiz";
+                if (GameModeManager.Instance != null && !string.IsNullOrEmpty(GameModeManager.Instance.ActiveModeId))
+                {
+                    modeId = GameModeManager.Instance.ActiveModeId;
+                }
+                else if (ModeSurfaceController.Instance != null && !string.IsNullOrEmpty(ModeSurfaceController.Instance.CurrentModeId))
+                {
+                    modeId = ModeSurfaceController.Instance.CurrentModeId;
+                }
+
+                ThemeBackgroundController bg = Object.FindAnyObjectByType<ThemeBackgroundController>();
+                if (bg != null)
+                {
+                    bg.ApplyGameMode(modeId);
+                }
             }
 
             GUILayout.Space(6f);

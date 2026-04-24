@@ -62,7 +62,7 @@ namespace CongoGames.Core
             CanvasScaler scaler = canvasGo.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
-            scaler.matchWidthOrHeight = 0.5f;
+            scaler.matchWidthOrHeight = 0.55f;
             canvasGo.AddComponent<GraphicRaycaster>();
 
             GameObject es = new GameObject("EventSystem");
@@ -96,23 +96,29 @@ namespace CongoGames.Core
 
             CreateFlagBadge(topBar.transform);
 
-            Text title = CreateText(canvasGo.transform, "Title", font, 42, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(72f, -40f), new Vector2(0f, 52f));
+            Text title = CreateText(canvasGo.transform, "Title", font, 48, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(72f, -40f), new Vector2(0f, 58f));
             title.fontStyle = FontStyle.Bold;
             title.color = new Color(1f, 0.92f, 0.2f);
             title.text = "CONGOGAMES";
 
-            Text brand = CreateText(canvasGo.transform, "Brand", font, 17, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -86f), new Vector2(0f, 30f));
+            Text brand = CreateText(canvasGo.transform, "Brand", font, 21, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -90f), new Vector2(0f, 36f));
             brand.color = new Color(0.92f, 0.92f, 0.92f, 0.9f);
             brand.text = "Congo · tricolore vert · jaune · rouge · FR · Lingala · Kituba";
 
-            Text modeLabel = CreateText(canvasGo.transform, "ModeLabel", font, 22, TextAnchor.MiddleLeft, new Vector2(0f, 1f), new Vector2(0.72f, 1f), new Vector2(24f, -118f), new Vector2(0f, 36f));
+            Text modeLabel = CreateText(canvasGo.transform, "ModeLabel", font, 28, TextAnchor.MiddleLeft, new Vector2(0f, 1f), new Vector2(0.48f, 1f), new Vector2(20f, -122f), new Vector2(0f, 40f));
             modeLabel.color = Color.white;
-            modeLabel.horizontalOverflow = HorizontalWrapMode.Overflow;
+            modeLabel.horizontalOverflow = HorizontalWrapMode.Wrap;
             modeLabel.verticalOverflow = VerticalWrapMode.Overflow;
+            modeLabel.resizeTextForBestFit = true;
+            modeLabel.resizeTextMinSize = 18;
+            modeLabel.resizeTextMaxSize = 30;
 
-            GameObject timerBlock = CreateUiRect(canvasGo.transform, "TimerBlock", new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-20f, -128f), new Vector2(100f, 100f));
+            // Bande haute 52–75 % (entre le libellé de mode et le Classement) : le minuteur n’est plus sous le panneau central ni le classement
+            GameObject timerBlock = CreateUiRect(canvasGo.transform, "TimerBlock", new Vector2(0.52f, 0.86f), new Vector2(0.75f, 0.99f), Vector2.zero, Vector2.zero);
             RectTransform timerRt = timerBlock.GetComponent<RectTransform>();
-            timerRt.pivot = new Vector2(1f, 1f);
+            timerRt.pivot = new Vector2(0.5f, 0.5f);
+            timerRt.offsetMin = new Vector2(2f, 2f);
+            timerRt.offsetMax = new Vector2(-2f, -2f);
             Image ringBg = timerBlock.AddComponent<Image>();
             ringBg.sprite = GetWhiteSprite();
             ringBg.color = new Color(0.15f, 0.15f, 0.18f, 0.9f);
@@ -127,36 +133,44 @@ namespace CongoGames.Core
             ring.fillAmount = 1f;
             ring.raycastTarget = false;
 
-            Text timerSec = CreateText(timerBlock.transform, "TimerSec", font, 34, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(100f, 56f));
+            Text timerSec = CreateText(timerBlock.transform, "TimerSec", font, 40, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(120f, 64f));
             timerSec.fontStyle = FontStyle.Bold;
             timerSec.color = Color.white;
 
-            GameObject lbPanel = CreateUiRect(canvasGo.transform, "LeaderboardPanel", new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-16f, 24f), new Vector2(340f, 420f));
+            GameObject lbPanel = CreateUiRect(canvasGo.transform, "LeaderboardPanel", new Vector2(0.76f, 0.1f), new Vector2(0.99f, 0.9f), Vector2.zero, Vector2.zero);
             Image lbBg = lbPanel.AddComponent<Image>();
             lbBg.sprite = GetWhiteSprite();
             lbBg.color = new Color(0.08f, 0.1f, 0.14f, 0.92f);
+            RectTransform lbPanelRt = lbPanel.GetComponent<RectTransform>();
+            lbPanelRt.offsetMin = new Vector2(8f, 8f);
+            lbPanelRt.offsetMax = new Vector2(-8f, -8f);
 
-            Text lbTitle = CreateText(lbPanel.transform, "LbTitle", font, 26, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(12f, -10f), new Vector2(-24f, 40f));
+            Text lbTitle = CreateText(lbPanel.transform, "LbTitle", font, 30, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(12f, -10f), new Vector2(-24f, 44f));
             lbTitle.fontStyle = FontStyle.Bold;
             lbTitle.color = new Color(1f, 0.85f, 0.15f);
             lbTitle.text = "Classement";
 
-            Text lbBody = CreateText(lbPanel.transform, "LbBody", font, 16, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(10f, -48f), new Vector2(-20f, 360f));
+            Text lbBody = CreateText(lbPanel.transform, "LbBody", font, 20, TextAnchor.UpperLeft, new Vector2(0f, 0f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero);
             lbBody.color = new Color(0.95f, 0.95f, 0.95f);
             lbBody.alignment = TextAnchor.UpperLeft;
             lbBody.horizontalOverflow = HorizontalWrapMode.Wrap;
             lbBody.verticalOverflow = VerticalWrapMode.Overflow;
+            lbBody.lineSpacing = 1.12f;
             RectTransform lbRt = lbBody.rectTransform;
-            lbRt.anchorMin = new Vector2(0f, 1f);
-            lbRt.anchorMax = new Vector2(0f, 1f);
-            lbRt.pivot = new Vector2(0f, 1f);
-            lbRt.anchoredPosition = new Vector2(10f, -48f);
-            lbRt.sizeDelta = new Vector2(300f, 360f);
+            lbRt.anchorMin = new Vector2(0f, 0f);
+            lbRt.anchorMax = new Vector2(1f, 1f);
+            lbRt.pivot = new Vector2(0.5f, 0.5f);
+            lbRt.anchoredPosition = Vector2.zero;
+            lbRt.offsetMin = new Vector2(10f, 12f);
+            lbRt.offsetMax = new Vector2(-10f, -52f);
 
             LeaderboardUI lbUi = lbPanel.AddComponent<LeaderboardUI>();
             lbUi.BindRuntime(lbBody);
 
-            GameObject modeRoot = CreateUiRect(canvasGo.transform, "ModePanelsRoot", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(72f, -18f), new Vector2(1040f, 820f));
+            GameObject modeRoot = CreateUiRect(canvasGo.transform, "ModePanelsRoot", new Vector2(0.02f, 0.08f), new Vector2(0.75f, 0.92f), Vector2.zero, Vector2.zero);
+            RectTransform modeRootRt = modeRoot.GetComponent<RectTransform>();
+            modeRootRt.offsetMin = new Vector2(4f, 4f);
+            modeRootRt.offsetMax = new Vector2(-6f, -4f);
             modeRoot.AddComponent<ModeSurfaceController>();
             modeRoot.AddComponent<MiniGamePanelContent>();
             modeRoot.AddComponent<HudPanelAnimator>();
@@ -252,6 +266,16 @@ namespace CongoGames.Core
             GameObject roundVfx = new GameObject("RoundVictoryOverlay");
             roundVfx.transform.SetParent(canvasGo.transform, false);
             roundVfx.AddComponent<RoundVictoryOverlay>();
+
+            if (modeRoot != null && timerBlock != null)
+            {
+                timerBlock.transform.SetSiblingIndex(modeRoot.transform.GetSiblingIndex() + 1);
+            }
+
+            if (roundVfx != null)
+            {
+                roundVfx.transform.SetAsLastSibling();
+            }
         }
 
         /// <summary>
@@ -311,15 +335,15 @@ namespace CongoGames.Core
             rt.offsetMax = new Vector2(-10f, -10f);
             Text text = go.AddComponent<Text>();
             text.font = font;
-            text.fontSize = 30;
+            text.fontSize = 32;
             text.fontStyle = FontStyle.Bold;
             text.alignment = TextAnchor.UpperCenter;
             text.color = Color.white;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 18;
-            text.resizeTextMaxSize = 34;
+            text.resizeTextMinSize = 20;
+            text.resizeTextMaxSize = 40;
             text.raycastTarget = false;
             Outline ol = go.AddComponent<Outline>();
             ol.effectColor = new Color(0f, 0f, 0f, 0.55f);
@@ -340,15 +364,15 @@ namespace CongoGames.Core
             rt.offsetMax = Vector2.zero;
             Text text = go.AddComponent<Text>();
             text.font = font;
-            text.fontSize = 21;
+            text.fontSize = 24;
             text.fontStyle = FontStyle.Bold;
             text.alignment = TextAnchor.MiddleCenter;
             text.color = new Color(1f, 0.85f, 0.2f, 1f);
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 14;
-            text.resizeTextMaxSize = 22;
+            text.resizeTextMinSize = 16;
+            text.resizeTextMaxSize = 28;
             text.raycastTarget = false;
             return text;
         }

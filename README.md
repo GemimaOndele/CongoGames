@@ -45,7 +45,9 @@ Enrichissement données (Commons, schémas JSON, prompts IA rédaction) : **`Dat
 
 - **Unity** : dossier `Library`, script `prepare-unity`, ordre d’ouverture (ce qui se régénère, dépannage) : **`docs/UNITY_LIBRARY_AND_LAUNCH.md`**.
 
-- **Scène personnalisée (sans le canvas auto du bootstrap)** : menu **CongoGames → UI → Ajouter RoundVictoryOverlay** + **`docs/UNITY_SCENE_SETUP.md`** (§ 3 bis).
+- **Scène personnalisée (sans le canvas auto du bootstrap)** : menu **CongoGames → UI → Ajouter RoundVictoryOverlay** + **`docs/UNITY_SCENE_SETUP.md`** (§ 3 bis et § 6 — fond 3D show TV vs scène perso).
+
+- **Fond 3D (socle show TV) et feuille de route itération type AAA** : **`docs/ROADMAP_UI_3D.md`**, checklist **`docs/3D_PRODUCTION_ITERATION.md`**, **fonds vidéo par mode + 3D** : **`docs/THEME_BACKGROUNDS.md`** (inclut `Theme/remote_media.json` avec **URL de démo** ; hors-ligne : renommer ce fichier ou vider les URLs).
 
 ### 1) Backend
 

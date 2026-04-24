@@ -48,6 +48,14 @@ namespace CongoGames.Presentation
                 return;
             }
 
+            if (StreamingMediaUrlPolicy.IsNonStreamableContentPageUrl(url))
+            {
+                StreamingMediaUrlPolicy.LogOnceRejected("Bandeau (bottomVideoUrl)", url);
+                StopStrip();
+                gameObject.SetActive(false);
+                return;
+            }
+
             gameObject.SetActive(true);
             if (url == activeUrl && video != null && video.isPlaying) return;
 

@@ -15,10 +15,10 @@ Je vais t’aider concrètement avec :
 
 Ton jeu doit être :
 
-* rapide (questions < 5 sec)
-* interactif (chat → réponse)
-* visuel (animations, score, effets)
-* compétitif (classement live)
+- rapide (questions < 5 sec)
+- interactif (chat → réponse)
+- visuel (animations, score, effets)
+- compétitif (classement live)
 
 👉 Exemple de boucle :
 
@@ -135,10 +135,10 @@ Tu peux ajouter un assistant vocal avec :
 
 ### 👉 IA recommandées :
 
-* ElevenLabs → voix réaliste
-* OpenAI → cerveau du bot
-* Unity → si tu veux 3D avancée
-* Blender → créer ton robot
+- ElevenLabs → voix réaliste
+- OpenAI → cerveau du bot
+- Unity → si tu veux 3D avancée
+- Blender → créer ton robot
 
 ---
 
@@ -164,18 +164,18 @@ Integrate with ElevenLabs API for voice.
 
 ### 💥 Mécaniques TikTok :
 
-* "Top donateur = bonus points"
-* "Like = multiplier de score"
-* "Follow = revive dans le jeu"
+- "Top donateur = bonus points"
+- "Like = multiplier de score"
+- "Follow = revive dans le jeu"
 
 ### 🎯 Contenu Congo (clé du succès)
 
 Inclure :
 
-* artistes (ex: Fally Ipupa même si RDC, les gens aiment)
-* histoire (colonisation, indépendance)
-* langues (Lingala, Kituba)
-* villes (Brazzaville, Pointe-Noire)
+- artistes (ex: Fally Ipupa même si RDC, les gens aiment)
+- histoire (colonisation, indépendance)
+- langues (Lingala, Kituba)
+- villes (Brazzaville, Pointe-Noire)
 
 ---
 
@@ -183,15 +183,15 @@ Inclure :
 
 ### Version simple (MVP rapide)
 
-* React + Node
-* OBS pour streamer
-* Overlay navigateur
+- React + Node
+- OBS pour streamer
+- Overlay navigateur
 
 ### Version avancée
 
-* Unity (jeu 3D)
-* API TikTok Live
-* IA vocale + avatar
+- Unity (jeu 3D)
+- API TikTok Live
+- IA vocale + avatar
 
 ---
 
@@ -199,8 +199,8 @@ Inclure :
 
 TikTok ne donne pas facilement accès à son API live → souvent tu dois :
 
-* scraper le chat
-* ou utiliser des libs non officielles
+- scraper le chat
+- ou utiliser des libs non officielles
 
 ---
 
@@ -208,10 +208,10 @@ TikTok ne donne pas facilement accès à son API live → souvent tu dois :
 
 Je peux te faire :
 
-* architecture complète prête à coder
-* design UI du jeu
-* script OBS pour ton live
-* stratégie pour gagner des viewers
+- architecture complète prête à coder
+- design UI du jeu
+- script OBS pour ton live
+- stratégie pour gagner des viewers
 
 ---
 
@@ -232,27 +232,27 @@ Tu ne dois pas tout mélanger. Sépare en 4 blocs :
 
 ### 🎮 1. Jeu 3D
 
-* moteur : Unity
-* scène : plateau de quiz + avatar robot
-* animations + effets visuels
+- moteur : Unity
+- scène : plateau de quiz + avatar robot
+- animations + effets visuels
 
 ### 🧠 2. IA (cerveau du robot)
 
-* questions + réponses
-* logique du jeu
-* génération dynamique
+- questions + réponses
+- logique du jeu
+- génération dynamique
 
 → via OpenAI
 
 ### 🗣️ 3. Voix du robot
 
-* synthèse vocale réaliste
-  → ElevenLabs
+- synthèse vocale réaliste
+→ ElevenLabs
 
 ### 📡 4. Interaction TikTok Live
 
-* lecture du chat
-* conversion messages → actions
+- lecture du chat
+- conversion messages → actions
 
 ---
 
@@ -260,16 +260,16 @@ Tu ne dois pas tout mélanger. Sépare en 4 blocs :
 
 Ton robot doit être :
 
-* expressif
-* rapide
-* un peu “showman” (très important sur TikTok)
+- expressif
+- rapide
+- un peu “showman” (très important sur TikTok)
 
 ### 🎭 Comportement
 
-* pose la question
-* réagit aux réponses
-* fait des blagues
-* chauffe le chat
+- pose la question
+- réagit aux réponses
+- fait des blagues
+- chauffe le chat
 
 ---
 
@@ -385,15 +385,15 @@ Prepare system to connect to TikTok Live API later.
 
 Tu peux créer ton robot avec :
 
-* Blender
-* ou télécharger un modèle sur Sketchfab
+- Blender
+- ou télécharger un modèle sur Sketchfab
 
 👉 Style recommandé :
 
-* futuriste africain
-* couleurs vert / jaune / rouge (Congo 🇨🇬)
-* yeux lumineux
-* animations exagérées (TikTok = spectacle)
+- futuriste africain
+- couleurs vert / jaune / rouge (Congo 🇨🇬)
+- yeux lumineux
+- animations exagérées (TikTok = spectacle)
 
 ---
 
@@ -401,15 +401,15 @@ Tu peux créer ton robot avec :
 
 Ton robot doit faire ça :
 
-* “🔥 3 bonnes réponses = bonus !”
-* “🚨 PERSONNE N’A TROUVÉ ?!”
-* “💥 @username est en tête !!”
+- “🔥 3 bonnes réponses = bonus !”
+- “🚨 PERSONNE N’A TROUVÉ ?!”
+- “💥 @username est en tête !!”
 
 👉 Ajoute :
 
-* musique dynamique
-* effets visuels
-* réactions exagérées
+- musique dynamique
+- effets visuels
+- réactions exagérées
 
 ---
 
@@ -433,11 +433,11 @@ Tu vas avoir 3 défis majeurs :
 
 # 🚀 6. Stack finale recommandée
 
-* Unity (jeu 3D)
-* OBS (stream)
-* Node.js (backend chat)
-* OpenAI (IA)
-* ElevenLabs (voix)
+- Unity (jeu 3D)
+- OBS (stream)
+- Node.js (backend chat)
+- OpenAI (IA)
+- ElevenLabs (voix)
 
 ---
 
@@ -469,10 +469,10 @@ Tu vas avoir 3 défis majeurs :
 
 Je peux te faire :
 
-* 🎮 un design complet de scène Unity (comme un vrai jeu)
-* 🤖 personnalité du robot (phrases prêtes à l’emploi)
-* 🧠 prompts ultra optimisés pour OpenAI
-* 📡 système complet de connexion TikTok Live
+- 🎮 un design complet de scène Unity (comme un vrai jeu)
+- 🤖 personnalité du robot (phrases prêtes à l’emploi)
+- 🧠 prompts ultra optimisés pour OpenAI
+- 📡 système complet de connexion TikTok Live
 
 ---
 
@@ -495,18 +495,16 @@ Parfait — on va faire les deux, mais de façon **structurée et exploitable di
 
 ### 🎨 Style visuel
 
-* Robot humanoïde futuriste
-* Inspirations afro-futuristes (type Wakanda, mais original)
-* Couleurs principales :
-
-  * Vert 🇨🇬
-  * Jaune
-  * Rouge
-* Éléments :
-
-  * yeux LED lumineux
-  * lignes néon sur le corps
-  * écran poitrine (affiche score ou réactions)
+- Robot humanoïde futuriste
+- Inspirations afro-futuristes (type Wakanda, mais original)
+- Couleurs principales :
+  - Vert 🇨🇬
+  - Jaune
+  - Rouge
+- Éléments :
+  - yeux LED lumineux
+  - lignes néon sur le corps
+  - écran poitrine (affiche score ou réactions)
 
 ---
 
@@ -516,9 +514,9 @@ Ton robot doit être **charismatique + exagéré** :
 
 Exemples de phrases :
 
-* “🔥 Brazzaville en force !! Qui va gagner ?!”
-* “😱 Personne n’a trouvé ?! Impossible !”
-* “💥 @player123 prend la tête !!”
+- “🔥 Brazzaville en force !! Qui va gagner ?!”
+- “😱 Personne n’a trouvé ?! Impossible !”
+- “💥 @player123 prend la tête !!”
 
 ---
 
@@ -526,24 +524,24 @@ Exemples de phrases :
 
 ### 🏟️ Environnement
 
-* Plateau circulaire type jeu télé
-* Écran géant derrière le robot
-* Sol lumineux (réagit aux bonnes réponses)
+- Plateau circulaire type jeu télé
+- Écran géant derrière le robot
+- Sol lumineux (réagit aux bonnes réponses)
 
 ### 📺 UI dans la scène
 
-* Question affichée en grand
-* 4 réponses (A/B/C/D)
-* Timer circulaire
-* Leaderboard flottant
+- Question affichée en grand
+- 4 réponses (A/B/C/D)
+- Timer circulaire
+- Leaderboard flottant
 
 ---
 
 ## ✨ Effets visuels
 
-* Bonne réponse → explosion de lumière
-* Mauvaise réponse → glitch rouge
-* Top joueur → spotlight
+- Bonne réponse → explosion de lumière
+- Mauvaise réponse → glitch rouge
+- Top joueur → spotlight
 
 ---
 
@@ -732,8 +730,8 @@ Requirements:
 
 Pour ton robot :
 
-* Blender (création)
-* ou Sketchfab (rapide)
+- Blender (création)
+- ou Sketchfab (rapide)
 
 ---
 
@@ -767,10 +765,10 @@ Ce n’est PAS la techno.
 
 👉 C’est :
 
-* rythme rapide
-* réactions du robot
-* interaction chat
-* ambiance
+- rythme rapide
+- réactions du robot
+- interaction chat
+- ambiance
 
 ---
 
@@ -790,8 +788,6 @@ tous :
 👉 🎮 scène Unity détaillée étape par étape (clic par clic)
 👉 📡 connexion réelle TikTok Live (code Node.js)
 
-
-
 Parfait — on va construire ça **comme un vrai studio de jeu** : design → Unity → backend live. Tu pourras suivre étape par étape sans te perdre.
 
 ---
@@ -800,9 +796,9 @@ Parfait — on va construire ça **comme un vrai studio de jeu** : design → Un
 
 Tu peux utiliser :
 
-* Midjourney
-* DALL·E
-* Stable Diffusion
+- Midjourney
+- DALL·E
+- Stable Diffusion
 
 ---
 
@@ -832,8 +828,8 @@ game show environment, ultra realistic, 3D cinematic render, 8k
 
 👉 Astuce :
 
-* génère plusieurs images
-* prends une → transforme en modèle 3D dans Blender ou via outils AI 3D
+- génère plusieurs images
+- prends une → transforme en modèle 3D dans Blender ou via outils AI 3D
 
 ---
 
@@ -855,25 +851,25 @@ Logiciel : Unity
 
 ### 👉 Sol (plateau)
 
-* Click droit → 3D Object → Plane
-* Scale : (10, 1, 10)
-* Material → couleur sombre + émission (glow)
+- Click droit → 3D Object → Plane
+- Scale : (10, 1, 10)
+- Material → couleur sombre + émission (glow)
 
 ---
 
 ### 👉 Écran géant
 
-* 3D Object → Cube
-* Scale : (6, 3, 0.2)
-* Position : derrière robot
-* Renommer : `QuestionScreen`
+- 3D Object → Cube
+- Scale : (6, 3, 0.2)
+- Position : derrière robot
+- Renommer : `QuestionScreen`
 
 ---
 
 ### 👉 Robot
 
-* Import modèle (ou capsule temporaire)
-* Position centre
+- Import modèle (ou capsule temporaire)
+- Position centre
 
 ---
 
@@ -881,24 +877,24 @@ Logiciel : Unity
 
 ### Canvas :
 
-* Click droit → UI → Canvas
-* Mode : **World Space**
+- Click droit → UI → Canvas
+- Mode : **World Space**
 
 ---
 
 ### Ajouter :
 
-* Text → Question
-* 4 boutons → réponses A B C D
-* Text → Timer
-* Panel → Leaderboard
+- Text → Question
+- 4 boutons → réponses A B C D
+- Text → Timer
+- Panel → Leaderboard
 
 ---
 
 ## ⏱️ Étape 4 — Timer visuel
 
-* UI → Image (type radial)
-* Script pour countdown
+- UI → Image (type radial)
+- Script pour countdown
 
 ---
 
@@ -906,17 +902,17 @@ Logiciel : Unity
 
 Attache :
 
-* `GameManager` → empty object
-* `AIManager` → robot
-* `UIManager` → canvas
+- `GameManager` → empty object
+- `AIManager` → robot
+- `UIManager` → canvas
 
 ---
 
 ## ✨ Étape 6 — Effets
 
-* Light → Spotlights
-* Particles → confetti
-* Animator → robot
+- Light → Spotlights
+- Particles → confetti
+- Animator → robot
 
 ---
 
@@ -1022,10 +1018,10 @@ public class WebSocketClient : MonoBehaviour
 
 Exemple :
 
-* Viewer tape "A"
-* Unity reçoit message
-* Compare avec bonne réponse
-* Update score
+- Viewer tape "A"
+- Unity reçoit message
+- Compare avec bonne réponse
+- Update score
 
 ---
 
@@ -1033,7 +1029,7 @@ Exemple :
 
 ### 🎥 Stream
 
-* Unity → OBS → TikTok Live
+- Unity → OBS → TikTok Live
 
 ### 📡 Data flow
 
@@ -1045,9 +1041,9 @@ TikTok → Node.js → Unity → affichage
 
 Ajoute :
 
-* 🎁 dons TikTok → bonus points
-* ❤️ likes → multiplier score
-* 👑 top viewer affiché en 3D
+- 🎁 dons TikTok → bonus points
+- ❤️ likes → multiplier score
+- 👑 top viewer affiché en 3D
 
 ---
 
@@ -1067,14 +1063,11 @@ Dis-moi :
 ou
 👉 **les animations + expressions du robot (niveau ultra réaliste)**
 
-
-
 tous : 
 
 👉 tu veux que je te fasse maintenant le système complet de scoring + leaderboard temps réel
 ou
 👉 les animations + expressions du robot (niveau ultra réaliste)
-
 
 Parfait — là on passe au niveau “jeu pro”. Je te donne **les deux blocs complets** :
 
@@ -1089,10 +1082,10 @@ Tu peux intégrer directement dans ton projet Unity.
 
 ## 🎯 Objectif
 
-* chaque viewer = un joueur
-* réponse via chat (A/B/C/D)
-* points attribués en live
-* leaderboard mis à jour instantanément
+- chaque viewer = un joueur
+- réponse via chat (A/B/C/D)
+- points attribués en live
+- leaderboard mis à jour instantanément
 
 ---
 
@@ -1100,9 +1093,9 @@ Tu peux intégrer directement dans ton projet Unity.
 
 Créer 3 scripts :
 
-* `PlayerData.cs`
-* `ScoreManager.cs`
-* `LeaderboardUI.cs`
+- `PlayerData.cs`
+- `ScoreManager.cs`
+- `LeaderboardUI.cs`
 
 ---
 
@@ -1242,9 +1235,9 @@ void ProcessMessage(string json)
 
 # 🔥 BONUS GAMEPLAY (à ajouter)
 
-* 🔥 streak = multiplicateur
-* ⚡ fastest answer = bonus
-* 💎 dons TikTok = points boost
+- 🔥 streak = multiplicateur
+- ⚡ fastest answer = bonus
+- 💎 dons TikTok = points boost
 
 ---
 
@@ -1254,9 +1247,9 @@ void ProcessMessage(string json)
 
 Ton robot doit :
 
-* parler
-* bouger
-* réagir émotionnellement
+- parler
+- bouger
+- réagir émotionnellement
 
 ---
 
@@ -1264,11 +1257,11 @@ Ton robot doit :
 
 Créer Animator avec états :
 
-* Idle
-* Talking
-* Happy
-* Angry
-* Hype
+- Idle
+- Talking
+- Happy
+- Angry
+- Hype
 
 ---
 
@@ -1339,9 +1332,9 @@ Si ton modèle le permet :
 
 Exemples :
 
-* sourire
-* surprise
-* colère
+- sourire
+- surprise
+- colère
 
 ---
 
@@ -1374,23 +1367,23 @@ Ajoute :
 
 ### 🎥 Caméra dynamique
 
-* zoom quand réponse correcte
-* shake quand mauvaise réponse
+- zoom quand réponse correcte
+- shake quand mauvaise réponse
 
 ---
 
 ### 💡 Lumières dynamiques
 
-* vert = correct
-* rouge = wrong
+- vert = correct
+- rouge = wrong
 
 ---
 
 ### 🎆 Effets
 
-* particules
-* glow
-* explosion visuelle
+- particules
+- glow
+- explosion visuelle
 
 ---
 
@@ -1406,9 +1399,9 @@ Ajoute :
 
 # 💰 5. CE QUI VA FAIRE EXPLOSER TON JEU
 
-* réactions exagérées du robot
-* leaderboard visible en permanence
-* interaction constante
+- réactions exagérées du robot
+- leaderboard visible en permanence
+- interaction constante
 
 ---
 
@@ -1424,10 +1417,7 @@ Je peux maintenant te faire :
 
 Dis-moi ce que tu veux en next niveau.
 
-
 tous et pour terminer ca sera sur github en mode privée (faut éviter de surcharger la mémoire donc le projet doit être bien structuré ) : Je peux maintenant te faire : 👉 🤖 synchronisation lèvres + voix (lip sync réaliste) 👉 🎮 système complet de questions dynamiques générées par IA 👉 💸 système de monétisation TikTok (gifts = gameplay)
-
-
 
 Parfait — là on finalise ton projet en mode **pro + scalable + prêt GitHub privé**.
 Je te donne les 3 briques demandées + une **structure propre pour éviter de surcharger la mémoire** (très important pour Unity + live).
@@ -1481,8 +1471,8 @@ Logs/
 
 Synchroniser :
 
-* voix (ElevenLabs)
-* bouche (animation Unity)
+- voix (ElevenLabs)
+- bouche (animation Unity)
 
 ---
 
@@ -1526,8 +1516,8 @@ public class LipSync : MonoBehaviour
 
 ## 🎯 Résultat
 
-* le robot “ouvre la bouche” selon la voix
-* léger mais efficace pour TikTok
+- le robot “ouvre la bouche” selon la voix
+- léger mais efficace pour TikTok
 
 ---
 
@@ -1535,9 +1525,9 @@ public class LipSync : MonoBehaviour
 
 ## 🎯 Objectif
 
-* générer des questions en live
-* éviter base statique
-* contenu infini
+- générer des questions en live
+- éviter base statique
+- contenu infini
 
 ---
 
@@ -1602,9 +1592,9 @@ Transformer les dons en actions dans le jeu
 
 ## 💡 Idées gameplay
 
-* 🎁 cadeau → +50 points
-* 💎 gros don → multiplier score x2
-* 👑 top donateur → bonus spécial
+- 🎁 cadeau → +50 points
+- 💎 gros don → multiplier score x2
+- 👑 top donateur → bonus spécial
 
 ---
 
@@ -1653,26 +1643,26 @@ Sinon ton jeu va lag en live.
 
 ### 🔹 1. Pooling objets
 
-* ne recrée pas UI/effets
-* réutilise
+- ne recrée pas UI/effets
+- réutilise
 
 ---
 
 ### 🔹 2. Audio cache
 
-* phrases répétées → stocker audio
+- phrases répétées → stocker audio
 
 ---
 
 ### 🔹 3. Questions limitées
 
-* garde max 20 en mémoire
+- garde max 20 en mémoire
 
 ---
 
 ### 🔹 4. JSON léger
 
-* évite gros fichiers
+- évite gros fichiers
 
 ---
 
@@ -1765,9 +1755,9 @@ Ton succès ne dépend pas de :
 
 Je peux te faire :
 
-* 🤖 avatar robot ULTRA réaliste style MetaHuman
-* 🎮 système multi-room (plusieurs parties live)
-* 📊 dashboard analytics viewers
+- 🤖 avatar robot ULTRA réaliste style MetaHuman
+- 🎮 système multi-room (plusieurs parties live)
+- 📊 dashboard analytics viewers
 
 ---
 
@@ -1775,7 +1765,6 @@ Dis-moi :
 👉 tu veux maintenant que je te fasse un **plan pour lancer et percer sur TikTok avec ce jeu (growth + stratégie)**
 ou
 👉 un **pack final prêt à upload sur GitHub (README + doc + scripts clean)**
-
 
 Pour terminer je veux en plus l'introduction (du lingala et kituba comme langue du Congo dont la capitale est Brazzaville en plus du français comme langues par défaut avec des mini jeux proposées dedans (quiz, sémantique, mot melé, mot croisé, blind test , mot mystere, jeu de memoire, jeu de chrono, devinette des mots par rapport à l'image associée qui est affiché, des battles lancés (les 2 joueur ayant le plus marqué ou battle lancé par des cadeaux) ) et tout ça : 
 
@@ -1791,9 +1780,9 @@ Parfait — on clôture ton projet avec **une intro immersive + multi-langues + 
 
 👉 Langues :
 
-* Français (par défaut)
-* Lingala
-* Kituba
+- Français (par défaut)
+- Lingala
+- Kituba
 
 ---
 
@@ -1906,46 +1895,46 @@ Requirements:
 
 ### 2. Mot mélangé
 
-* afficher mot mélangé
-* chat doit deviner
+- afficher mot mélangé
+- chat doit deviner
 
 ---
 
 ### 3. Mot croisé (simplifié)
 
-* grille + indices
+- grille + indices
 
 ---
 
 ### 4. Blind test 🎵
 
-* jouer musique
-* chat devine artiste
+- jouer musique
+- chat devine artiste
 
 ---
 
 ### 5. Image guessing 🖼️
 
-* afficher image
-* chat répond
+- afficher image
+- chat répond
 
 ---
 
 ### 6. Mémoire 🧠
 
-* retourner cartes
+- retourner cartes
 
 ---
 
 ### 7. Chrono ⏱️
 
-* répondre le plus vite
+- répondre le plus vite
 
 ---
 
 ### 8. Devinette
 
-* “Je suis une ville du Congo…”
+- “Je suis une ville du Congo…”
 
 ---
 
@@ -1955,11 +1944,11 @@ Requirements:
 
 ### Cas 1 : top 2 joueurs
 
-* duel automatique
+- duel automatique
 
 ### Cas 2 : via cadeaux 🎁
 
-* viewer lance battle
+- viewer lance battle
 
 ---
 
@@ -2008,20 +1997,20 @@ Interactive TikTok Live game built with Unity + AI.
 
 ## 🎮 Features
 
-* 3D quiz game
-* AI robot host
-* Multi-language (French, Lingala, Kituba)
-* Real-time TikTok interaction
-* Multiple mini-games
-* Leaderboard & battles
+- 3D quiz game
+- AI robot host
+- Multi-language (French, Lingala, Kituba)
+- Real-time TikTok interaction
+- Multiple mini-games
+- Leaderboard & battles
 
 ## 🧠 Tech Stack
 
-* Unity 3D
-* Node.js
-* WebSocket
-* OpenAI API
-* ElevenLabs
+- Unity 3D
+- Node.js
+- WebSocket
+- OpenAI API
+- ElevenLabs
 
 ## 🚀 Run
 
@@ -2036,9 +2025,9 @@ Open project → Run scene
 
 ## 🔥 Gameplay
 
-* Answer in chat (A/B/C/D)
-* Gifts = bonuses
-* Top players = battles
+- Answer in chat (A/B/C/D)
+- Gifts = bonuses
+- Top players = battles
 
 ## 📡 Stream
 
@@ -2054,40 +2043,40 @@ Use OBS → TikTok Live
 
 ## 🎯 Format live
 
-* sessions de 1h
-* rythme rapide
-* zéro temps mort
+- sessions de 1h
+- rythme rapide
+- zéro temps mort
 
 ---
 
 ## 🔥 Hooks (début live)
 
-* “⚠️ Personne ne trouve cette question !”
-* “🔥 100 points à gagner MAINTENANT !”
+- “⚠️ Personne ne trouve cette question !”
+- “🔥 100 points à gagner MAINTENANT !”
 
 ---
 
 ## 💡 Engagement
 
-* répondre aux pseudos
-* afficher leaderboard
-* provoquer les viewers
+- répondre aux pseudos
+- afficher leaderboard
+- provoquer les viewers
 
 ---
 
 ## 🎁 Monétisation
 
-* dons = pouvoir
-* top donateur affiché
-* battle sponsorisée
+- dons = pouvoir
+- top donateur affiché
+- battle sponsorisée
 
 ---
 
 ## 📈 Croissance
 
-* poster extraits sur TikTok
-* moments drôles du robot
-* fails viewers
+- poster extraits sur TikTok
+- moments drôles du robot
+- fails viewers
 
 ---
 
@@ -2117,13 +2106,11 @@ Je peux encore te faire :
 ou
 **“transformer ça en startup / app rentable”**
 
-
 Oui je veux tous ça et pour terminer le nom du jeu c'est CongoGames: 
 
 👉 🎤 voix du robot ultra naturelle (accent africain stylé)
 👉 🎮 UI digne d’un jeu TV pro
 👉 💰 système complet de revenus TikTok optimisé  
-
 
 “optimiser pour 10k viewers”
 et
@@ -2138,9 +2125,9 @@ Je te livre les 4 blocs finaux : voix du robot, UI TV pro, monétisation optimis
 
 ## 🎯 Objectif
 
-* voix **chaleureuse, énergique**
-* légère musicalité africaine (sans caricature)
-* phrases courtes (TikTok)
+- voix **chaleureuse, énergique**
+- légère musicalité africaine (sans caricature)
+- phrases courtes (TikTok)
 
 👉 Outil : ElevenLabs
 
@@ -2169,11 +2156,10 @@ Examples:
 
 ## 🧠 Optimisation pro
 
-* pré-génère :
-
-  * réactions
-  * phrases hype
-* garde cache audio (évite latence)
+- pré-génère :
+  - réactions
+  - phrases hype
+- garde cache audio (évite latence)
 
 ---
 
@@ -2181,8 +2167,8 @@ Examples:
 
 ## 🎯 Style visuel
 
-* inspiré jeux TV (Questions pour un champion vibe)
-* lisible sur mobile (ultra important TikTok)
+- inspiré jeux TV (Questions pour un champion vibe)
+- lisible sur mobile (ultra important TikTok)
 
 ---
 
@@ -2190,22 +2176,22 @@ Examples:
 
 ### 📺 Écran principal
 
-* question = GRAND format
-* réponses = couleurs distinctes
+- question = GRAND format
+- réponses = couleurs distinctes
 
 ---
 
 ### 🏆 Leaderboard
 
-* toujours visible
-* animé (montée / descente)
+- toujours visible
+- animé (montée / descente)
 
 ---
 
 ### ⏱️ Timer
 
-* cercle animé
-* couleur change (vert → rouge)
+- cercle animé
+- couleur change (vert → rouge)
 
 ---
 
@@ -2231,9 +2217,9 @@ Style:
 
 ## 🔥 Bonus visuel
 
-* glow sur bonnes réponses
-* shake caméra sur erreurs
-* spotlight sur top player
+- glow sur bonnes réponses
+- shake caméra sur erreurs
+- spotlight sur top player
 
 ---
 
@@ -2249,12 +2235,14 @@ transformer viewers → payeurs → joueurs engagés
 
 ### 🎁 Gifts → effets
 
+
 | Cadeau    | Effet                 |
 | --------- | --------------------- |
 | Rose      | +50 points            |
 | Lion      | x2 score              |
 | Galaxy    | lance battle          |
 | Don élevé | freeze autres joueurs |
+
 
 ---
 
@@ -2295,24 +2283,24 @@ Annonce toujours :
 
 Exemples :
 
-* “⚠️ 99% des gens échouent à cette question”
-* “🔥 200 points à gagner MAINTENANT”
+- “⚠️ 99% des gens échouent à cette question”
+- “🔥 200 points à gagner MAINTENANT”
 
 ---
 
 ## ⚡ 2. Rythme
 
-* question toutes les 8–10 secondes
-* aucune pause
-* robot parle constamment
+- question toutes les 8–10 secondes
+- aucune pause
+- robot parle constamment
 
 ---
 
 ## 👥 3. Interaction
 
-* citer les pseudos
-* afficher classement
-* provoquer :
+- citer les pseudos
+- afficher classement
+- provoquer :
 
 👉 “@user tu es dernier 😭”
 
@@ -2320,9 +2308,9 @@ Exemples :
 
 ## 📈 4. Croissance
 
-* clip tes lives
-* poste sur TikTok
-* recycler moments drôles
+- clip tes lives
+- poste sur TikTok
+- recycler moments drôles
 
 ---
 
@@ -2338,38 +2326,38 @@ Exemples :
 
 ### 1. MVP (ce que tu fais maintenant)
 
-* jeu live TikTok
+- jeu live TikTok
 
 ---
 
 ### 2. V2
 
-* app mobile
-* multi-room
+- app mobile
+- multi-room
 
 ---
 
 ### 3. V3
 
-* marques sponsor
-* quiz sponsorisés
+- marques sponsor
+- quiz sponsorisés
 
 ---
 
 ## 💰 Revenus
 
-* TikTok gifts
-* sponsors
-* pub intégrée
-* abonnements premium
+- TikTok gifts
+- sponsors
+- pub intégrée
+- abonnements premium
 
 ---
 
 ## 🧠 Différenciation
 
-* contenu africain 🇨🇬
-* multi-langues
-* IA robot
+- contenu africain 🇨🇬
+- multi-langues
+- IA robot
 
 👉 c’est ça ta force
 
@@ -2379,12 +2367,12 @@ Exemples :
 
 **CongoGames =**
 
-* 🎮 jeu 3D Unity
-* 🤖 robot IA
-* 🗣️ voix naturelle
-* 📡 TikTok live connecté
-* 💰 monétisation intégrée
-* 🌍 multi-langues
+- 🎮 jeu 3D Unity
+- 🤖 robot IA
+- 🗣️ voix naturelle
+- 📡 TikTok live connecté
+- 💰 monétisation intégrée
+- 🌍 multi-langues
 
 ---
 
@@ -2403,10 +2391,1473 @@ Mais pour réussir :
 
 Je peux t’aider à :
 
-* lever des fonds 💰
-* créer une vraie startup tech
-* scaler à 100k viewers
+- lever des fonds 💰
+- créer une vraie startup tech
+- scaler à 100k viewers
 
 ---
 
 🎯 Tu as maintenant un blueprint complet pour lancer **CongoGames**.
+
+Et ici, dans le développement de mon jeu que je suis en train de faire avec le sort IA, je suis sur la partie qui concerne l'enrichissement des datasets, parce qu'il a exemple plusieurs types de jeux. Et moi, ce que j'aimerais, c'est recueillir de la donnée pour qu'elle reste en local et soit directement sur le GitHub. Mais en tout cas, recueillir de la donnée, de la donnée de type image. Par exemple, il y a des types de jeux où on doit deviner des images. Il y a des types de jeux où il y a la musique qui se lance et on me pose la question en fonction de cette musique, par exemple le type de la musique, l'histoire autour de cette musique, le nom des chanteurs ou des chanteurs de la musique, des choses comme ça. Et moi, j'aimerais tout ça justement dans mon jeu. Et avec le sort IA, j'ai du mal de parler des droits d'auteur, mais normalement, je sais que c'est possible de récupérer de la musique, des images sans discuter parce que j'ai déjà eu à le faire sur Internet là. Et du coup, moi, j'aimerais besoin d'avoir ton aide pour que tu m'aides à recueillir toutes ces datas, les structurer et tout et me donner un prompt avec des liens et tout cela où on peut recueillir la data. Tout cela, je veux d'énormes datas pour enrichir, enrichir, renforcer, améliorer tous les types de jeux. Je dis bien tous les types de jeux.Côté dépôt (déjà sur origin/master, commit 922c371)
+GridThemeBank : 2 thèmes en plus (histoire, éco/vie courante) + mots 4–7 car. pour grilles 7×7.
+CongoLocalQuizBank : 5 questions en plus (stade de Kintélé, cathédrale Sainte-Anne, live lisible, Congo vs RDC, etc.) — vérification factuelle faite.
+MiniGameDemoBanks : 3 manches de blind + 2 manches image (Kintélé avec kintele optionnel, code IATA BZV).
+Playlist audio : fichier Theme/blind-test/track01.ogg et track02.ogg (Wikimedia Commons, mêmes sources que ATTRIBUTION.md) + méta Unity. ThemeMusicPlayer enchaînera ces pistes en mode blind-test.
+ATTRIBUTION.md : note sur le dossier blind-test / URLs.
+NOMS_FICHIERS.txt : entrée optionnelle kintele.
+docs/WORKFLOW_LOCAL.md : ordre pull → npm run start-all → Play Unity ; README mis à jour avec le lien.
+Sur ton PC : C:\Congogame
+Ouvre un terminal dans le dossier du clone (pas l’environnement cloud) :
+git pull origin master
+Backend (comme d’habitude) : npm run start-all à la racine, avec un Backend/.env correct.
+Unity : ouvre le projet, Play (une scène avec RuntimeBootstrap ou ta scène habituelle).
+Les .ogg arrivent avec le pull (≈4,4 Mo au total) : si le clone met du temps, c’est surtout ça.
+
+Pas encore “tout le pack” (honnête)
+Enrichissement “massif” (centaines d’items) : c’est itératif ; ce lot en ajoute un bon lot, pas une base exhaustive.
+Images “réelles” : seulement des fichiers que tu mets (brazzaville, kintele, etc.) + licences ; le jeu garde le flou 15 s + secours s’il manque le fichier.
+Blind test “titre, date, chanteur” calés sur la piste : seulement si chaque piste a sa fiche (fichier ou banque) — pas d’invention automatique à partir d’Internet.
+Look PS5 / plateau 3D : toujours un projet art + scène Unity ; voir docs/AAA_Blockbuster_Specification_CongoGames.md + ROADMAP_UI_3D.md.
+En une phrase : tu peux pull, lancer le backend, Play : la playlist blind-test est fournie légalement (Commons) et les banques sont un peu plus grosses ; le reste, c’est contenu et 3D en lots suivants.
+
+Je vais être direct avec toi :
+👉 récupérer “énormément de data images + musiques sans discuter des droits”, c’est risqué et peut faire sauter ton projet (TikTok + GitHub + monétisation).
+
+Mais bonne nouvelle :
+👉 tu peux construire une **grosse base de données propre, locale, scalable et monétisable** sans problème juridique.
+
+Je te donne **une méthode PRO complète** 👇
+
+---
+
+# 🧠 1. STRATÉGIE INTELLIGENTE (ce que font les vrais projets)
+
+Au lieu de “scraper tout Internet”, fais :
+
+### ✅ 3 sources SAFE
+
+1. contenus libres (open data)
+2. contenus générés par IA
+3. contenus créés par ta communauté
+
+👉 ça te donne :
+
+- volume énorme
+- zéro problème légal
+- contenu unique (très important)
+
+---
+
+# 🌍 2. SOURCES DE DATA (IMAGES + AUDIO)
+
+## 🖼️ IMAGES LIBRES
+
+### 🔥 Source principale
+
+- Wikimedia Commons
+
+👉 parfait pour :
+
+- villes (Brazzaville, Pointe-Noire)
+- monuments
+- personnalités historiques
+
+---
+
+### 🔥 Autres sources
+
+- Unsplash
+- Pexels
+
+---
+
+## 🎵 MUSIQUE / AUDIO
+
+### ✅ SAFE
+
+- Free Music Archive
+- Wikimedia Commons
+
+👉 idéal pour blind test (instrumental, ambiance)
+
+---
+
+## ⚠️ IMPORTANT
+
+❌ Évite :
+
+- Spotify / YouTube (copyright)
+- téléchargement sauvage
+
+👉 sinon TikTok peut te shadowban
+
+---
+
+# 🤖 3. DATA GÉNÉRÉE PAR IA (TRÈS PUISSANT)
+
+👉 Tu peux créer :
+
+- images (quiz)
+- questions
+- descriptions
+- indices
+
+avec :
+
+- OpenAI
+- Stable Diffusion
+
+---
+
+## 🔥 Prompt génération dataset images
+
+```id="datasetimg01"
+Generate 50 quiz image ideas about Republic of Congo.
+
+For each item:
+- Title
+- Description of the image
+- Category (city, culture, music, history)
+- Difficulty level
+- Accepted answers (multiple variations)
+
+Format: JSON
+```
+
+---
+
+# 🧱 4. STRUCTURE DATASET (TRÈS IMPORTANT)
+
+👉 organise ton repo comme ça :
+
+```id="dataset01"
+Datasets/
+│
+├── images/
+│   ├── brazzaville.jpg
+│   ├── kintele.jpg
+│
+├── audio/
+│   ├── track01.ogg
+│
+├── quiz/
+│   ├── questions.json
+│
+├── blindtest/
+│   ├── tracks.json
+│
+├── metadata/
+│   ├── attribution.json
+```
+
+---
+
+## 📄 Exemple JSON (image quiz)
+
+```json id="jsonimg01"
+{
+  "id": "img_001",
+  "file": "brazzaville.jpg",
+  "question": "Quelle est cette ville ?",
+  "answers": ["Brazzaville"],
+  "hints": ["Capitale du Congo"],
+  "difficulty": "easy"
+}
+```
+
+---
+
+## 🎵 Exemple JSON (blind test)
+
+```json id="jsonaudio01"
+{
+  "id": "audio_01",
+  "file": "track01.ogg",
+  "question": "Quel est le style musical ?",
+  "answers": ["rumba", "afro"],
+  "artist": "Unknown",
+  "source": "Wikimedia Commons"
+}
+```
+
+---
+
+# 🔗 5. PROMPT CURSOR POUR SCRAPER PROPREMENT
+
+👉 (respect des licences inclus)
+
+```id="scraper01"
+Create a Node.js script to collect media data from open sources.
+
+Requirements:
+- Fetch images from Wikimedia Commons API
+- Download files locally
+- Save metadata (title, author, license)
+- Store everything in JSON format
+- Avoid duplicates
+- Limit requests to avoid blocking
+
+Output:
+- Clean dataset ready for a quiz game
+```
+
+---
+
+# ⚡ 6. AUTOMATISATION (TRÈS PRO)
+
+👉 pipeline :
+
+1. script récupère data
+2. nettoie
+3. stocke local
+4. commit GitHub
+
+---
+
+# 💾 7. GITHUB (IMPORTANT)
+
+👉 garde :
+
+- JSON léger
+- images compressées
+- audio .ogg (comme tu fais 👍)
+
+👉 évite :
+
+- fichiers lourds → utilise Git LFS si besoin
+
+---
+
+# 🔥 8. IDÉE ULTRA PUISSANTE (DIFFÉRENCIATION)
+
+👉 ajoute :
+
+### 🧑‍🤝‍🧑 contenu communautaire
+
+- viewers envoient images
+- viewers proposent questions
+
+👉 ça te crée :
+
+- data infinie
+- engagement énorme
+
+---
+
+# ⚠️ 9. RÉALITÉ (très important)
+
+Ton objectif :
+❌ “énormes datasets”
+✔ “datasets intelligents + évolutifs”
+
+---
+
+# 🚀 10. CE QUE TU AS DÉJÀ FAIT (très bien)
+
+Tu es déjà en mode PRO :
+
+- .ogg optimisé ✅
+- attribution ✅
+- structuration dataset ✅
+- workflow Git propre ✅
+
+👉 honnêtement : t’es au-dessus de beaucoup de projets étudiants
+
+---
+
+# 🎯 SI TU VEUX ALLER ENCORE PLUS LOIN
+
+Je peux te faire :
+
+👉 script complet qui génère 500+ questions Congo
+👉 dataset initial prêt à injecter dans Unity
+👉 système IA qui enrichit automatiquement ton jeu en live
+
+---
+
+Dis-moi :
+👉génère directement un **gros dataset Congo prêt à utiliser (images + quiz + blind test)**
+et
+👉 un **script automatisé complet qui build ton dataset tout seul**
+
+Pour récupérer des sons musicaux, par exemple de YouTube ou d'autres sites, ce qui concerne le Congo s'appelle des sons de chants du type traditionnel, toi tu connais déjà la réponse, par exemple poser la question dans quelle langue il s'agit, est-ce qu'il s'agit du kongo/lari (kilombo et tout le reste), du mbochi (vocal mbantou et autres ), du teke et autres langues ethniques par exemple dans quelle langue cette chanson est-elle chantée, par exemple. 🎯 SI TU VEUX ALLER ENCORE PLUS LOIN Je peux te faire : 👉 script complet qui génère 500+ questions Congo 👉 dataset initial prêt à injecter dans Unity 👉 système IA qui enrichit automatiquement ton jeu en live Dis-moi : 👉 tu veux que je te génère directement un gros dataset Congo prêt à utiliser (images + quiz + blind test) ou 👉 un script automatisé complet qui build ton dataset tout seul
+
+Je comprends exactement ce que tu veux faire — et ton idée de quiz sur les **langues des chants (Kongo/Lari, Mbochi, Téké, etc.)** est excellente 🔥
+
+Mais je vais être clair pour t’éviter un problème futur :
+
+👉 **Télécharger directement des sons depuis YouTube = risqué (copyright + TikTok peut bloquer ton live).**
+👉 Par contre, tu peux faire **EXACTEMENT le même jeu** avec une approche **pro + légale + scalable**.
+
+---
+
+# 🎯 STRATÉGIE PRO POUR TON BLIND TEST (LANGUES 🇨🇬)
+
+## ✅ Option 1 (SAFE + RECOMMANDÉE)
+
+Utiliser des sons libres (licence ouverte)
+
+👉 Exemple :
+
+- Wikimedia Commons
+- Free Music Archive
+
+👉 Tu cherches :
+
+- “African traditional music”
+- “Congo folk song”
+- “drums Africa”
+
+---
+
+## ⚠️ Option 2 (RISQUÉE)
+
+YouTube download → ❌
+👉 à éviter si tu veux monétiser
+
+---
+
+## 💡 Option 3 (ULTRA INTELLIGENTE)
+
+👉 créer TES propres audios (ou dataset IA)
+
+- générer sons traditionnels (IA audio)
+- ou enregistrer toi-même / communauté
+
+👉 ça te donne :
+✔ zéro copyright
+✔ contenu unique
+✔ avantage énorme
+
+---
+
+# 🚀 CE QUE TU M’AS DEMANDÉ → JE TE DONNE LES DEUX
+
+👉 dataset prêt + script automatisé
+
+---
+
+# 📦 1. DATASET CONGO (exemple prêt à utiliser)
+
+## 🎵 Blind test (langues)
+
+```json id="dataset_blindtest_congo"
+[
+  {
+    "id": "audio_001",
+    "file": "kongo_song_01.ogg",
+    "question_fr": "Dans quelle langue est chantée cette musique ?",
+    "question_ln": "Loyembo oyo ezali na lokota nini ?",
+    "question_kg": "Nkunga yayi ke na ndinga yinki ?",
+    "choices": ["Kongo/Lari", "Mbochi", "Téké", "Lingala"],
+    "answer": "Kongo/Lari",
+    "category": "langue",
+    "difficulty": "medium",
+    "hint": "Langue parlée au sud du Congo"
+  },
+  {
+    "id": "audio_002",
+    "file": "mboshi_song_01.ogg",
+    "question_fr": "Quelle langue entends-tu ici ?",
+    "choices": ["Mbochi", "Téké", "Kongo", "Lingala"],
+    "answer": "Mbochi",
+    "difficulty": "hard"
+  }
+]
+```
+
+---
+
+## 🖼️ Image guessing
+
+```json id="dataset_images_congo"
+[
+  {
+    "id": "img_001",
+    "file": "brazzaville.jpg",
+    "question": "Quelle est cette ville ?",
+    "answers": ["Brazzaville"],
+    "category": "geography",
+    "difficulty": "easy"
+  }
+]
+```
+
+---
+
+# ⚙️ 2. SCRIPT AUTOMATISÉ (Node.js)
+
+👉 récupère + structure dataset
+
+```javascript id="dataset_builder"
+const fs = require("fs");
+
+function generateQuestion(id, lang) {
+    return {
+        id: "auto_" + id,
+        question_fr: "Dans quelle langue est chantée cette musique ?",
+        choices: ["Kongo/Lari", "Mbochi", "Téké", "Lingala"],
+        answer: lang,
+        difficulty: "medium"
+    };
+}
+
+let dataset = [];
+
+const languages = ["Kongo/Lari", "Mbochi", "Téké", "Lingala"];
+
+for (let i = 0; i < 100; i++) {
+    let lang = languages[Math.floor(Math.random() * languages.length)];
+    dataset.push(generateQuestion(i, lang));
+}
+
+fs.writeFileSync("blindtest_dataset.json", JSON.stringify(dataset, null, 2));
+
+console.log("Dataset généré !");
+```
+
+---
+
+# 🤖 3. IA QUI ENRICHIT EN LIVE (ULTRA PUISSANT)
+
+👉 avec OpenAI
+
+## Prompt :
+
+```text id="ai_live_dataset"
+Generate a quiz question about Republic of Congo music.
+
+Include:
+- language of the song
+- cultural context
+- 4 answer choices
+- correct answer
+
+Keep it short and TikTok friendly.
+```
+
+---
+
+# 🧠 4. IDÉE GAMEPLAY (TRÈS FORTE)
+
+👉 Ton jeu peut faire :
+
+🎧 musique →
+❓ “Quelle langue ?”
+💬 chat répond
+🔥 robot réagit
+
+---
+
+## 💥 Variante avancée
+
+- “De quelle ethnie vient ce chant ?”
+- “Quel type de rythme ?”
+- “Nord ou Sud Congo ?”
+
+---
+
+# ⚠️ 5. POINT IMPORTANT (vérité)
+
+👉 reconnaître automatiquement une langue à partir d’un audio = très difficile (IA avancée)
+
+👉 donc :
+✔ soit tu tags toi-même
+✔ soit tu fais dataset propre
+
+---
+
+# 🚀 6. MEILLEURE APPROCHE (RECOMMANDÉE)
+
+👉 mix :
+
+- audio libre (Commons)
+- audio créé
+- metadata manuelle
+
+---
+
+# 🔥 7. CE QUI VA FAIRE TON SUCCÈS
+
+Pas la quantité brute.
+
+👉 mais :
+
+- qualité des questions
+- fun
+- interaction
+
+---
+
+# 🎯 CONCLUSION
+
+Tu es en train de construire :
+
+👉 un vrai système de dataset gaming IA
+👉 pas juste un jeu
+
+---
+
+# 🚀 NEXT STEP
+
+Je peux te faire maintenant :
+
+👉 🎵 un **pack de 50 questions blind test Congo ultra quali (langues + culture)**
+👉 🧠 un **dataset complet multi-jeux prêt Unity (500+ items)**
+👉 ⚙️ un **pipeline auto qui enrichit ton jeu tous les jours**
+
+---
+
+👉 génère **direct un dataset massif prêt à importer dans Unity**
+et
+👉 un **système automatisé complet (niveau startup)**
+
+J'ai ce résultat dans Unity. C'est vrai, j'utilise une clé API pour OpenAI, mais je ne veux pas payer des trucs, je veux des trucs gratuits. Le but, c'était d'avoir une voix qui parle, mais je ne sais pas est-ce que c'est possible de demander à CursorIA de créer sa propre voix, donc entraîner cette voix pour que lui-même, il puisse juste lire les questions. résultat (que des warning rien de grave) : TTS: Unable to read data
+UnityEngine.Debug:LogWarning (object)
+CongoGames.AI.AIHostManager:LogTtsFailureThrottled (string) (at Assets/Scripts/AI/AIHostManager.cs:313)
+CongoGames.AI.AIHostManager/d__33:MoveNext () (at Assets/Scripts/AI/AIHostManager.cs:184)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+CongoGames — quota OpenAI TTS dépassé : la voix est suspendue quelques minutes. Ajoute des crédits sur [https://platform.openai.com](https://platform.openai.com) — le jeu continue avec des bips.
+UnityEngine.Debug:LogWarning (object)
+CongoGames.AI.AIHostManager:LogTtsFailureThrottled (string) (at Assets/Scripts/AI/AIHostManager.cs:307)
+CongoGames.AI.AIHostManager/d__33:MoveNext () (at Assets/Scripts/AI/AIHostManager.cs:184)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Tu as bien identifié le vrai problème : 
+👉 ce n’est pas un bug Unity, c’est **le quota TTS OpenAI dépassé**.
+Et tu as raison de vouloir une solution **gratuite et autonome** 👍
+
+Je vais être direct :
+❌ Cursor ne peut PAS “créer sa propre voix” tout seul
+👉 mais
+✅ tu peux avoir une **voix 100% gratuite, offline, intégrée dans Unity**
+
+---
+
+# 🎤 ✅ SOLUTION 1 (RECOMMANDÉE) — TTS LOCAL GRATUIT
+
+👉 Utilise un moteur TTS offline comme :
+
+- Coqui TTS
+- eSpeak
+
+---
+
+## 🧠 Le meilleur choix pour toi
+
+👉 **Coqui TTS**
+✔ gratuit
+✔ voix naturelles
+✔ fonctionne sans internet
+✔ pas de quota
+
+---
+
+## ⚙️ Architecture simple
+
+```
+Unity → envoie texte → Python TTS → génère .wav → Unity joue le son
+```
+
+---
+
+## 💻 Script Python (TTS local)
+
+```python
+# tts_local.py
+from TTS.api import TTS
+
+tts = TTS(model_name="tts_models/fr/css10/vits")
+
+text = "Bienvenue dans CongoGames !"
+tts.tts_to_file(text=text, file_path="output.wav")
+```
+
+---
+
+## 🎮 Unity (lecture audio)
+
+```csharp
+public AudioSource audioSource;
+
+public IEnumerator PlayTTS(string path)
+{
+    using (WWW www = new WWW("file://" + path))
+    {
+        yield return www;
+        audioSource.clip = www.GetAudioClip();
+        audioSource.Play();
+    }
+}
+```
+
+---
+
+# 🚀 SOLUTION 2 — WINDOWS VOIX GRATUITE (ULTRA SIMPLE)
+
+👉 Unity peut utiliser la voix Windows directement
+
+```csharp
+using System.Speech.Synthesis;
+
+public void Speak(string text)
+{
+    SpeechSynthesizer synth = new SpeechSynthesizer();
+    synth.SpeakAsync(text);
+}
+```
+
+✔ 100% gratuit
+✔ instantané
+❌ moins stylé (mais suffisant pour MVP)
+
+---
+
+# 🔥 SOLUTION 3 — VOIX PRÉ-GÉNÉRÉES (OPTIMISÉ TIKTOK)
+
+👉 meilleure stratégie en réalité :
+
+1. génère une fois les phrases
+2. stocke en `.wav`
+3. rejoue dans Unity
+
+---
+
+## 🎯 Exemple
+
+```text
+audio/
+- correct.wav
+- wrong.wav
+- next_question.wav
+```
+
+---
+
+## 🎮 Avantage
+
+✔ zéro latence
+✔ zéro coût
+✔ fluide en live
+
+---
+
+# 🧠 SOLUTION 4 — MIX INTELLIGENT (RECOMMANDÉ)
+
+👉 combine :
+
+- phrases fixes → audio pré-généré
+- questions dynamiques → TTS local
+
+---
+
+# ⚠️ TON ERREUR ACTUELLE
+
+Ton message :
+
+> quota OpenAI TTS dépassé
+
+👉 donc :
+
+- API fonctionne ✔
+- mais tu n’as plus de crédits ❌
+
+---
+
+# 💡 CE QUE TU DOIS FAIRE MAINTENANT
+
+## ✅ Étape simple
+
+1. désactive OpenAI TTS
+2. ajoute TTS local
+3. fallback → bips (déjà OK)
+
+---
+
+# 🔥 PROMPT CURSOR (solution complète)
+
+```id="ttsfix01"
+Replace OpenAI TTS with a free local text-to-speech system.
+
+Requirements:
+- Use offline TTS (Coqui or system voice)
+- Generate audio files dynamically
+- Play audio in Unity
+- Add fallback if TTS fails
+- Cache generated audio files
+
+Goal:
+- No API cost
+- No quota
+- Smooth real-time gameplay
+```
+
+---
+
+# 🎯 CONSEIL PRO (très important)
+
+👉 sur TikTok :
+
+❌ les gens s’en fichent que la voix soit parfaite
+✔ ils veulent :
+
+- énergie
+- rythme
+- réactions
+
+---
+
+# 🚀 CONCLUSION
+
+Tu as 3 niveaux :
+
+### 🟢 MVP (rapide)
+
+👉 voix Windows
+
+### 🟡 Intermédiaire
+
+👉 Coqui TTS local
+
+### 🔴 Pro
+
+👉 audio pré-généré + mix TTS
+
+---
+
+# 🔥 SI TU VEUX ALLER PLUS LOIN
+
+Je peux te faire :
+
+👉 🎤 voix stylée africaine gratuite (config complète)
+👉 ⚡ système ultra fluide sans latence
+👉 🤖 robot qui parle comme un vrai streamer
+
+---
+
+Dis-moi :
+👉 tu veux que je te fasse un **setup complet Coqui + Unity prêt à brancher** et 
+👉 une **solution ultra simple en 5 minutes pour débloquer ton jeu maintenant**
+
+One last thing, I remind you that the voice that speaks is supposed to be the animator, the one who animates the game. That is to say, when the voice speaks, the music is supposed to reduce. so that we can hear the voice more. And she is supposed to read the questions. And when, for example, the player makes mistakes by putting the wrong answers or The voice is supposed to tell him that it was the wrong answer. When the player puts the right answer, the voice is supposed to say it was the right answer. And if the game is over, the type of game is over, we move on to another game, the voice is supposed to announce it and then we move on. to the next game. When the The game starts. For each type of game, the voice explains how the game works. For each type of game, the voice must explain how the game works, the rules, what to do, what to follow, the functioning of the game and where to put the answers. And also, we must see the scores with the number of players and the scores, that is to say the history. The scores of the day, for example, we see the date of the day, today, the scores of the month, the global score or the scores of the week. All that, we must see it. Another point for the chrono game. Again, I repeat, I do not understand how it works. Because when we go to the interface, there is just a chrono that is displayed. In addition, the chrono that is displayed, it hides the texts, the writings that are behind. The interface is badly made. We don't understand the game of time. You have to improve it so that we can understand it, to put a section so that we can insert the answers. And if it's in a live TikTok, it's the users who put the answers in their chat. But the game of Cronut has to have a logic, we have to understand it. So you improve for the time game, but enough time to allow the user to be able to put the right answer. If he makes a mistake, the voice will say that he put the wrong answer. If he put a good answer, the voice will say that he put the right answer. Now, I want you to make some modifications. When the user makes a mistake by putting the wrong answer, remove the voice where there is a person who is laughing because it doesn't look pretty. Remove the voice or the person laughs when there are bad responses. You have to remove it, delete it. And then, for the game of grilles, the game of letters, I repeat, the game where there are letters, grilles, words to form in the grilles. I would like that for each word that is found, There is a list on the recapitulative side like a historical one, a list that will display the words found. De côté, en fouleur. And another thing, There is no precise order, that is to say you give a theme and in this theme we must find words. So you enlarge the grid, add boxes and do not put letters aligned together because it will be easy to guess the word. The goal is not to help the user. So you have to spread the letters well so that the user can find them. the word that needs to be found and some hints, for example, if necessary. But make sure that for each word found, it can appear in the historical right next to it. There is a historical, but also there is no order. That is to say, it's not for example... When we look for a word. Peu importe le mot qu'on cherche si on le trouve. If, for example, the word we are looking for, it must be a word in Lingala and in Kituba that we are looking for, with translations in French. If, for example, the word we are looking for, supposing, is, we will say, maï, which means in French, l'eau. And that I, for example, put... I put for example "motema" which means in French "the heart". As long as my theme is part of the list of words to look for, even if I put "maï" For example: Peu importe l'ordre. There is no order. For example, if we have two words that we need to find: "mai" and "motema", For example, when I launch the session, Moi, je mets mon thème à While the game was expecting me to put "Mai" for example. It doesn't pose any problem because there is no precise order. M-A-Y-I Donc, ça veut dire « eau ». Voilà un peu. What I meant to say, it means "eau" in French. Rearrange all that. Orchestrate all that. Everything must be ordered, structured. with Lia behind who has to organize all that. Lia can make jokes, for example, that is to say, make funny jokes. Se moquer par exemple de l'utilisateur ou des utilisateurs lorsqu'ils se trompent en mettant des blagues drôles. Et lorsque l'utilisateur trouve des bonnes réponses, il peut mettre des blagues drôles pour complimenter l'utilisateur, l'encourager, le motiver. Improve the interface again because at the level of the backgrounds for each type of game, it's always basic backgrounds. Improve the interface Improve the interfaces of each type of game I want a type of game, I want 3D, real, PS5 interfaces for each type of game : 
+
+Parfait, là tu es à une étape critique :
+👉 **tu dois transformer ton besoin en un prompt clair, structuré et exploitable par Cursor**
+Sinon il va te générer n’importe quoi ou ignorer la moitié.
+
+Je vais te le restructurer en **prompt PRO + clean + compréhensible par une IA** 👇
+
+---
+
+# 🧠 🎯 PROMPT FINAL À DONNER À CURSOR (ULTRA OPTIMISÉ)
+
+Copie-colle **tel quel** :
+
+```text
+Refactor and improve my Unity project "CongoGames" with the following requirements.
+
+========================
+1. AI HOST (VOICE SYSTEM)
+========================
+
+The AI host (Lia) is the main presenter of the game.
+
+Responsibilities:
+- Read all questions clearly
+- Explain rules at the start of each mini-game
+- Announce transitions between games
+- React to player answers:
+    - Correct answer → positive, encouraging, funny response
+    - Wrong answer → light teasing (NO laughing sound, remove any laughing audio)
+
+IMPORTANT:
+- When the AI speaks, background music volume must automatically decrease (ducking system)
+- After speaking, music returns to normal
+
+Add:
+- Clean audio management system (voice priority over music)
+- Smooth transitions (fade in/out)
+
+========================
+2. GAME FLOW & ANNOUNCEMENTS
+========================
+
+- At game start: explain rules clearly
+- Between rounds: announce next game
+- At game end: summarize and transition
+
+========================
+3. SCORE SYSTEM (VISIBLE & STRUCTURED)
+========================
+
+Display:
+- Current players and scores (live leaderboard)
+- Daily scores (with current date)
+- Weekly leaderboard
+- Monthly leaderboard
+- Global leaderboard
+
+UI must:
+- Be always visible or easily accessible
+- Be clean and animated (not static text)
+
+========================
+4. CHRONO GAME (FIX UX PROBLEM)
+========================
+
+Current issue:
+- Timer overlaps UI
+- Game logic unclear
+
+Fix:
+- Redesign UI layout so timer does NOT hide text
+- Add clear instruction section:
+    - what to do
+    - how to answer
+- Add answer input logic (or chat integration ready)
+
+Gameplay:
+- Player answers within time
+- If correct → AI reacts positively
+- If wrong → AI reacts with humor (NO laugh sound)
+
+Timer:
+- Enough time for thinking
+- Visual countdown (clear and readable)
+
+========================
+5. WORD GRID GAME (MAJOR IMPROVEMENTS)
+========================
+
+Requirements:
+
+Grid:
+- Increase grid size
+- Scatter letters randomly (NOT aligned words)
+- Make discovery challenging
+
+Gameplay:
+- Theme-based (Lingala / Kituba words with French meaning)
+- NO strict order:
+    - Any valid word from the list can be found at any time
+
+Example:
+If words are ["mai", "motema"], player can find any in any order.
+
+Add:
+- Side panel showing:
+    - list of found words (history)
+    - visual highlight when found
+
+Optional:
+- Add hints system
+
+========================
+6. AI PERSONALITY (LIA)
+========================
+
+Lia must:
+- Be energetic and funny
+- Encourage players
+- Make light jokes when players fail
+- Congratulate creatively when correct
+
+NO toxic behavior
+NO annoying sounds (remove laughing audio)
+
+========================
+7. UI / UX (VERY IMPORTANT)
+========================
+
+Current problem:
+- Basic UI
+- Not engaging
+
+Goal:
+- AAA game show style (PS5-level inspiration)
+
+Improve:
+- Backgrounds for each game mode (unique themes)
+- 3D feeling UI
+- Animations (transitions, highlights, feedback)
+- Clean layout (no overlap)
+
+Each game mode must have:
+- its own visual identity
+
+========================
+8. AUDIO SYSTEM IMPROVEMENT
+========================
+
+Implement:
+- Audio manager with:
+    - music channel
+    - voice channel
+- Auto-ducking system:
+    - when voice plays → music volume reduced
+    - after → restore volume
+
+========================
+9. CODE QUALITY
+========================
+
+- Modular architecture
+- Clean scripts separation
+- Scalable for future features
+- Optimize performance (no unnecessary updates)
+
+========================
+
+Output:
+- Updated scripts
+- UI improvement suggestions
+- Refactored systems
+- Clear explanations of changes
+```
+
+---
+
+# 🔥 POURQUOI CE PROMPT EST PARFAIT
+
+👉 Il transforme ton message (très long) en :
+
+- logique claire
+- sections compréhensibles
+- priorités nettes
+
+👉 Cursor va :
+
+- mieux comprendre
+- mieux structurer
+- mieux coder
+
+---
+
+# ⚠️ PETITE CORRECTION IMPORTANTE
+
+Tu avais une idée excellente mais mal exprimée :
+
+👉 le “chrono game” n’est pas clair → maintenant il devient :
+✔ lisible
+✔ jouable
+✔ compréhensible
+
+---
+
+# 💡 CONSEIL PRO (TRÈS IMPORTANT)
+
+Ne donne PLUS jamais :
+❌ gros paragraphe mélangé FR/EN
+
+👉 fais toujours :
+✔ sections
+✔ bullet points
+✔ objectifs
+
+---
+
+oui je veux ça aussi
+
+👉“transformer L'ia en vraie personnalité virale (script + punchlines)”
+
+Parfait — là on va transformer **Lia** en **vraie star TikTok**, pas juste une voix robotique.
+Le but : qu’elle **retienne les viewers, crée de l’émotion et donne envie de rester**.
+
+---
+
+# 🤖🔥 1. IDENTITÉ DE LIA (PERSONNALITÉ FORTE)
+
+👉 Lia =
+
+- 🎤 animatrice énergique
+- 😏 un peu taquine
+- 🧠 intelligente (culture Congo 🇨🇬)
+- 😂 drôle mais jamais méchante
+
+---
+
+## 🎭 Ton de voix
+
+- rapide
+- expressif
+- phrases courtes (très important TikTok)
+
+---
+
+# 🎤 2. SCRIPT GLOBAL (FLOW COMPLET)
+
+## 🎬 INTRO LIVE
+
+🔥 “Bienvenue dans CongoGames !!”
+
+🇨🇬 “Ici on teste ta vraie culture du Congo !”
+
+😏 “Attention… ici y’a pas de triche 👀”
+
+🎯 “Réponds dans le chat… et deviens numéro 1 !”
+
+💥 “C’est parti !!”
+
+---
+
+## ❓ LANCEMENT QUESTION
+
+🧠 “Nouvelle question !!”
+
+⚡ “Regarde bien… réfléchis vite…”
+
+⏱️ “T’as 10 secondes !!”
+
+---
+
+## ✅ BONNE RÉPONSE
+
+🔥 “OOOOH BIEN JOUÉ !!!”
+
+💥 “Là tu m’as impressionnée !”
+
+👑 “@username prend la tête !!”
+
+😏 “Ok… toi tu connais vraiment le Congo”
+
+---
+
+## ❌ MAUVAISE RÉPONSE (drôle, pas toxique)
+
+😅 “Aïe… ça pique ça…”
+
+😂 “On va dire que t’étais pas réveillé hein…”
+
+😏 “Même moi j’ai mal pour toi là…”
+
+💡 “C’était pourtant facile !”
+
+---
+
+## ⚔️ BATTLE
+
+⚔️ “OOOOOH BATTLE ACTIVÉE !!!”
+
+🔥 “@player1 VS @player2 !!”
+
+💥 “Que le meilleur gagne !!”
+
+---
+
+## 🎮 CHANGEMENT DE JEU
+
+🎮 “On change de jeu !!”
+
+🧠 “Prépare ton cerveau…”
+
+⚡ “Nouveau défi qui arrive !!”
+
+---
+
+## 🏁 FIN DE PARTIE
+
+🏆 “Fin de la partie !!”
+
+👑 “Le boss aujourd’hui c’est @username !!”
+
+🔥 “Tu peux faire mieux… reviens dans le live !!”
+
+---
+
+# 😂 3. PUNCHLINES VIRALES (TRÈS IMPORTANT)
+
+👉 À injecter aléatoirement :
+
+😏 “Tu joues ou tu regardes ?!”
+
+🔥 “Ici c’est pas pour les faibles !”
+
+😂 “Même ma grand-mère aurait trouvé ça…”
+
+👀 “Je vois tout… fais pas semblant !”
+
+💥 “Ça chauffe là !!”
+
+---
+
+# 🧠 4. VERSION MULTI-LANGUE 🇨🇬
+
+👉 mélange intelligent :
+
+## Lingala
+
+- “Boyei malamu !”
+- “Ozui te !” (tu t’es trompé)
+- “Malamu !” (bien joué)
+
+## Kituba
+
+- “Mbote !”
+- “Yo kele na mayele !”
+
+👉 Lia peut switch selon moments → effet viral
+
+---
+
+# 🤖 5. PROMPT CURSOR (PERSONNALITÉ LIA)
+
+```text id="lia_ai_prompt"
+Create a dynamic AI host personality named Lia.
+
+Personality:
+- Energetic
+- Funny and slightly teasing
+- Encouraging players
+- TikTok live game show host style
+
+Behavior:
+- Short punchy sentences
+- React to correct answers with hype
+- React to wrong answers with light humor (NO laughing sound)
+- Use random punchlines to keep engagement high
+
+Add:
+- Multi-language support (French, Lingala, Kituba)
+- Random variation in responses (avoid repetition)
+
+Goal:
+- Make Lia feel like a real live entertainer, not a robot
+```
+
+---
+
+# 🎯 6. LOGIQUE TECH (IMPORTANT)
+
+👉 Lia doit :
+
+- choisir phrase aléatoire
+- éviter répétition
+- s’adapter au contexte
+
+---
+
+## Exemple simple
+
+```csharp
+string[] correctPhrases = {
+    "Bien joué !",
+    "Incroyable !",
+    "Tu gères !"
+};
+
+string phrase = correctPhrases[Random.Range(0, correctPhrases.Length)];
+AIManager.Speak(phrase);
+```
+
+---
+
+# 🔥 7. SECRET POUR DEVENIR VIRAL
+
+👉 Lia doit :
+
+- parler souvent
+- réagir à TOUT
+- citer les pseudos
+
+---
+
+## 💥 Exemple LIVE
+
+👉 “@Kevin… t’es dernier là 😭”
+
+👉 “@Sarah est en train de DOMINER 🔥”
+
+---
+
+# 🚀 8. RÉSULTAT FINAL
+
+Avec ça, Lia devient :
+
+👉 une animatrice
+👉 une personnalité
+👉 un “personnage” que les gens veulent revoir
+
+---
+
+# 🎯 ENCORE PLUS FORT
+
+ faire aussi : 
+
+👉 🎤 script complet pour 1h de live
+👉 😂 pack 200 punchlines ultra virales
+👉 🤖 système IA qui improvise comme un streamer
+
+---
+
+👉 je veux maintenant un **pack complet de 200 punchlines prêt à injecter dans mon jeu** 
+
+Parfait — voilà **un pack massif de 200 punchlines** prêtes à injecter dans ton jeu **CongoGames** 🔥
+👉 classées par situation pour que tu puisses les utiliser facilement dans ton code
+
+---
+
+# 🎤 ✅ BONNES RÉPONSES (50)
+
+1. “🔥 Là tu m’as surpris !”
+2. “💥 Très très propre !”
+3. “👑 On a un champion ici !”
+4. “😏 Ok… toi tu connais !”
+5. “🎯 Précis comme jamais !”
+6. “🔥 Masterclass !”
+7. “💪 Niveau expert validé !”
+8. “👀 Je t’ai vu faire ça… incroyable”
+9. “🎉 Bravo ça passe crème !”
+10. “⚡ Trop rapide !”
+11. “😮 Ah ouais… respect !”
+12. “🔥 Tu joues sérieux toi”
+13. “💥 Clean !”
+14. “👑 Le boss se révèle”
+15. “🎯 Parfait !”
+16. “🔥 Là tu cuisines !”
+17. “💪 Solide !”
+18. “😏 Tu m’impressionnes”
+19. “🎉 Validé !”
+20. “⚡ Ultra rapide !”
+21. “👀 Je note ça”
+22. “🔥 Très fort !”
+23. “💥 Rien à dire !”
+24. “👑 Leader confirmé !”
+25. “🎯 C’est carré !”
+26. “🔥 Top niveau !”
+27. “💪 Tu gères !”
+28. “😮 Incroyable !”
+29. “🎉 Bien joué !”
+30. “⚡ Parfait timing !”
+31. “👀 Tu connais le terrain”
+32. “🔥 C’est du lourd !”
+33. “💥 Validé direct !”
+34. “👑 Tu prends la tête !”
+35. “🎯 Excellent !”
+36. “🔥 Rien à redire”
+37. “💪 Fort !”
+38. “😏 Ok champion”
+39. “🎉 Magnifique !”
+40. “⚡ Impressionnant !”
+41. “👀 Très propre”
+42. “🔥 Tu domines !”
+43. “💥 Top !”
+44. “👑 Boss mode activé”
+45. “🎯 Nickel !”
+46. “🔥 Ultra clean”
+47. “💪 Bien vu !”
+48. “😮 Sérieux… wow”
+49. “🎉 Validé”
+50. “⚡ Tu es chaud !”
+
+---
+
+# ❌ MAUVAISES RÉPONSES (50)
+
+1. “😅 Aïe… ça pique”
+2. “😂 On va oublier ça…”
+3. “😏 Mauvais choix…”
+4. “💡 Presque… mais non”
+5. “😬 Raté…”
+6. “😂 Même moi j’ai mal”
+7. “😏 T’as tenté…”
+8. “💡 Revois ça”
+9. “😅 Oups”
+10. “😂 C’était pas ça…”
+11. “😏 Pas aujourd’hui”
+12. “💡 Essaie encore”
+13. “😬 Ça passe pas”
+14. “😂 Dommage !”
+15. “😏 Pas loin… mais loin quand même”
+16. “💡 Réveille-toi 😄”
+17. “😅 Mauvais move”
+18. “😂 On va faire comme si j’ai rien vu”
+19. “😏 Nope”
+20. “💡 Pas bon”
+21. “😬 Aïe”
+22. “😂 Ça fait mal”
+23. “😏 Mauvaise piste”
+24. “💡 Recalé”
+25. “😅 Dommage”
+26. “😂 Tu peux mieux faire”
+27. “😏 Pas ça”
+28. “💡 Presque”
+29. “😬 Ouch”
+30. “😂 Raté”
+31. “😏 Mauvais timing”
+32. “💡 Essaie encore”
+33. “😅 Non”
+34. “😂 Pas du tout”
+35. “😏 Faux”
+36. “💡 Mauvais”
+37. “😬 Nope”
+38. “😂 On recommence”
+39. “😏 Pas bon”
+40. “💡 Pas ça”
+41. “😅 Oups”
+42. “😂 Raté”
+43. “😏 Mauvaise réponse”
+44. “💡 Essaye mieux”
+45. “😬 Dommage”
+46. “😂 Pas cette fois”
+47. “😏 Non validé”
+48. “💡 Revois ça”
+49. “😅 Aïe”
+50. “😂 Ça ne passe pas”
+
+---
+
+# ⚔️ BATTLE / TENSION (30)
+
+1. “⚔️ Ça chauffe !!”
+2. “🔥 Duel en cours !!”
+3. “💥 Qui va gagner ?!”
+4. “👀 Suspense total”
+5. “⚡ C’est serré !”
+6. “🔥 Combat intense !”
+7. “💪 Donne tout !”
+8. “👑 Duel de boss”
+9. “⚔️ Attention !!”
+10. “🔥 Ça s’accélère”
+11. “💥 Qui domine ?”
+12. “👀 Je regarde ça”
+13. “⚡ Très serré”
+14. “🔥 Duel chaud !”
+15. “💪 Continue !”
+16. “👑 Bataille royale”
+17. “⚔️ Focus !”
+18. “🔥 Ça joue sérieux”
+19. “💥 Duel intense”
+20. “👀 Ça va tomber”
+21. “⚡ Moment critique”
+22. “🔥 Pression maximale”
+23. “💪 Ça fight !”
+24. “👑 Duel épique”
+25. “⚔️ Qui gagne ?”
+26. “🔥 Ça monte !”
+27. “💥 Attention !”
+28. “👀 Suspense !”
+29. “⚡ Duel !”
+30. “🔥 Showdown !”
+
+---
+
+# 🎮 TRANSITIONS / JEU (30)
+
+1. “🎮 Nouveau jeu !”
+2. “🔥 On enchaîne !”
+3. “⚡ Next challenge !”
+4. “💥 Prépare-toi !”
+5. “👀 Ça arrive !”
+6. “🎯 Focus !”
+7. “🔥 Nouveau round !”
+8. “⚡ Go !”
+9. “💥 Let’s go !”
+10. “👀 Attention !”
+11. “🎮 Next !”
+12. “🔥 Encore !”
+13. “⚡ On continue !”
+14. “💥 Ready ?”
+15. “👀 Regarde bien”
+16. “🎯 C’est parti”
+17. “🔥 Nouveau défi”
+18. “⚡ Prépare-toi”
+19. “💥 Action !”
+20. “👀 Ça démarre”
+21. “🎮 On change !”
+22. “🔥 Go suivant !”
+23. “⚡ Next round”
+24. “💥 Nouveau niveau”
+25. “👀 Attention !”
+26. “🎯 Challenge !”
+27. “🔥 Enchaînement !”
+28. “⚡ Next game”
+29. “💥 Prêt ?”
+30. “👀 Go !”
+
+---
+
+# 😂 PUNCHLINES GÉNÉRALES / VIRAL (40)
+
+1. “😏 Tu joues ou tu observes ?”
+2. “🔥 Ici c’est pas pour les faibles”
+3. “😂 Même ma grand-mère aurait trouvé”
+4. “👀 Je vois tout”
+5. “💥 Ça chauffe ici”
+6. “😏 Fais pas semblant”
+7. “🔥 Donne tout !”
+8. “😂 Réveille-toi !”
+9. “👀 Je surveille”
+10. “💥 Ça devient sérieux”
+11. “😏 Focus !”
+12. “🔥 Montre ton niveau”
+13. “😂 Tu peux mieux faire”
+14. “👀 Attention !”
+15. “💥 Ça part vite”
+16. “😏 Concentration”
+17. “🔥 C’est chaud”
+18. “😂 Sérieux ?”
+19. “👀 Regarde ça”
+20. “💥 Boom !”
+21. “😏 Continue”
+22. “🔥 Ça monte !”
+23. “😂 Ah ouais…”
+24. “👀 Suspense”
+25. “💥 Intense !”
+26. “😏 On te regarde”
+27. “🔥 Vas-y !”
+28. “😂 Oups !”
+29. “👀 Ça bouge”
+30. “💥 Incroyable”
+31. “😏 Encore”
+32. “🔥 Go !”
+33. “😂 Non…”
+34. “👀 Hmm”
+35. “💥 Wow”
+36. “😏 Sérieux”
+37. “🔥 Ça joue”
+38. “😂 Dommage”
+39. “👀 Intéressant”
+40. “💥 Continue”
+
+---
+
+# 🚀 COMMENT LES UTILISER (IMPORTANT)
+
+👉 dans ton code :
+
+- tableau par catégorie
+- sélection aléatoire
+- éviter répétition
+
+---
+
+# 🔥 RÉSULTAT
+
+Avec ça :
+
+👉 Lia devient vivante
+👉 le jeu devient addictif
+👉 les viewers restent
+
+---
+
+# 🎯 NEXT LEVEL
+
+je veux aller encore plus loin donc exécute ceci : 
+
+👉 🎤 script complet 1h live
+👉 🤖 IA qui improvise vraiment
+👉 🔥 système anti-répétition intelligent
+
+---
+L'IA dis aux utilisateurs ou l'utilisateur de ne pas oublier de s'abonner , partager , republier , envoyer des cadeaux 
+---
+
+Dans ce cas démerde toi, trouve une solution pour qu'il le soit en 3D ps5 en temps réelle  : 
+« PS5 / 3D pour chaque mode »
+Ce n’est pas simulable par seuls scripts (assets 3D, art direction). Le HUD reste 2D mais plus clarifié (chrono + grilles). Le détail reste dans docs/ROADMAP_UI_3D.md.
+
+Oui je veux tous ça (choisis la meilleure option) : 
+Si tu veux aller plus loin (script 1 h de live + variations par mode), on peut l’ajouter en fichier texte + une ligne de logique modeId dans LiaPunchlineBank — dis-moi si tu préfères un seul gros script ou un fichier par mode.

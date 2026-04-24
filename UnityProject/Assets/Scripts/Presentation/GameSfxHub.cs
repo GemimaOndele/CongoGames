@@ -33,6 +33,7 @@ namespace CongoGames.Presentation
         private AudioClip okClip;
         private AudioClip badClip;
         private AudioClip cheerClip;
+        private AudioClip chronoTickClip;
 
         private void Awake()
         {
@@ -69,6 +70,14 @@ namespace CongoGames.Presentation
             okClip = Resources.Load<AudioClip>("Audio/sfx_correct") ?? ProceduralClips.BuildCorrectChime();
             badClip = Resources.Load<AudioClip>("Audio/sfx_wrong") ?? ProceduralClips.BuildWrongBuzz();
             cheerClip = Resources.Load<AudioClip>("Audio/sfx_cheer") ?? ProceduralClips.BuildCrowdCheer();
+            chronoTickClip = Resources.Load<AudioClip>("Audio/sfx_chrono_tick") ?? ProceduralClips.BuildChronoTick();
+        }
+
+        /// <summary>Tic une fois par seconde (phases écoute blind, révélation image, etc.).</summary>
+        public void PlayChronoTick(float linearVolume = 0.62f)
+        {
+            if (source == null || chronoTickClip == null) return;
+            source.PlayOneShot(chronoTickClip, Mathf.Clamp01(linearVolume));
         }
 
         public void SetBroadcastDuckMultiplier(float linear01)
@@ -146,7 +155,15 @@ namespace CongoGames.Presentation
         {
             AudioClip loaded = null;
             string url = (remoteUrl ?? "").Trim();
-            if (url.Length > 10 && (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase)))
+            if (url.Length > 10
+                && (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                && StreamingMediaUrlPolicy.IsNonStreamableContentPageUrl(url))
+            {
+                StreamingMediaUrlPolicy.LogOnceRejected("Blind (audioUrl)", url, "Importez l’audio en .mp3 local (StreamingAssets) ou un lien direct vers un .mp3/.ogg si vous avez hébergé le fichier.");
+            }
+            else if (url.Length > 10
+                && (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                && !StreamingMediaUrlPolicy.IsNonStreamableContentPageUrl(url))
             {
                 AudioType t = GuessAudioTypeFromUrl(url);
                 using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(url, t))

@@ -9,8 +9,8 @@ namespace CongoGames.Presentation
     [DisallowMultipleComponent]
     public class Ps5HudParallax : MonoBehaviour
     {
-        [SerializeField] private float posAmp = 6f;
-        [SerializeField] private float rotAmpDeg = 0.45f;
+        [SerializeField] private float posAmp = 2.5f;
+        [SerializeField] private float rotAmpDeg = 0.2f;
         [SerializeField] private float speed = 0.7f;
 
         private RectTransform rt;

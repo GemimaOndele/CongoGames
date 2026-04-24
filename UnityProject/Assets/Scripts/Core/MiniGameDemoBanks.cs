@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -42,7 +43,7 @@ namespace CongoGames.Core
             }
         }
 
-        private static readonly BlindRound[] BlindRounds =
+        private static readonly BlindRound[] BlindRoundsDefault =
         {
             new BlindRound(
                 "D’après l’extrait : quel style est le plus proche ?",
@@ -189,6 +190,7 @@ namespace CongoGames.Core
 
         private static readonly Queue<int> BlindOrder = new Queue<int>();
         private static int lastBlind = -1;
+        private static BlindRound[] blindRoundsRuntime;
 
         private static readonly string[] ScrambleWords =
         {
@@ -230,7 +232,7 @@ namespace CongoGames.Core
             }
         }
 
-        private static readonly ImageGuessRound[] ImageGuessRounds =
+        private static readonly ImageGuessRound[] ImageGuessRoundsDefault =
         {
             new ImageGuessRound(
                 "Capitale politique du pays (Congo) sur le fleuve — quelle ville ? (réponse courte)",
@@ -261,13 +263,151 @@ namespace CongoGames.Core
 
         private static readonly Queue<int> ImageGuessOrder = new Queue<int>();
         private static int lastImageGuess = -1;
+        private static ImageGuessRound[] imageGuessRoundsRuntime;
+
+        [Serializable] private class BlindExtrasFile
+        {
+            public BlindJsonItem[] items;
+        }
+
+        [Serializable] private class BlindJsonItem
+        {
+            public string prompt;
+            public string a;
+            public string b;
+            public string c;
+            public string d;
+            public int correctIndex;
+            public string subLine;
+            public string audioFileBase;
+            public string audioUrl;
+            public string categoryLabel;
+        }
+
+        [Serializable] private class ImageExtrasFile
+        {
+            public ImageJsonItem[] items;
+        }
+
+        [Serializable] private class ImageJsonItem
+        {
+            public string hint;
+            public string answerKey;
+            public int styleSeed;
+            public string streamingFileBase;
+            public string altAnswerKey;
+            public string trivia;
+        }
+
+        private static BlindRound[] GetBlindRoundsMerged()
+        {
+            if (blindRoundsRuntime == null) BuildBlindRounds();
+            return blindRoundsRuntime;
+        }
+
+        private static void BuildBlindRounds()
+        {
+            var list = new List<BlindRound>(BlindRoundsDefault.Length + 4);
+            foreach (BlindRound r in BlindRoundsDefault)
+            {
+                list.Add(r);
+            }
+
+            string path = Path.Combine(Application.streamingAssetsPath, "Datasets", "minigame_blind_extras.json");
+            if (File.Exists(path))
+            {
+                try
+                {
+                    string json = File.ReadAllText(path);
+                    if (!string.IsNullOrWhiteSpace(json))
+                    {
+                    BlindExtrasFile f = JsonUtility.FromJson<BlindExtrasFile>(json);
+                    if (f?.items != null)
+                    {
+                    foreach (BlindJsonItem row in f.items)
+                    {
+                        if (row == null || string.IsNullOrEmpty(row.prompt)) continue;
+                        string[] c = { row.a, row.b, row.c, row.d };
+                        if (c[0] == null) c[0] = "";
+                        if (c[1] == null) c[1] = "";
+                        if (c[2] == null) c[2] = "";
+                        if (c[3] == null) c[3] = "";
+                        int cor = Mathf.Clamp(row.correctIndex, 0, 3);
+                        list.Add(new BlindRound(
+                            row.prompt,
+                            c,
+                            cor,
+                            row.subLine ?? "",
+                            row.audioFileBase,
+                            row.audioUrl,
+                            row.categoryLabel));
+                    }
+                    }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning("minigame_blind_extras.json : " + e.Message);
+                }
+            }
+
+            blindRoundsRuntime = list.ToArray();
+        }
+
+        private static ImageGuessRound[] GetImageGuessRoundsMerged()
+        {
+            if (imageGuessRoundsRuntime == null) BuildImageGuessRounds();
+            return imageGuessRoundsRuntime;
+        }
+
+        private static void BuildImageGuessRounds()
+        {
+            var list = new List<ImageGuessRound>(ImageGuessRoundsDefault.Length + 4);
+            foreach (ImageGuessRound r in ImageGuessRoundsDefault)
+            {
+                list.Add(r);
+            }
+
+            string path = Path.Combine(Application.streamingAssetsPath, "Datasets", "minigame_image_guess_extras.json");
+            if (File.Exists(path))
+            {
+                try
+                {
+                    string json = File.ReadAllText(path);
+                    if (!string.IsNullOrWhiteSpace(json))
+                    {
+                    ImageExtrasFile f = JsonUtility.FromJson<ImageExtrasFile>(json);
+                    if (f?.items != null)
+                    {
+                    foreach (ImageJsonItem row in f.items)
+                    {
+                        if (row == null || string.IsNullOrEmpty(row.hint) || string.IsNullOrEmpty(row.answerKey)) continue;
+                        list.Add(new ImageGuessRound(
+                            row.hint,
+                            row.answerKey,
+                            row.styleSeed,
+                            row.streamingFileBase,
+                            row.altAnswerKey,
+                            row.trivia));
+                    }
+                    }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning("minigame_image_guess_extras.json : " + e.Message);
+                }
+            }
+
+            imageGuessRoundsRuntime = list.ToArray();
+        }
 
         public static ImageGuessRound NextImageGuessRound()
         {
             RefillImageGuess();
             int ix = ImageGuessOrder.Dequeue();
             lastImageGuess = ix;
-            return ImageGuessRounds[ix];
+            return GetImageGuessRoundsMerged()[ix];
         }
 
         public static bool ImageGuessMatches(ImageGuessRound r, string userInput)
@@ -298,8 +438,9 @@ namespace CongoGames.Core
         private static void RefillImageGuess()
         {
             if (ImageGuessOrder.Count > 0) return;
-            List<int> idx = new List<int>(ImageGuessRounds.Length);
-            for (int i = 0; i < ImageGuessRounds.Length; i++) idx.Add(i);
+            int len = GetImageGuessRoundsMerged().Length;
+            List<int> idx = new List<int>(len);
+            for (int i = 0; i < len; i++) idx.Add(i);
             for (int i = idx.Count - 1; i > 0; i--)
             {
                 int j = Random.Range(0, i + 1);
@@ -320,7 +461,7 @@ namespace CongoGames.Core
             RefillBlind();
             int ix = BlindOrder.Dequeue();
             lastBlind = ix;
-            return BlindRounds[ix];
+            return GetBlindRoundsMerged()[ix];
         }
 
         /// <summary>Mélange l’ordre des choix pour l’affichage A–D (bonne réponse suit).</summary>
@@ -357,8 +498,9 @@ namespace CongoGames.Core
         private static void RefillBlind()
         {
             if (BlindOrder.Count > 0) return;
-            List<int> idx = new List<int>(BlindRounds.Length);
-            for (int i = 0; i < BlindRounds.Length; i++) idx.Add(i);
+            int len = GetBlindRoundsMerged().Length;
+            List<int> idx = new List<int>(len);
+            for (int i = 0; i < len; i++) idx.Add(i);
             for (int i = idx.Count - 1; i > 0; i--)
             {
                 int j = Random.Range(0, i + 1);

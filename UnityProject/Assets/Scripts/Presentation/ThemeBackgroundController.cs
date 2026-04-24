@@ -9,7 +9,8 @@ using UnityEngine.Video;
 namespace CongoGames.Presentation
 {
     /// <summary>
-    /// Fond par mode : Theme/&lt;modeId&gt;/background.(mp4|webm) puis Theme/global, sinon animation couleur.
+    /// Fond par mode : URL remote, puis <see cref="ThemeModeCatalog"/> (plusieurs noms
+    /// <c>background/loop/theatre/show</c> .mp4/.webm par mode et global), sinon 3D <see cref="VirtualShowStage3D"/>, etc.
     /// </summary>
     [RequireComponent(typeof(RawImage))]
     public class ThemeBackgroundController : MonoBehaviour
@@ -63,19 +64,19 @@ namespace CongoGames.Presentation
             RemoteModeMediaEntry remote = RemoteThemeMediaConfig.Resolve(id);
             if (!string.IsNullOrWhiteSpace(remote.backgroundVideoUrl))
             {
-                TryPlayVideoUrl(remote.backgroundVideoUrl.Trim(), muteVideoSound);
-                return;
+                string urlBg = remote.backgroundVideoUrl.Trim();
+                if (StreamingMediaUrlPolicy.IsNonStreamableContentPageUrl(urlBg))
+                {
+                    StreamingMediaUrlPolicy.LogOnceRejected("Fond (backgroundVideoUrl)", urlBg);
+                }
+                else
+                {
+                    TryPlayVideoUrl(urlBg, muteVideoSound);
+                    return;
+                }
             }
 
-            string root = Path.Combine(Application.streamingAssetsPath, "Theme");
-            string[] candidates =
-            {
-                Path.Combine(root, id, "background.mp4"),
-                Path.Combine(root, id, "background.webm"),
-                Path.Combine(root, "background.mp4"),
-                Path.Combine(root, "background.webm")
-            };
-
+            IReadOnlyList<string> candidates = ThemeModeCatalog.BuildLocalBackgroundCandidates(id);
             foreach (string path in candidates)
             {
                 if (File.Exists(path))

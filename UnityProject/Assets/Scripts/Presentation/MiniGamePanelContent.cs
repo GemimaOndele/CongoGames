@@ -75,9 +75,13 @@ namespace CongoGames.Presentation
         [SerializeField] private float blindListenSeconds = 48f;
         private bool blindInQuestionPhase;
         private Coroutine blindListenCo;
+        private float blindListenEndUnscaled;
+        private float blindListenWindowSec;
         private Image imageGuessVeil;
         [SerializeField] private float imageGuessRevealSec = 15f;
         private Coroutine imageRevealCo;
+        private float imageRevealEndUnscaled;
+        private float imageRevealWindowSec;
         private const float ImageGuessRevealingAlpha = 0.42f;
 
         /// <summary>Mot cible pour la démo mots mélangés (Valider).</summary>
@@ -220,7 +224,7 @@ namespace CongoGames.Presentation
                 return;
             }
 
-            gmm.ScheduleNextMode(0.45f);
+            gmm.ScheduleNextMode(1.1f);
         }
 
         private void ResetThematicGridState()
@@ -932,6 +936,7 @@ namespace CongoGames.Presentation
 
         private void ApplyBlindDemo()
         {
+            blindListenEndUnscaled = 0f;
             if (blindListenCo != null)
             {
                 StopCoroutine(blindListenCo);
@@ -993,7 +998,10 @@ namespace CongoGames.Presentation
         {
             GameSfxHub.Instance?.PlayBlindDemoMusic(musicSeed, raw.AudioFileBase, raw.AudioUrl);
             float wait = listen > 0.01f ? listen : 0.35f;
+            blindListenWindowSec = wait;
+            blindListenEndUnscaled = Time.unscaledTime + wait;
             yield return new WaitForSecondsRealtime(wait);
+            blindListenEndUnscaled = 0f;
             GameSfxHub.Instance?.StopBlindDemoMusic();
             blindInQuestionPhase = true;
             SetBlindChoicesInteractable(true);
@@ -1033,6 +1041,8 @@ namespace CongoGames.Presentation
                 StopCoroutine(blindListenCo);
                 blindListenCo = null;
             }
+
+            blindListenEndUnscaled = 0f;
 
             if (blindEmojiPulseCo != null)
             {
@@ -1435,6 +1445,41 @@ namespace CongoGames.Presentation
         /// <summary>Chrono vitesse actif (réaction 1–4) : le minuteur rond en bas s’affiche ailleurs pour éviter la superposition.</summary>
         public bool IsChronoRoundActive => chronoModeActive;
 
+        /// <summary>HUD : pendant l’écoute blind ou la révélation image, le cercle compte le temps restant (pas le bloc 120 s).</summary>
+        public bool TryGetHudCountdownOverride(out float fill01, out int secondsCeil)
+        {
+            fill01 = 0f;
+            secondsCeil = 0;
+            GameModeManager gmm = GameModeManager.Instance;
+            if (gmm == null) return false;
+            string id = gmm.ActiveModeId ?? "";
+            if (string.Equals(id, "blind-test", StringComparison.Ordinal) && blindListenEndUnscaled > 0.1f)
+            {
+                float rem = blindListenEndUnscaled - Time.unscaledTime;
+                if (rem > 0.001f)
+                {
+                    float d = Mathf.Max(0.01f, blindListenWindowSec);
+                    fill01 = Mathf.Clamp01(rem / d);
+                    secondsCeil = Mathf.Max(0, Mathf.CeilToInt(rem));
+                    return true;
+                }
+            }
+
+            if (string.Equals(id, "image-guess", StringComparison.Ordinal) && imageRevealEndUnscaled > 0.1f)
+            {
+                float rem = imageRevealEndUnscaled - Time.unscaledTime;
+                if (rem > 0.001f)
+                {
+                    float d = Mathf.Max(0.01f, imageRevealWindowSec);
+                    fill01 = Mathf.Clamp01(rem / d);
+                    secondsCeil = Mathf.Max(0, Mathf.CeilToInt(rem));
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1)) OnChronoInput(0);
@@ -1499,6 +1544,7 @@ namespace CongoGames.Presentation
 
         private void ApplyImageDemo()
         {
+            imageRevealEndUnscaled = 0f;
             if (imageRevealCo != null)
             {
                 StopCoroutine(imageRevealCo);
@@ -1581,6 +1627,8 @@ namespace CongoGames.Presentation
         {
             float total = totalSec < 0.2f ? 0.2f : totalSec;
             float t0 = Time.unscaledTime;
+            imageRevealWindowSec = total;
+            imageRevealEndUnscaled = t0 + total;
             if (imageGuessInput != null) imageGuessInput.interactable = false;
             if (imageGuessSubmit != null) imageGuessSubmit.interactable = false;
             if (imageCaption != null)
@@ -1630,6 +1678,7 @@ namespace CongoGames.Presentation
                 imageCaption.text = "Image révélée. " + h;
             }
 
+            imageRevealEndUnscaled = 0f;
             imageRevealCo = null;
         }
 
@@ -1834,17 +1883,18 @@ namespace CongoGames.Presentation
             crossFbRt.sizeDelta = new Vector2(900f, 36f);
 
             GameObject blind = PanelShell(modeRoot, "PanelBlind", "blind-test", new Color(0.1f, 0.06f, 0.14f, 0.96f), white, surf);
-            demo.blindTitle = Title(blind.transform, font, "BTitle", "Blind test", new Vector2(0f, -26f));
-            demo.blindPrompt = Sub(blind.transform, font, "BlindQ", new Vector2(0f, -72f));
-            demo.blindPrompt.rectTransform.sizeDelta = new Vector2(920f, 96f);
-            demo.blindPrompt.fontSize = 24;
-            demo.blindSub = Sub(blind.transform, font, "BlindSub", new Vector2(0f, -148f));
-            demo.blindSub.rectTransform.sizeDelta = new Vector2(900f, 56f);
-            demo.blindSub.fontSize = 20;
-            Transform blindHost = CreateGridHost(blind.transform, "BlindEmojiHost", 0.52f, new Vector2(0f, 88f), new Vector2(920f, 140f));
-            demo.blindEmoji = BigLettersCentered(blindHost, font, "BEmoji", 58);
-            GameObject blindChoicesRoot = CreateRect(blind.transform, "BlindChoicesRoot", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 118f), new Vector2(940f, 240f));
-            BlindChoiceColumn(blindChoicesRoot.transform, font, new Vector2(0f, -20f), 46f, demo);
+            demo.blindTitle = Title(blind.transform, font, "BTitle", "Blind test", new Vector2(0f, -30f));
+            demo.blindPrompt = Sub(blind.transform, font, "BlindQ", new Vector2(0f, -80f));
+            demo.blindPrompt.rectTransform.sizeDelta = new Vector2(940f, 150f);
+            demo.blindPrompt.fontSize = 30;
+            demo.blindSub = Sub(blind.transform, font, "BlindSub", new Vector2(0f, -200f));
+            demo.blindSub.rectTransform.sizeDelta = new Vector2(920f, 120f);
+            demo.blindSub.fontSize = 24;
+            demo.blindSub.lineSpacing = 1.05f;
+            Transform blindHost = CreateGridHost(blind.transform, "BlindEmojiHost", 0.48f, new Vector2(0f, 72f), new Vector2(920f, 150f));
+            demo.blindEmoji = BigLettersCentered(blindHost, font, "BEmoji", 64);
+            GameObject blindChoicesRoot = CreateRect(blind.transform, "BlindChoicesRoot", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 108f), new Vector2(960f, 280f));
+            BlindChoiceColumn(blindChoicesRoot.transform, font, new Vector2(0f, -12f), 54f, demo);
 
             GameObject myst = PanelShell(modeRoot, "PanelMystery", "mystery-word", new Color(0.07f, 0.09f, 0.13f, 0.96f), white, surf);
             demo.mysteryTitle = Title(myst.transform, font, "MTitle", "Mot mystère", new Vector2(0f, -30f));
@@ -1874,24 +1924,61 @@ namespace CongoGames.Presentation
 
             GameObject chrono = PanelShell(modeRoot, "PanelChrono", "speed-chrono", new Color(0.12f, 0.07f, 0.06f, 0.96f), white, surf);
             demo.chronoTitle = Title(chrono.transform, font, "ChTitle", "Chrono vitesse", new Vector2(0f, -32f));
-            GameObject chronoRule = CreateRect(chrono.transform, "ChronoRules", new Vector2(0f, 0.5f), new Vector2(0.55f, 0.5f), new Vector2(24f, 0f), new Vector2(480f, 360f));
+            GameObject chronoRule = CreateRect(chrono.transform, "ChronoRules", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            {
+                RectTransform crR = chronoRule.GetComponent<RectTransform>();
+                crR.anchorMin = new Vector2(0.03f, 0.1f);
+                crR.anchorMax = new Vector2(0.56f, 0.92f);
+                crR.offsetMin = new Vector2(6f, 6f);
+                crR.offsetMax = new Vector2(-4f, -6f);
+            }
+
             Image chRuleBg = chronoRule.AddComponent<Image>();
             chRuleBg.sprite = white;
             chRuleBg.color = new Color(0.04f, 0.04f, 0.08f, 0.6f);
             chRuleBg.raycastTarget = false;
-            demo.chronoInstruction = CreateText(chronoRule.transform, "ChronoInstr", font, 19, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(10f, -10f), new Vector2(-20f, 320f));
+            demo.chronoInstruction = CreateText(chronoRule.transform, "ChronoInstr", font, 19, TextAnchor.UpperLeft, new Vector2(0f, 0f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero);
             demo.chronoInstruction.color = new Color(0.9f, 0.9f, 0.88f, 0.95f);
             demo.chronoInstruction.alignment = TextAnchor.UpperLeft;
             demo.chronoInstruction.horizontalOverflow = HorizontalWrapMode.Wrap;
             demo.chronoInstruction.text = "";
-            GameObject chronoNumHost = CreateRect(chrono.transform, "ChronoNumHost", new Vector2(0.6f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-8f, 0f), new Vector2(400f, 220f));
-            demo.chronoBig = BigLettersCentered(chronoNumHost.transform, font, "ChBig", 86);
-            demo.chronoSub = CreateText(chronoNumHost.transform, "ChSub", font, 22, TextAnchor.LowerCenter, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(360f, 64f));
+            {
+                RectTransform iRt = demo.chronoInstruction.rectTransform;
+                iRt.anchorMin = new Vector2(0f, 0f);
+                iRt.anchorMax = new Vector2(1f, 1f);
+                iRt.offsetMin = new Vector2(8f, 8f);
+                iRt.offsetMax = new Vector2(-8f, -8f);
+            }
+
+            GameObject chronoNumHost = CreateRect(chrono.transform, "ChronoNumHost", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            {
+                RectTransform cnhR = chronoNumHost.GetComponent<RectTransform>();
+                cnhR.anchorMin = new Vector2(0.57f, 0.1f);
+                cnhR.anchorMax = new Vector2(0.98f, 0.92f);
+                cnhR.offsetMin = new Vector2(4f, 6f);
+                cnhR.offsetMax = new Vector2(-10f, -6f);
+            }
+
+            demo.chronoMeta = CreateText(chronoNumHost.transform, "ChMeta", font, 16, TextAnchor.UpperCenter, new Vector2(0.04f, 0.7f), new Vector2(0.96f, 0.98f), Vector2.zero, Vector2.zero);
+            demo.chronoMeta.color = new Color(0.75f, 0.9f, 0.8f, 0.95f);
+            demo.chronoMeta.alignment = TextAnchor.MiddleCenter;
+            demo.chronoMeta.horizontalOverflow = HorizontalWrapMode.Wrap;
+            {
+                RectTransform mRt = demo.chronoMeta.rectTransform;
+                mRt.offsetMin = new Vector2(4f, 0f);
+                mRt.offsetMax = new Vector2(-4f, 0f);
+            }
+
+            demo.chronoBig = BigLettersInRegion(chronoNumHost.transform, font, "ChBig", 64, 0.04f, 0.1f, 0.96f, 0.65f);
+            demo.chronoSub = CreateText(chronoNumHost.transform, "ChSub", font, 20, TextAnchor.LowerCenter, new Vector2(0.04f, 0f), new Vector2(0.96f, 0.22f), Vector2.zero, Vector2.zero);
             demo.chronoSub.color = new Color(1f, 0.9f, 0.3f, 1f);
             demo.chronoSub.alignment = TextAnchor.MiddleCenter;
-            demo.chronoMeta = CreateText(chronoNumHost.transform, "ChMeta", font, 16, TextAnchor.UpperCenter, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -4f), new Vector2(360f, 40f));
-            demo.chronoMeta.color = new Color(0.75f, 0.9f, 0.8f, 0.95f);
-            if (chronoNumHost.GetComponent<RectTransform>() == null) chronoNumHost.AddComponent<RectTransform>();
+            demo.chronoSub.horizontalOverflow = HorizontalWrapMode.Wrap;
+            {
+                RectTransform sRt = demo.chronoSub.rectTransform;
+                sRt.offsetMin = new Vector2(2f, 2f);
+                sRt.offsetMax = new Vector2(-2f, -2f);
+            }
 
             GameObject img = PanelShell(modeRoot, "PanelImageGuess", "image-guess", new Color(0.08f, 0.09f, 0.11f, 0.96f), white, surf);
             demo.imageTitle = Title(img.transform, font, "ImgTitle", "Devine l’image", new Vector2(0f, -24f));
@@ -2055,10 +2142,10 @@ namespace CongoGames.Presentation
 
         private static Text Title(Transform parent, Font font, string name, string txt, Vector2 pos)
         {
-            GameObject go = CreateRect(parent, name, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), pos, new Vector2(980f, 52f));
+            GameObject go = CreateRect(parent, name, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), pos, new Vector2(980f, 60f));
             Text t = go.AddComponent<Text>();
             t.font = font;
-            t.fontSize = 30;
+            t.fontSize = 34;
             t.fontStyle = FontStyle.Bold;
             t.alignment = TextAnchor.MiddleCenter;
             t.color = new Color(1f, 0.9f, 0.2f, 1f);
@@ -2070,10 +2157,10 @@ namespace CongoGames.Presentation
 
         private static Text Sub(Transform parent, Font font, string name, Vector2 pos)
         {
-            GameObject go = CreateRect(parent, name, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), pos, new Vector2(900f, 64f));
+            GameObject go = CreateRect(parent, name, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), pos, new Vector2(920f, 96f));
             Text t = go.AddComponent<Text>();
             t.font = font;
-            t.fontSize = 22;
+            t.fontSize = 26;
             t.alignment = TextAnchor.MiddleCenter;
             t.color = new Color(0.92f, 0.92f, 0.92f, 0.95f);
             t.horizontalOverflow = HorizontalWrapMode.Wrap;
@@ -2119,6 +2206,31 @@ namespace CongoGames.Presentation
             t.fontStyle = FontStyle.Bold;
             t.alignment = TextAnchor.MiddleCenter;
             t.color = Color.white;
+            t.text = "";
+            return t;
+        }
+
+        /// <summary>Chiffre chrono ancré dans un pourcentage du parent (évite 960px qui débordent d’un hôte 400px).</summary>
+        private static Text BigLettersInRegion(Transform parent, Font font, string name, int fontSize, float ax, float ay, float bx, float by)
+        {
+            GameObject go = CreateRect(parent, name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(ax, ay);
+            rt.anchorMax = new Vector2(bx, by);
+            rt.offsetMin = new Vector2(2f, 2f);
+            rt.offsetMax = new Vector2(-2f, -2f);
+            Text t = go.AddComponent<Text>();
+            t.font = font;
+            t.fontSize = fontSize;
+            t.fontStyle = FontStyle.Bold;
+            t.alignment = TextAnchor.MiddleCenter;
+            t.color = Color.white;
+            t.resizeTextForBestFit = true;
+            t.resizeTextMinSize = 30;
+            t.resizeTextMaxSize = fontSize;
+            t.verticalOverflow = VerticalWrapMode.Overflow;
+            t.horizontalOverflow = HorizontalWrapMode.Overflow;
+            t.raycastTarget = false;
             t.text = "";
             return t;
         }
@@ -2182,7 +2294,7 @@ namespace CongoGames.Presentation
             Button[] btns = new Button[4];
             for (int i = 0; i < 4; i++)
             {
-                GameObject go = CreateRect(parent, "BlindChoice" + i, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), start + new Vector2(0f, -i * stepY), new Vector2(920f, 46f));
+                GameObject go = CreateRect(parent, "BlindChoice" + i, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), start + new Vector2(0f, -i * stepY), new Vector2(920f, 56f));
                 Image rowBg = go.AddComponent<Image>();
                 rowBg.sprite = White();
                 rowBg.color = new Color(0.08f, 0.1f, 0.16f, 0.96f);
@@ -2197,9 +2309,11 @@ namespace CongoGames.Presentation
                 GameObject txGo = CreateRect(go.transform, "Txt", Vector2.zero, Vector2.one, new Vector2(12f, 0f), new Vector2(-24f, 0f));
                 Text t = txGo.AddComponent<Text>();
                 t.font = font;
-                t.fontSize = 22;
+                t.fontSize = 26;
                 t.alignment = TextAnchor.MiddleLeft;
                 t.color = new Color(0.96f, 0.96f, 0.98f, 1f);
+                t.horizontalOverflow = HorizontalWrapMode.Wrap;
+                t.verticalOverflow = VerticalWrapMode.Overflow;
                 t.raycastTarget = false;
                 arr[i] = t;
                 btns[i] = hit;

@@ -12,6 +12,7 @@
     "demo:local": "node scripts/demo-live.mjs",
     "test:cloud": "node scripts/test-cloud.mjs",
     "smoke:live": "node scripts/smoke-test-live.mjs",
-    "dataset:commons": "node scripts/fetch-commons-assets.mjs"
+    "dataset:commons": "node scripts/fetch-commons-assets.mjs",
+    "theme:import-youtube": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/fetch-youtube-theme.ps1"
   }
 }

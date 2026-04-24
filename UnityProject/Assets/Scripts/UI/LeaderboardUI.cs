@@ -55,7 +55,7 @@ namespace CongoGames.UI
             for (int i = 0; i < players.Count; i++)
             {
                 string u = players[i].Username;
-                if (u != null && u.Length > 14) u = u.Substring(0, 12) + "…";
+                if (u != null && u.Length > 20) u = u.Substring(0, 18) + "…";
                 sb.Append(i + 1).Append(". ").Append(u).Append(" ").Append(players[i].Score).Append('\n');
             }
 

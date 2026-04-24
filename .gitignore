@@ -19,6 +19,9 @@ Recordings/
 *.user
 *.userprefs
 
+# Fonds / imports vidéo locaux (yt-dlp, binaires lourds — ne pas versionner)
+UnityProject/Assets/StreamingAssets/Theme/_dev_import/
+
 # Node
 node_modules/
 npm-debug.log*

@@ -1,0 +1,44 @@
+{
+  "items": [
+    {
+      "hint": "Habitants célèbres pour l’élégance des tenues, parfois photographiés près de Brazzaville — mot collectif souvent entendu ?",
+      "answerKey": "SAPEUR",
+      "styleSeed": 3101,
+      "streamingFileBase": "sapeurs",
+      "altAnswerKey": "SAPEURS",
+      "trivia": "Placer sapeurs.png (photo libre de droits / Commons) dans Theme/ImageGuess/ — pas de poids binaire imposé dans le dépôt public."
+    },
+    {
+      "hint": "Département côtier, pétrole, cultures maritimes (un mot) ?",
+      "answerKey": "KOUILOU",
+      "styleSeed": 3202,
+      "streamingFileBase": "",
+      "altAnswerKey": "KOUILOU",
+      "trivia": "Carte admin. du Congo (Brazzaville) : sud-ouest."
+    },
+    {
+      "hint": "Réserve naturelle, rhinocéros, savanes (Nord) — un mot du nom de parc connu ?",
+      "answerKey": "Odzala",
+      "styleSeed": 3303,
+      "streamingFileBase": "odzala",
+      "altAnswerKey": "ODZALA",
+      "trivia": "Image : paysage forêt / savane — visuel local optionnel odzala.png."
+    },
+    {
+      "hint": "Cours d’eau secondaire, affluent du fleuve, nom du bâtiment législatif à Brazzaville (fait le lien) — abréviation 3 lettres d’un aéroport congolais ?",
+      "answerKey": "BZV",
+      "styleSeed": 3404,
+      "streamingFileBase": "",
+      "altAnswerKey": "",
+      "trivia": "Cohérent avec bzv de la banque de base : variante question."
+    },
+    {
+      "hint": "Langue véhiculaire très entendue à Brazzaville et en chansons (un mot) ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 3505,
+      "streamingFileBase": "",
+      "altAnswerKey": "KITUBA",
+      "trivia": "Indice : Kituba (munukutuba) est aussi répandu — une des deux formes de réponse selon l’intitulé côté banc."
+    }
+  ]
+}
