@@ -27,9 +27,15 @@ Ce dossier sert de **cible de déploiement statique** (Vercel, Netlify, etc.) : 
 
 4. Ouvrir l’URL HTTPS affichée (téléphone, tablette, PC). Le build WebGL utilise `Resources/CloudEndpoints.json` (Vercel + Railway) pour TTS / WebSocket.
 
+## Vercel et compression (`.gz`)
+
+Le CDN Vercel **applique mal** les en-têtes `Content-Encoding: gzip` sur des fichiers **déjà** compressés par Unity (`*.js.gz`, etc.), ce qui casse le chargement WebGL. Dans ce dépôt, **Player Settings → WebGL → Publishing Settings → Compression format** est réglé sur **Disabled** (`webGLCompressionFormat: 0`) : le build sort des `.js` / `.wasm` / `.data` **non** suffixés `.gz`, et Vercel les compresse correctement en transit. Après changement de ce réglage : **refaire un build WebGL**, recopier avec `copy-into-webgl-site.ps1`, puis `npm run webgl:vercel`.
+
+Les règles `vercel.json` pour `*.gz` / `*.br` restent utiles si tu réactives Gzip/Brotli et héberges ailleurs (Nginx, S3, etc.).
+
 ## Fichiers versionnés ici
 
-- `vercel.json` — en-têtes `Content-Type` pour `.wasm` / `.js` (souvent requis).
+- `vercel.json` — `Content-Type` et, si besoin, `Content-Encoding` pour builds compressés hors Vercel.
 - `copy-into-webgl-site.ps1` — script de copie.
 - `README.md` — ce texte.
 
