@@ -15,7 +15,27 @@ namespace CongoGames.Presentation
 
     public static class PresentationConfig
     {
+        public const string PrefsUseVirtual3D = "CongoUseVirtual3D";
+        public const string PrefsPresentQuality = "CongoPresentationQuality";
+
         public static PresentationQualityTier Tier { get; set; } = PresentationQualityTier.Cinematic;
+
+        /// <summary>Scène 3D « plateau TV » (Render Texture → fond) au lieu du seul fond 2D / vidéo.</summary>
+        public static bool UseVirtual3DShowStage { get; set; } = true;
+
+        public static int VirtualStageWidth => Tier switch
+        {
+            PresentationQualityTier.Compact => 960,
+            PresentationQualityTier.Standard => 1280,
+            _ => 1600
+        };
+
+        public static int VirtualStageHeight => Tier switch
+        {
+            PresentationQualityTier.Compact => 540,
+            PresentationQualityTier.Standard => 720,
+            _ => 900
+        };
 
         public static float SceneRichness => Tier switch
         {
@@ -27,8 +47,9 @@ namespace CongoGames.Presentation
 
         public static void ApplyFromPlayerPrefs()
         {
-            int v = PlayerPrefs.GetInt("CongoPresentationQuality", (int)PresentationQualityTier.Cinematic);
+            int v = PlayerPrefs.GetInt(PrefsPresentQuality, (int)PresentationQualityTier.Cinematic);
             Tier = (PresentationQualityTier)Mathf.Clamp(v, 0, 2);
+            UseVirtual3DShowStage = PlayerPrefs.GetInt(PrefsUseVirtual3D, 1) != 0;
         }
     }
 }

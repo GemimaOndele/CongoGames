@@ -24,6 +24,7 @@ namespace CongoGames.Presentation
         private Coroutine slideCo;
         private readonly List<Texture2D> slideTextures = new List<Texture2D>();
         private SyntheticVideoBackground synthetic;
+        private VirtualShowStage3D virtual3D;
         private string activeModeId = "";
 
         private void Awake()
@@ -36,6 +37,12 @@ namespace CongoGames.Presentation
             if (synthetic == null)
             {
                 synthetic = gameObject.AddComponent<SyntheticVideoBackground>();
+            }
+
+            virtual3D = GetComponent<VirtualShowStage3D>();
+            if (virtual3D == null)
+            {
+                virtual3D = gameObject.AddComponent<VirtualShowStage3D>();
             }
         }
 
@@ -81,9 +88,17 @@ namespace CongoGames.Presentation
             StartSyntheticOrSlides(id);
         }
 
-        /// <summary>Sans fichier vidéo : rendu animé type clip (caméra). Images bg_*.png seulement si dossier Theme dédié « use_slides ».</summary>
+        /// <summary>Sans fichier vidéo : plateau 3D (option) ; sinon slides ; sinon « clip » 2D procédural.</summary>
         private void StartSyntheticOrSlides(string id)
         {
+            if (PresentationConfig.UseVirtual3DShowStage && virtual3D != null)
+            {
+                synthetic?.Stop();
+                virtual3D.RebuildForMode(id, raw);
+                return;
+            }
+
+            virtual3D?.Teardown();
             string root = Path.Combine(Application.streamingAssetsPath, "Theme");
             string useSlidesFlag = Path.Combine(root, id, "use_slides.flag");
             string useSlidesGlobal = Path.Combine(root, "use_slides.flag");
@@ -106,6 +121,11 @@ namespace CongoGames.Presentation
 
         private void StopEverything()
         {
+            if (virtual3D != null)
+            {
+                virtual3D.Teardown();
+            }
+
             if (slideCo != null)
             {
                 StopCoroutine(slideCo);
