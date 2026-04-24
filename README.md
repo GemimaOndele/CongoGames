@@ -69,10 +69,11 @@ Si un port est occupe, le backend bascule automatiquement sur le port suivant (`
 
 ## Variables d'environnement
 
-Copier `Backend/.env.example` vers `Backend/.env` puis renseigner:
+Copier `Backend/.env.example` vers `Backend/.env` puis renseigner (minimum utile) :
 
-- `OPENAI_API_KEY`
-- `ELEVENLABS_API_KEY` (synthèse vocale `/tts` pour Unity ; la clé ne doit pas être dans le build jeu)
+- **TTS (voix hôte, `/tts`)** : par défaut **gratuit, sans clé** — moteur Microsoft **Edge** côté serveur. Optionnel : `TTS_EDGE_VOICE`, `TTS_EDGE_ENABLED=0` pour n’utiliser que les clés. Voir `docs/TTS_LOCAL.md`.
+- `OPENAI_API_KEY` (surtout `POST /question/generate` ; repli TTS si Edge est désactivé)
+- `ELEVENLABS_API_KEY` (repli TTS ; la clé ne doit pas être dans le build jeu)
 - `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL_ID`, `ELEVENLABS_OUTPUT_FORMAT` (optionnels, voir `.env.example`)
 - `TIKTOK_USERNAME`
 - `TIKTOK_USERNAMES` (liste separee par virgules, ex: `congogame,je_suis_gemima`)
@@ -92,7 +93,7 @@ Endpoints disponibles sur l'URL Vercel:
 
 - `GET /health`
 - `GET /metrics`
-- `GET /tts/status` — indique si la synthèse ElevenLabs est prête (clé API serveur)
+- `GET /tts/status` — TTS (Edge / OpenAI / ElevenLabs)
 - `POST /tts` — corps `application/x-www-form-urlencoded` avec champ `text=` ; réponse JSON PCM (base64) pour Unity
 - `POST /events/chat`
 - `POST /events/gift`

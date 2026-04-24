@@ -8,7 +8,12 @@ import { WebSocketServer } from "ws";
 import { GiftEngine } from "./services/giftEngine.js";
 import { QuestionGenerator } from "./services/questionGenerator.js";
 import { TikTokLiveBridge } from "./services/tiktokLiveBridge.js";
-import { isTtsConfigured, synthesizeToAudioBase64, isElevenLabsReady } from "./services/ttsService.js";
+import {
+  isTtsConfigured,
+  synthesizeToAudioBase64,
+  isElevenLabsReady
+} from "./services/ttsService.js";
+import { isEdgeTtsEnabled } from "./services/edgeTtsService.js";
 import { isOpenAiSpeechReady } from "./services/openAiSpeechService.js";
 import { MessageType, createMessage } from "./protocol/messages.js";
 
@@ -129,7 +134,7 @@ code{background:#f0f0f0;padding:2px 6px;border-radius:4px}a{color:#0a6}</style><
 <p>Le serveur tourne. Il n’y a pas de page web de jeu ici : c’est une <strong>API</strong> pour Unity et les scripts.</p>
 <ul>
 <li><a href="/health"><code>/health</code></a> — ports HTTP / WS + TTS</li>
-<li><a href="/tts/status"><code>/tts/status</code></a> — TTS (OpenAI ou ElevenLabs) configuré ?</li>
+<li><a href="/tts/status"><code>/tts/status</code></a> — TTS (Edge gratuit, OpenAI, ElevenLabs)</li>
 <li><code>POST /tts</code> — formulaire <code>text=…</code> (Unity)</li>
 <li><code>POST /events/chat</code>, <code>POST /events/gift</code>, <code>POST /question/generate</code></li>
 </ul>
@@ -151,6 +156,7 @@ app.get("/tts/status", (_req, res) => {
   res.json({
     ok: true,
     enabled: isTtsConfigured(),
+    edge: isEdgeTtsEnabled(),
     elevenLabs: isElevenLabsReady(),
     openAi: isOpenAiSpeechReady()
   });
@@ -165,7 +171,7 @@ app.post("/tts", async (req, res) => {
     return res.status(503).json({
       ok: false,
       error:
-        "TTS non configuré : ajoute OPENAI_API_KEY (recommandé) ou ELEVENLABS_API_KEY + ELEVENLABS_VOICE_ID dans .env"
+        "TTS non disponible : active TTS Edge (TTS_EDGE_ENABLED=1 par défaut) ou ajoute OPENAI_API_KEY / ElevenLabs dans .env"
     });
   }
   try {

@@ -305,8 +305,8 @@ namespace CongoGames.AI
             if (quota)
             {
                 Debug.LogWarning(
-                    "CongoGames — quota OpenAI TTS dépassé : la voix est suspendue quelques minutes. " +
-                    "Ajoute des crédits sur https://platform.openai.com — le jeu continue avec des bips.");
+                    "CongoGames — quota TTS API dépassé (ex. OpenAI) : la voix est suspendue quelques minutes. " +
+                    "En local, le backend peut utiliser le TTS Edge gratuit (voir docs/TTS_LOCAL.md) — le jeu continue avec des bips.");
             }
             else
             {

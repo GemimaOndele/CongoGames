@@ -1,9 +1,10 @@
 /**
- * Synthèse vocale : ElevenLabs (si clé + voice_id) puis repli OpenAI (tts-1).
+ * Synthèse vocale (priorité) : TTS Edge gratuit (sans clé) → OpenAI (PCM) → ElevenLabs.
  * Les comptes ElevenLabs gratuits ne peuvent pas utiliser les voix « bibliothèque » via l’API sans abonnement payant.
  */
 
 import { isOpenAiSpeechReady, synthesizeOpenAiSpeechToPcm } from "./openAiSpeechService.js";
+import { isEdgeTtsEnabled, synthesizeEdgeToPcm } from "./edgeTtsService.js";
 
 const DEFAULT_MODEL = "eleven_multilingual_v2";
 const MAX_CHARS = 2500;
@@ -15,6 +16,9 @@ export function isElevenLabsReady() {
 }
 
 export function isTtsConfigured() {
+  if (isEdgeTtsEnabled()) {
+    return true;
+  }
   return isElevenLabsReady() || isOpenAiSpeechReady();
 }
 
@@ -114,6 +118,16 @@ export async function synthesizeToAudioBase64(text, opts = {}) {
   const preferPcm = Boolean(opts.preferPcm);
   const errors = [];
 
+  if (isEdgeTtsEnabled()) {
+    try {
+      return await synthesizeEdgeToPcm(clean);
+    } catch (e) {
+      const msg = e?.message || String(e);
+      errors.push(msg);
+      console.warn("[tts] Edge (gratuit) indisponible:", msg.slice(0, 160));
+    }
+  }
+
   /** Unity lit mal certains MP3 : avec prefer_pcm, OpenAI (PCM brut) en premier si les deux sont configurés. */
   if (preferPcm && isOpenAiSpeechReady() && isElevenLabsReady()) {
     try {
@@ -141,6 +155,6 @@ export async function synthesizeToAudioBase64(text, opts = {}) {
 
   throw new Error(
     errors.join(" | ") ||
-      "Aucun TTS disponible : ajoute OPENAI_API_KEY (recommandé en gratuit) ou ELEVENLABS_API_KEY + ELEVENLABS_VOICE_ID (voix non « bibliothèque »)."
+      "Aucun TTS disponible : active Edge (TTS_EDGE_ENABLED=1 par défaut) ou ajoute OPENAI_API_KEY / ElevenLabs."
   );
 }

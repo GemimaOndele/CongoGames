@@ -8,7 +8,9 @@
     "dev": "node --watch src/server.js"
   },
   "dependencies": {
+    "audio-decode": "^3.10.1",
     "dotenv": "^16.4.5",
+    "edge-tts-universal": "^1.4.0",
     "express": "^4.21.2",
     "openai": "^4.104.0",
     "tiktok-live-connector": "^1.2.2",

@@ -15,7 +15,7 @@ Ce guide finalise le flux **backend + WebSocket + TTS + Unity** décrit dans le 
 Tu n’as **pas** besoin d’un live TikTok pour valider le jeu.
 
 1. **Backend** : `npm run start-all` ou `.\start-all.ps1` — par défaut **`TIKTOK_BRIDGE_ENABLED=false`** (voir `package.json`) : pas de pont TikTok, seulement HTTP + WebSocket + TTS.
-2. **Variables** : `Backend/.env` avec au minimum ce qui active le TTS / les questions (souvent `OPENAI_API_KEY`) ; `TIKTOK_USERNAME` peut rester vide pour ce parcours.
+2. **Variables** : en local, le TTS par défaut est **gratuit (Edge, sans clé)** — `OPENAI_API_KEY` sert surtout à `POST /question/generate` et au repli TTS si tu coupes Edge ; `TIKTOK_USERNAME` peut rester vide pour ce parcours. Détails : [TTS_LOCAL.md](TTS_LOCAL.md).
 3. **Unity** : **Play** sur une scène vide ou la tienne ; le **RuntimeBootstrap** monte le HUD si besoin.
 4. **Simulation chat / scores** : dans un second terminal, `npm run demo:local` — le script envoie des événements comme un chat de test ; tu dois voir questions, scores, TTS si le backend l’expose. *(Si « fetch failed » : le script contacte d’abord `127.0.0.1` puis `localhost` sur les ports 3000–3010. Garde `npm run start-all` lancé et regarde le **port HTTP** indiqué par le log du serveur.)*
 
@@ -31,7 +31,8 @@ Copie `Backend/.env.example` vers `Backend/.env` si besoin, puis renseigne au mi
 
 | Variable | Rôle |
 |----------|------|
-| `OPENAI_API_KEY` | **TTS local recommandé** : active `POST /tts` via OpenAI en **PCM** (`response_format: pcm`, pas de MP3 côté Unity). Sert aussi à `POST /question/generate`. |
+| `TTS_EDGE_ENABLED` / `TTS_EDGE_VOICE` | **Par défaut** le backend utilise le TTS Microsoft **Edge** (gratuit, **sans** clé) → `POST /tts` en **PCM** pour Unity. `TTS_EDGE_ENABLED=0` pour ne pas l’utiliser. |
+| `OPENAI_API_KEY` | Sert surtout à `POST /question/generate` ; en TTS, **repli** si Edge est désactivé ou indisponible (OpenAI en **PCM** côté Unity). |
 | `ELEVENLABS_API_KEY` + `ELEVENLABS_VOICE_ID` | Optionnel : ElevenLabs si les deux sont définis (sinon repli OpenAI). Avec Unity, garde **`ELEVENLABS_OUTPUT_FORMAT=pcm_22050`** dans `.env` pour limiter le MP3 (le client envoie déjà `prefer_pcm=1`). Compte gratuit : souvent erreur 402 sur les voix bibliothèque. |
 | `ELEVENLABS_OUTPUT_FORMAT` | Défaut dans `.env.example` : `pcm_22050`. Évite le chemin MP3 dans Unity (décodage fragile sous Windows). |
 | `TIKTOK_USERNAME` / `TIKTOK_USERNAMES` | Pour le pont TikTok (désactivé en `npm run start-all` par défaut). |
@@ -75,7 +76,7 @@ Si le HTTP a basculé (ex. `3001`), utilise cette URL pour les tests curl suivan
 curl -s http://127.0.0.1:3000/tts/status
 ```
 
-`enabled: true` si `OPENAI_API_KEY` **ou** la paire ElevenLabs (`ELEVENLABS_API_KEY` + `ELEVENLABS_VOICE_ID`) est configurée. Le JSON indique aussi `openAi` et `elevenLabs`.
+`enabled: true` dès que le TTS **Edge** est actif (défaut) **ou** si `OPENAI_API_KEY` / la paire ElevenLabs est configurée. Le JSON indique `edge`, `openAi` et `elevenLabs`.
 
 - **Test TTS comme Unity** (PCM demandé, même corps que le jeu) :
 
@@ -117,7 +118,7 @@ Toujours avec le backend lancé :
 npm run demo:local
 ```
 
-Tu dois voir dans Unity : questions, scores, éventuellement la voix (si `POST /tts` fonctionne — OpenAI ou ElevenLabs).
+Tu dois voir dans Unity : questions, scores, éventuellement la voix (si `POST /tts` fonctionne — Edge par défaut, ou OpenAI / ElevenLabs en repli).
 
 ## 6. Limites connues (rappel)
 
@@ -131,8 +132,8 @@ Tu dois voir dans Unity : questions, scores, éventuellement la voix (si `POST /
 
 | Symptôme | Piste |
 |----------|--------|
-| Bip au lieu de la voix | `GET /tts/status` → `enabled: false` (ajoute `OPENAI_API_KEY`), ou **quota OpenAI** (429) : crédits / facturation sur [platform.openai.com](https://platform.openai.com). Après 429, Unity suspend les appels TTS quelques minutes pour éviter le spam. |
-| Console Unity : erreur TTS / « Unable to read data » | Privilégie le **PCM** : `OPENAI_API_KEY` (TTS OpenAI en PCM) ou ElevenLabs avec `ELEVENLABS_OUTPUT_FORMAT=pcm_22050` + `prefer_pcm=1` (déjà envoyé par Unity). Le MP3 temporaire n’est plus supprimé trop tôt côté client. Si ça échoue encore, regarde la **console Node** (`[tts] …`). Vérifie les clés sans **espace** en fin de ligne dans `.env`. |
+| Bip au lieu de la voix | `GET /tts/status` : si `edge: false` et `enabled: false`, active Edge (`TTS_EDGE_ENABLED=1`) ou `OPENAI_API_KEY`. **Quota API** (429 sur OpenAI, etc.) : crédits ou repli sur Edge. Après 429, Unity suspend les appels TTS quelques minutes pour éviter le spam. Voir [TTS_LOCAL.md](TTS_LOCAL.md). |
+| Console Unity : erreur TTS / « Unable to read data » | Le chemin **PCM** (Edge ou OpenAI) évite le MP3 fragile dans Unity. Avec repli **MP3**, tu peux encore voir cette erreur : vérifie la **console Node** (`[tts] …`), `ELEVENLABS_OUTPUT_FORMAT=pcm_22050`, clés sans **espace** en fin de ligne dans `.env`. |
 | Play impossible / « fix errors » sans message clair | Safe Mode, compteurs d’erreurs dans la Console, `Editor.log`, puis `.\prepare-unity.ps1` avec Unity fermé (voir §4, sous-section *Play grisé…*). |
 | Unity ne trouve pas le HTTP | Vérifie le pare-feu ; augmente **Discover Port Max** sur `AIHostManager` ; ou désactive l’auto et mets l’URL exacte du log serveur. |
 | WS OK mais pas le TTS en cloud | Définis `PUBLIC_HTTP_BASE` sur le backend déployé (HTTPS) pour que le message `system` pointe vers la bonne API HTTP. |
