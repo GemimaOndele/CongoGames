@@ -1,0 +1,9 @@
+{
+  "name": "congogames-webgl",
+  "private": true,
+  "description": "Dossier statique (build Unity WebGL) — pas de compilation npm.",
+  "scripts": {
+    "vercel-build": "node -e \"process.exit(0)\"",
+    "build": "node -e \"process.exit(0)\""
+  }
+}

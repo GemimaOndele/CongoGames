@@ -1,0 +1,18 @@
+# Binaires WebGL (copiés ici) — conserver seulement la config dans Git
+/Build/
+/TemplateData/
+/StreamingAssets/
+index.html
+*.html
+*.data
+*.wasm
+*.js
+*.json
+!vercel.json
+!package.json
+*.symbols.json
+*.br
+*.unityweb
+ServiceWorker.js
+*Mem*
+.vercel
