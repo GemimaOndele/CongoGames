@@ -48,6 +48,8 @@ Ne commite jamais `.env` (déjà dans `.gitignore`).
 npm run start-all
 ```
 
+> Après un `git pull` qui modifie `Backend/package.json`, inutile d’oublier un `npm install` séparé : le script lance d’abord `npm --prefix Backend install` (récupère notamment `edge-tts-universal`, etc.), puis le serveur.
+
 Sous Windows PowerShell :
 
 ```powershell
