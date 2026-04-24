@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Blind audio round (CongoGames)",
+  "type": "object",
+  "required": ["id", "audioFileBase", "questionFr", "choices", "correctIndex", "license", "sourceUrl"],
+  "properties": {
+    "id": { "type": "string" },
+    "audioFileBase": { "type": "string", "description": "Sans extension ; .ogg/.mp3/.wav dans Theme/BlindTest/ ou Theme/blind-test/" },
+    "questionFr": { "type": "string" },
+    "choices": { "type": "array", "items": { "type": "string" }, "minItems": 4, "maxItems": 4 },
+    "correctIndex": { "type": "integer", "minimum": 0, "maximum": 3 },
+    "categoryLabel": { "type": "string" },
+    "subLine": { "type": "string" },
+    "languageTag": {
+      "type": "string",
+      "description": "Ex. Kongo-Lari, Mbochi, Teke, Lingala, Kituba — tag manuel validé"
+    },
+    "difficulty": { "enum": ["easy", "medium", "hard"] },
+    "license": { "type": "string" },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "author": { "type": "string" }
+  }
+}

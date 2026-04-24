@@ -11,6 +11,7 @@
     "start-all:prod": "npm --prefix Backend run start",
     "demo:local": "node scripts/demo-live.mjs",
     "test:cloud": "node scripts/test-cloud.mjs",
-    "smoke:live": "node scripts/smoke-test-live.mjs"
+    "smoke:live": "node scripts/smoke-test-live.mjs",
+    "dataset:commons": "node scripts/fetch-commons-assets.mjs"
   }
 }

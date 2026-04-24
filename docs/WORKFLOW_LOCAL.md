@@ -21,3 +21,15 @@ Ordre recommandé pour tester la boucle complète sur **Windows** (`C:\Congogame
 ## Rappel 3D « type PS5 »
 
 - Pas dans ce dépôt seul : scènes, modèles, éclairage URP, prefabs (voir `docs/AAA_Blockbuster_Specification_CongoGames.md` et `ROADMAP_UI_3D.md`).
+
+## Datasets (images / audio)
+
+- Guide : **`Datasets/README.md`** — politique : **`Datasets/CONTENT_POLICY.md`** (pas YouTube ; Commons / licences).
+- Rédaction IA (QCM, pas scraping) : **`Datasets/PROMPTS_IA_REDACTION.md`**.
+- Récupération d’exemples Commons (local, manifeste JSON) :
+
+```bash
+npm run dataset:commons -- --query "Brazzaville" --limit 3
+```
+
+Les fichiers vont dans `Datasets/harvest/staging/` (ignoré par git par défaut ; copie manuelle vers `StreamingAssets` si tu veux les versionner avec attributions).

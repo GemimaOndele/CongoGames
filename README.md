@@ -38,7 +38,8 @@ CongoGames est un jeu live interactif concu pour TikTok Live, centre sur la cult
 ## Demarrage rapide
 
 Guide pas à pas (`.env`, ports, Unity, dépannage) : **`docs/TESTER.md`**.  
-Ordre **pull → backend → Play** et rappels blind-test / images : **`docs/WORKFLOW_LOCAL.md`**.
+Ordre **pull → backend → Play** et rappels blind-test / images : **`docs/WORKFLOW_LOCAL.md`**.  
+Enrichissement données (Commons, schémas JSON, prompts IA rédaction) : **`Datasets/README.md`**.
 
 - **Git bloqué sur `git pull`** (conflits, fichiers locaux) : script **`reset-vers-origin.ps1`** à la racine + explications **`docs/RESET_VERS_ORIGIN.md`**.
 

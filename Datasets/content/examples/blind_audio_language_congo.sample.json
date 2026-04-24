@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "description": "Exemples blind test : langue du chant / ethnie musicale — chaque entrée DOIT avoir un fichier audio sous licence + sourceUrl. Ne pas inventer la langue sans validation humaine.",
+  "rounds": [
+    {
+      "id": "bllang_001",
+      "audioFileBase": "placeholder_kongo_demo",
+      "questionFr": "Parmi ces langues du pays, laquelle correspond le plus souvent à un chant traditionnel du pool (sud, thème pédagogique) ?",
+      "choices": ["Kongo / Lari (registre sud)", "Mbochi", "Téké", "Lingala urbain seul"],
+      "correctIndex": 0,
+      "categoryLabel": "Langue du chant (démo)",
+      "subLine": "Remplace placeholder_kongo_demo par un vrai fichier .ogg (Commons ou enregistrement libre) et valide l’étiquette avec un locuteur.",
+      "languageTag": "Kongo-Lari",
+      "difficulty": "hard",
+      "license": "À RENSEIGNER",
+      "sourceUrl": "https://commons.wikimedia.org",
+      "author": "À RENSEIGNER"
+    },
+    {
+      "id": "bllang_002",
+      "audioFileBase": "placeholder_mbochi_demo",
+      "questionFr": "Le timbre et le contexte évoquent plutôt quel ensemble linguistique du nord / centre-nord (thème quiz) ?",
+      "choices": ["Mbochi", "Téké", "Kongo/Lari", "Français seul"],
+      "correctIndex": 0,
+      "categoryLabel": "Langue du chant (démo)",
+      "subLine": "Même principe : fichier + validation manuelle.",
+      "languageTag": "Mbochi",
+      "difficulty": "medium",
+      "license": "À RENSEIGNER",
+      "sourceUrl": "https://commons.wikimedia.org",
+      "author": "À RENSEIGNER"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Image guess round",
+  "type": "object",
+  "required": ["id", "hint", "answerKey", "streamingFileBase", "license"],
+  "properties": {
+    "id": { "type": "string" },
+    "hint": { "type": "string" },
+    "answerKey": { "type": "string" },
+    "altAnswerKey": { "type": "string" },
+    "streamingFileBase": { "type": "string", "description": "Nom sans extension dans Theme/ImageGuess/" },
+    "trivia": { "type": "string" },
+    "styleSeed": { "type": "integer" },
+    "license": { "type": "string" },
+    "sourceUrl": { "type": "string" }
+  }
+}

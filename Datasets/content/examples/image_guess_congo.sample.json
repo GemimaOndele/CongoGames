@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "description": "Correspond à la logique ImageGuessRound : placer les PNG/JPEG dans Theme/ImageGuess/ avec le nom streamingFileBase.",
+  "rounds": [
+    {
+      "id": "img_001",
+      "hint": "Capitale sur le fleuve (photo aérienne ou pont) ?",
+      "answerKey": "BRAZZAVILLE",
+      "altAnswerKey": "BRAZZA",
+      "streamingFileBase": "brazzaville",
+      "trivia": "Comparer avec la RDC (Kinshasa) : autre pays.",
+      "styleSeed": 1101,
+      "license": "CC BY-SA 4.0 (exemple)",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/Category:Brazzaville"
+    }
+  ]
+}
