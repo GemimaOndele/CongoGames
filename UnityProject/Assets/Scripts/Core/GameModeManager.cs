@@ -16,9 +16,9 @@ namespace CongoGames.Core
     {
         public static GameModeManager Instance { get; private set; }
 
-        [SerializeField] private float roundDurationSec = 60f;
+        [SerializeField] private float roundDurationSec = 120f;
         [Tooltip("Durée totale du bloc Quiz (plusieurs questions enchaînées avant le mini-jeu suivant).")]
-        [SerializeField] private float quizSessionDurationSec = 120f;
+        [SerializeField] private float quizSessionDurationSec = 180f;
         [Tooltip("Démo locale : touches 1–9 (pavé ou ligne) pour choisir le mini-jeu (si le focus n’est pas dans un champ texte).")]
         [SerializeField] private bool keyboardPickModeInEditor = true;
 
@@ -192,6 +192,15 @@ namespace CongoGames.Core
             }
 
             string fromId = activeMode != null ? activeMode.ModeId : "";
+            if (string.Equals(fromId, "quiz", StringComparison.OrdinalIgnoreCase) && ScoreManager.Instance != null)
+            {
+                int hi = ScoreManager.Instance.GetHighestScoreAmongPlayers();
+                if (hi > 0)
+                {
+                    ScoreHistoryStore.RegisterHighWaterIfNeeded(hi);
+                }
+            }
+
             activeMode?.End();
             activeMode = mode;
             float blockDuration = string.Equals(modeId, "quiz", StringComparison.OrdinalIgnoreCase)

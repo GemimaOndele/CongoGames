@@ -54,6 +54,7 @@ namespace CongoGames.Core
 
             GameObject canvasGo = new GameObject("CongoGames_Canvas");
             canvasGo.AddComponent<ThemeUrlDebugBar>();
+            canvasGo.AddComponent<PlayerPrefsGui>();
             Canvas canvas = canvasGo.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             CanvasScaler scaler = canvasGo.AddComponent<CanvasScaler>();
