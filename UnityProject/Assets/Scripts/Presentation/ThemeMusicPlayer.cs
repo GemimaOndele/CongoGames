@@ -141,9 +141,27 @@ namespace CongoGames.Presentation
                         // ignoré
                     }
                 }
-
-                trackPaths.Sort(StringComparer.OrdinalIgnoreCase);
             }
+
+            if (string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase))
+            {
+                string legacyBlind = Path.Combine(root, "BlindTest");
+                if (Directory.Exists(legacyBlind))
+                {
+                    foreach (string ext in new[] { "ogg", "wav", "mp3" })
+                    {
+                        try
+                        {
+                            trackPaths.AddRange(Directory.GetFiles(legacyBlind, "track*." + ext, SearchOption.TopDirectoryOnly));
+                        }
+                        catch (IOException)
+                        {
+                        }
+                    }
+                }
+            }
+
+            trackPaths.Sort(StringComparer.OrdinalIgnoreCase);
 
             if (trackPaths.Count == 0 && Directory.Exists(root))
             {

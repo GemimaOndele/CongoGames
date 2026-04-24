@@ -53,6 +53,8 @@ namespace CongoGames.Core
         private float timer;
         private float displayedRoundDuration;
         private Coroutine scheduleNextCo;
+        /// <summary>Mots mélangés / mots croisés : ne pas enchaîner le mode suivant tant que les 2 grilles thématiques ne sont pas validées (démo) ; en live, le minuteur peut être dépassé.</summary>
+        private bool gridThematicBlockComplete;
 
         /// <summary>Arg1 = mode quitté (vide si premier lancement), Arg2 = mode entrant — pour brefs overlays de transition.</summary>
         public event Action<string, string> OnModeTransition;
@@ -67,6 +69,25 @@ namespace CongoGames.Core
             displayedRoundDuration = Mathf.Max(0.01f, s);
         }
         public string ActiveModeId => activeMode != null ? activeMode.ModeId : "";
+
+        public void SetGridThematicBlockComplete()
+        {
+            gridThematicBlockComplete = true;
+        }
+
+        /// <summary>Allonge le chrono quand on enchaîne la 2e grille thématique (démo : deux sessions dans le même mode).</summary>
+        public void ExtendModeTime(float extraSeconds)
+        {
+            if (extraSeconds <= 0f) return;
+            timer += extraSeconds;
+            displayedRoundDuration += extraSeconds;
+        }
+
+        public static bool IsGridThematicModeId(string id)
+        {
+            return string.Equals(id, "word-scramble", StringComparison.Ordinal)
+                   || string.Equals(id, "crossword-lite", StringComparison.Ordinal);
+        }
 
         public string ActiveModeDisplayName
         {
@@ -165,6 +186,15 @@ namespace CongoGames.Core
 
             if (timer <= 0f)
             {
+                if (activeMode != null
+                    && IsGridThematicModeId(activeMode.ModeId)
+                    && !gridThematicBlockComplete
+                    && !IsLiveTikTokConnected())
+                {
+                    timer = roundDurationSec;
+                    return;
+                }
+
                 NextMode();
             }
         }
@@ -203,6 +233,11 @@ namespace CongoGames.Core
 
             activeMode?.End();
             activeMode = mode;
+            if (IsGridThematicModeId(modeId))
+            {
+                gridThematicBlockComplete = false;
+            }
+
             float blockDuration = string.Equals(modeId, "quiz", StringComparison.OrdinalIgnoreCase)
                 ? quizSessionDurationSec
                 : roundDurationSec;

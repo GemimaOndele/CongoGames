@@ -7,6 +7,8 @@ Ce guide finalise le flux **backend + WebSocket + TTS + Unity** décrit dans le 
 **Play bloqué (0 erreur dans la Console, message « compiler errors… ») — version d’éditeur, `csc.rsp`, `Editor.log`, nettoyage `Library` :** [UNITY_TROUBLESHOOTING_PLAY.md](UNITY_TROUBLESHOOTING_PLAY.md).
 
 - **Chrono vitesse** : en mode *speed-chrono*, un compte à rebours 3-2-1 indique d’appuyer sur **1, 2, 3 ou 4** (clavier ou pavé) selon la cible affichée ; 3 vagues, score + bonus vitesse, puis passage auto au mode suivant. En **live** le timer principal continue parallèlement.
+- **Mots mélangés / mots cachés** : chaque passage sur ce mode tire un **thème Congo** (géo, nature, langues, etc.) avec **plusieurs mots** sur la même session ; en **démo hors TikTok**, le minuteur de la manche se **recharge** tant que le bloc n’est pas fini (au moins **2 grilles thématiques** à terminer) pour éviter d’enchaîner le mini-jeu suivant trop tôt. *Mots cachés* = grille 7×7 avec mots cachés en **ligne** ou **colonne** (type chasse au mot).
+- **Blind test — musique d’ambiance** : le fond `ThemeMusicPlayer` cherche d’abord `StreamingAssets/Theme/blind-test/track*.`, puis en secours `Theme/BlindTest/track*`, puis `Theme/track*` (playlist enchaînée). Placer ici des **fichiers licenciés** (artistes / labels Congo) ; les URLs « Internet » se configurent côté `remote_media` si tu les héberges toi-même (pas d’extraction auto depuis des services tiers).
 
 ## 0. Tester en local **sans** TikTok
 

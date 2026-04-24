@@ -1,1 +1,7 @@
-Blind test: place .ogg/.mp3/.wav in Theme/BlindTest/ or Theme/ (see MiniGameDemoBanks BlindRound AudioFileBase, AudioUrl).
+Blind test — extraits d’une manche
+--------------------------------
+Place .ogg / .mp3 / .wav in Theme/BlindTest/ or Theme/ (see MiniGameDemoBanks BlindRound AudioFileBase, AudioUrl).
+
+Musique d’ambiance (playlist enchaînée pendant le mode blind)
+-------------------------------------------------------------
+ThemeMusicPlayer charge pour le mode *blind-test* : d’abord Theme/blind-test/track01… puis Theme/BlindTest/track* puis Theme/track*. Tous **droits d’auteur** à ta charge (artistes du Congo, labels, morceaux libres de droit).

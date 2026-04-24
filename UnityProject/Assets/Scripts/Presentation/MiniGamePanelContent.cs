@@ -116,9 +116,141 @@ namespace CongoGames.Presentation
         private int chronoLastRoundPoints;
         private int chronoCountdownIndex;
 
+        [Header("Grilles thématiques (mots mélangés / mots cachés)")]
+        [Tooltip("Démo : 2 manches = 2 grilles thématiques (5–12 mots) avant le prochain mode ; en live, le chrono de la manche continue.")]
+        [SerializeField] private int gridSessionsPerThematicBlock = 2;
+        [SerializeField] private int gridThematicWordCount = 8;
+        private int gridMotsJeuSessionIndex; // 1 = premier mot, …
+        private int gridThematicBlockRound; // 0 = non initialisé, 1 = 1re grille, 2 = 2e…
+        private string currentGridThemeLabel = "";
+        private System.Collections.Generic.List<string> currentGridAllWords;
+        private System.Collections.Generic.HashSet<string> currentGridSolved;
+        [Tooltip("Cible active (mots mélangés + mots cachés) — rétro compatible avec CurrentScrambleAnswer.")]
+        public string CurrentScrambleTargetWord { get; private set; } = "CONGO";
+        [Tooltip("Dernier(s) mots reconnus sur mots cachés (séparateur « · »)")]
+        public string LastCrosswordGuessed { get; private set; } = "";
+        [Tooltip("7×7 (remplissage type chasse aux mots)")]
+        private const int WordSearchSize = 7;
+        private char[,] lastWordSearchGrid;
+        private string lastPopulatedModeId = "";
+
+        private void AdvanceGridMotsJeu()
+        {
+            if (currentGridAllWords == null || currentGridSolved == null) return;
+            for (int i = 0; i < currentGridAllWords.Count; i++)
+            {
+                string w = currentGridAllWords[i];
+                if (string.IsNullOrEmpty(w)) continue;
+                if (currentGridSolved.Contains(w)) continue;
+                CurrentScrambleTargetWord = w;
+                CurrentScrambleAnswer = w;
+                gridMotsJeuSessionIndex = i + 1;
+                if (wordHint != null)
+                {
+                    wordHint.text = "Thème : " + (currentGridThemeLabel ?? "—")
+                        + " — mot " + gridMotsJeuSessionIndex + " / " + currentGridAllWords.Count
+                        + " — " + w.Length + " lettres (réorganise le mot de la ligne jaune, hors lettres leurre).";
+                }
+
+                if (wordAnswerInput != null) wordAnswerInput.text = "";
+                if (crosswordAnswerInput != null) crosswordAnswerInput.text = "";
+                return;
+            }
+        }
+
         private static void MaybeAdvanceMiniGameAfterResponse()
         {
-            GameModeManager.Instance?.ScheduleNextMode(0.45f);
+            GameModeManager gmm = GameModeManager.Instance;
+            if (gmm == null)
+            {
+                return;
+            }
+
+            if (gmm != null
+                && GameModeManager.IsGridThematicModeId(gmm.ActiveModeId)
+                && Instance != null
+                && !Instance.FinishThematicGridIfCompleted())
+            {
+                return;
+            }
+
+            gmm.ScheduleNextMode(0.45f);
+        }
+
+        private void ResetThematicGridState()
+        {
+            gridThematicBlockRound = 0;
+            gridMotsJeuSessionIndex = 0;
+            currentGridThemeLabel = "";
+            currentGridAllWords = null;
+            currentGridSolved = null;
+            LastCrosswordGuessed = "";
+            lastWordSearchGrid = null;
+        }
+
+        private void NewThematicSession()
+        {
+            gridThematicBlockRound++;
+            int n = Mathf.Clamp(gridThematicWordCount, GridThemeBank.MinWords, GridThemeBank.MaxWords);
+            GridThemeBank.DrawSessionWords(out currentGridThemeLabel, out currentGridAllWords, n);
+            currentGridSolved = new System.Collections.Generic.HashSet<string>(StringComparer.Ordinal);
+            gridMotsJeuSessionIndex = 0;
+            LastCrosswordGuessed = "";
+            AdvanceGridMotsJeu();
+        }
+
+        /// <returns>True si le mode peut enchaîner (bloc 2/2 fini, ou mots cachés session complète).</returns>
+        private bool FinishThematicGridIfCompleted()
+        {
+            GameModeManager gmm = GameModeManager.Instance;
+            if (gmm == null) return true;
+            string id = gmm.ActiveModeId;
+            if (string.Equals(id, "word-scramble", StringComparison.Ordinal))
+            {
+                if (currentGridAllWords == null || currentGridSolved == null) return true;
+                if (currentGridSolved.Count < currentGridAllWords.Count)
+                {
+                    AdvanceGridMotsJeu();
+                    BuildWordScrambleForTarget();
+                    gmm.ExtendModeTime(45f);
+                    return false;
+                }
+
+                if (gridThematicBlockRound < gridSessionsPerThematicBlock)
+                {
+                    NewThematicSession();
+                    BuildWordScrambleForTarget();
+                    gmm.ExtendModeTime(60f);
+                    return false;
+                }
+
+                gmm.SetGridThematicBlockComplete();
+                return true;
+            }
+
+            if (string.Equals(id, "crossword-lite", StringComparison.Ordinal))
+            {
+                if (currentGridAllWords == null || currentGridSolved == null) return true;
+                if (currentGridSolved.Count < currentGridAllWords.Count)
+                {
+                    AdvanceGridMotsJeu();
+                    gmm.ExtendModeTime(25f);
+                    return false;
+                }
+
+                if (gridThematicBlockRound < gridSessionsPerThematicBlock)
+                {
+                    NewThematicSession();
+                    BuildWordSearchAndFillGrid();
+                    gmm.ExtendModeTime(60f);
+                    return false;
+                }
+
+                gmm.SetGridThematicBlockComplete();
+                return true;
+            }
+
+            return true;
         }
 
         private static Color CrosswordDecoBg(int row, int col)
@@ -265,6 +397,17 @@ namespace CongoGames.Presentation
                 chronoModeActive = false;
             }
 
+            if (!string.Equals(modeId, lastPopulatedModeId, StringComparison.Ordinal)
+                && (GameModeManager.IsGridThematicModeId(modeId) || GameModeManager.IsGridThematicModeId(lastPopulatedModeId)))
+            {
+                if (GameModeManager.IsGridThematicModeId(modeId))
+                {
+                    ResetThematicGridState();
+                }
+            }
+
+            lastPopulatedModeId = modeId ?? "";
+
             switch (modeId)
             {
                 case "quiz":
@@ -367,15 +510,56 @@ namespace CongoGames.Presentation
 
         private void ApplyWordScrambleDemo()
         {
+            if (currentGridAllWords == null || currentGridSolved == null
+                || (currentGridAllWords != null && currentGridAllWords.Count == 0 && gridThematicBlockRound == 0))
+            {
+                NewThematicSession();
+            }
+
+            if (currentGridAllWords == null || currentGridAllWords.Count == 0)
+            {
+                NewThematicSession();
+            }
+
+            if (string.IsNullOrEmpty((CurrentScrambleTargetWord ?? "").Trim()))
+            {
+                AdvanceGridMotsJeu();
+            }
+
+            if (string.IsNullOrEmpty((CurrentScrambleTargetWord ?? "").Trim()) && currentGridAllWords != null
+                && currentGridAllWords.Count > 0)
+            {
+                CurrentScrambleTargetWord = currentGridAllWords[0];
+                CurrentScrambleAnswer = CurrentScrambleTargetWord;
+            }
+
+            BuildWordScrambleForTarget();
+        }
+
+        private void BuildWordScrambleForTarget()
+        {
             LiveEventClient live = FindAnyObjectByType<LiveEventClient>();
             bool liveMode = live != null && live.IsConnected;
 
-            if (wordScrambleTitle != null) wordScrambleTitle.text = "Mots mélangés — lettres éparses";
+            if (wordScrambleTitle != null)
+            {
+                wordScrambleTitle.text = "Mots mélangés — " + (currentGridThemeLabel ?? "thème Congo")
+                    + " (session " + gridThematicBlockRound + "/" + gridSessionsPerThematicBlock + ", mot "
+                    + gridMotsJeuSessionIndex + "/" + (currentGridAllWords != null ? currentGridAllWords.Count : 0) + ")";
+            }
+
             Font tileFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")
                 ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
-            CurrentScrambleAnswer = MiniGameDemoBanks.NextScrambleWord();
-            int seed = UnityEngine.Random.Range(1, int.MaxValue);
-            string scrambled = ScrambleWord(CurrentScrambleAnswer, seed);
+            string target = (CurrentScrambleTargetWord ?? "CONGO").Trim().ToUpperInvariant();
+            if (string.IsNullOrEmpty(target) && currentGridAllWords != null && currentGridAllWords.Count > 0)
+            {
+                target = currentGridAllWords[0];
+            }
+
+            CurrentScrambleAnswer = target;
+            CurrentScrambleTargetWord = target;
+            int seed = (target + gridThematicBlockRound).GetHashCode() ^ 0x5a5a5a5a;
+            string scrambled = ScrambleWord(target, seed);
             if (wordScrambleLetters != null)
             {
                 wordScrambleLetters.gameObject.SetActive(false);
@@ -447,11 +631,13 @@ namespace CongoGames.Presentation
             if (wordHint != null)
             {
                 int n = (CurrentScrambleAnswer ?? "").Trim().Length;
-                wordHint.text = liveMode
-                    ? "Mode live : le chat compte pour le public — ici tu peux quand même glisser sur la grille (ligne jaune), taper et Valider pour l’animateur / les tests."
-                    : (n > 0
-                        ? "Mot de " + n + " lettres — clique les cases, ou glisse d’une case à l’autre (ligne jaune), ou tape ci-dessous, puis Valider."
-                        : "Glisse sur la grille pour enchaîner des lettres, ou tape dans le champ, puis Valider.");
+                string th = (currentGridThemeLabel ?? "—");
+                if (n > 0)
+                {
+                    wordHint.text = liveMode
+                        ? "Thème : " + th + " — " + n + " lettres, mot " + gridMotsJeuSessionIndex + " / " + (currentGridAllWords != null ? currentGridAllWords.Count : 0) + " (ligne jaune, puis Valider)."
+                        : "Thème : " + th + " — mot " + gridMotsJeuSessionIndex + " / " + (currentGridAllWords != null ? currentGridAllWords.Count : 0) + " — " + n + " lettres (ligne jaune, puis Valider).";
+                }
             }
 
             if (wordScrambleTiles != null)
@@ -544,64 +730,52 @@ namespace CongoGames.Presentation
             return new string(arr);
         }
 
-        private void ApplyCrosswordDemo()
+        private void BuildWordSearchAndFillGrid()
         {
-            LiveEventClient live = FindAnyObjectByType<LiveEventClient>();
-            bool liveMode = live != null && live.IsConnected;
-
-            if (crosswordCells == null || crosswordCells.Length < CrosswordTotalCells)
+            if (currentGridAllWords == null || currentGridAllWords.Count == 0) return;
+            int size = WordSearchSize;
+            var toTry = new System.Collections.Generic.List<string>(currentGridAllWords);
+            char[,] grid = null;
+            for (int attempt = 0; attempt < 12 && toTry.Count >= GridThemeBank.MinWords; attempt++)
             {
-                Debug.LogError("MiniGamePanelContent : crosswordCells non initialisés — vérifie que BuildSecondaryPanels a été exécuté sur ce ModePanelsRoot.");
-                return;
+                if (WordSearchPlacer.TryBuild(size, toTry, 200, out grid))
+                {
+                    break;
+                }
+
+                toTry.Sort((a, b) => (b != null ? b.Length : 0).CompareTo(a != null ? a.Length : 0));
+                if (toTry.Count > GridThemeBank.MinWords) toTry.RemoveAt(0);
             }
 
+            if (grid == null)
+            {
+                toTry = new System.Collections.Generic.List<string>();
+                for (int i = 0; i < currentGridAllWords.Count && i < 5; i++) toTry.Add(currentGridAllWords[i]);
+                WordSearchPlacer.TryBuild(size, toTry, 300, out grid);
+            }
+
+            if (grid == null) return;
+            if (toTry.Count < currentGridAllWords.Count)
+            {
+                currentGridAllWords = toTry;
+                currentGridSolved = new System.Collections.Generic.HashSet<string>(StringComparer.Ordinal);
+                AdvanceGridMotsJeu();
+            }
+
+            lastWordSearchGrid = grid;
+            if (crosswordCells == null || crosswordCells.Length < size * size) return;
             Font fontFallback = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")
                 ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
-            int dead = 0;
-            for (int z = 0; z < crosswordCells.Length; z++)
+            for (int r = 0; r < size; r++)
             {
-                if (crosswordCells[z] == null)
+                for (int c = 0; c < size; c++)
                 {
-                    dead++;
-                }
-            }
-
-            if (dead > 30)
-            {
-                Debug.LogError("MiniGamePanelContent : la grille mots croisés est corrompue (" + dead + " cases nulles).");
-                return;
-            }
-
-            if (crosswordTitle != null)
-            {
-                crosswordTitle.text = "Mots croisés — même lettre en ligne ou en bas, puis Valider";
-            }
-            crosswordSelectedCell = -1;
-            for (int z = 0; z < crosswordCells.Length; z++)
-            {
-                if (crosswordCells[z] != null)
-                {
-                    if (fontFallback != null) crosswordCells[z].font = fontFallback;
-                    crosswordCells[z].text = "";
-                    crosswordCells[z].color = new Color(1f, 0.94f, 0.22f, 1f);
-                }
-            }
-
-            int cols = CrosswordCols;
-            int rows = CrosswordCols;
-            string[] g = new string[cols * rows];
-            const string cons = "BCDFGHJKLMNPQRSTVWXYZ";
-            for (int i = 0; i < g.Length; i++)
-            {
-                g[i] = cons[UnityEngine.Random.Range(0, cons.Length)].ToString();
-            }
-
-            void SetLetter(int r, int c, string ch)
-            {
-                int idx = r * cols + c;
-                if (idx >= 0 && idx < crosswordCells.Length && crosswordCells[idx] != null)
-                {
-                    crosswordCells[idx].text = ch;
+                    int idx = r * CrosswordCols + c;
+                    if (idx < 0 || idx >= crosswordCells.Length || crosswordCells[idx] == null) continue;
+                    if (r >= size || c >= size) continue;
+                    if (fontFallback != null) crosswordCells[idx].font = fontFallback;
+                    char ch = grid[r, c];
+                    crosswordCells[idx].text = ch.ToString();
                     crosswordCells[idx].fontStyle = FontStyle.Bold;
                     crosswordCells[idx].color = new Color(1f, 0.94f, 0.22f, 1f);
                     Transform parent = crosswordCells[idx].transform.parent;
@@ -610,47 +784,60 @@ namespace CongoGames.Presentation
                 }
             }
 
-            string horiz = "CONGO";
-            int hr = 2;
-            for (int k = 0; k < horiz.Length; k++)
+            for (int r = 0; r < CrosswordCols; r++)
             {
-                SetLetter(hr, 1 + k, horiz[k].ToString());
-            }
-
-            SetLetter(hr, 0, "B");
-            SetLetter(hr, horiz.Length + 1, "A");
-
-            string vert = "BANI";
-            int vc = 3;
-            for (int k = 0; k < vert.Length; k++)
-            {
-                SetLetter(k, vc, vert[k].ToString());
-            }
-
-            SetLetter(6, 0, "Z");
-            SetLetter(6, 6, "R");
-
-            for (int r = 0; r < rows; r++)
-            {
-                for (int c = 0; c < cols; c++)
+                for (int c = 0; c < CrosswordCols; c++)
                 {
-                    int idx = r * cols + c;
-                    if (crosswordCells[idx] == null) continue;
-                    if (string.IsNullOrEmpty(crosswordCells[idx].text))
-                    {
-                        SetLetter(r, c, g[idx]);
-                    }
+                    if (r < size && c < size) continue;
+                    int idx = r * CrosswordCols + c;
+                    if (idx < crosswordCells.Length && crosswordCells[idx] != null) crosswordCells[idx].text = "";
                 }
             }
 
             for (int z = 0; z < crosswordCells.Length; z++)
             {
-                if (crosswordCells[z] != null)
-                {
-                    ConfigureGridLetter(crosswordCells[z], CrosswordCellPx);
-                }
+                if (crosswordCells[z] != null) ConfigureGridLetter(crosswordCells[z], CrosswordCellPx);
+            }
+        }
+
+        private void ApplyCrosswordDemo()
+        {
+            if (crosswordCells == null || crosswordCells.Length < CrosswordTotalCells)
+            {
+                Debug.LogError("MiniGamePanelContent : crosswordCells non initialisés — vérifie que BuildSecondaryPanels a été exécuté sur ce ModePanelsRoot.");
+                return;
             }
 
+            if (currentGridAllWords == null || currentGridSolved == null
+                || (currentGridAllWords != null && currentGridAllWords.Count == 0 && gridThematicBlockRound == 0))
+            {
+                NewThematicSession();
+            }
+
+            if (currentGridAllWords == null || currentGridAllWords.Count == 0)
+            {
+                NewThematicSession();
+            }
+
+            if (string.IsNullOrEmpty((CurrentScrambleTargetWord ?? "").Trim()))
+            {
+                AdvanceGridMotsJeu();
+            }
+
+            if (string.IsNullOrEmpty((CurrentScrambleTargetWord ?? "").Trim()) && currentGridAllWords != null
+                && currentGridAllWords.Count > 0)
+            {
+                CurrentScrambleTargetWord = currentGridAllWords[0];
+                CurrentScrambleAnswer = CurrentScrambleTargetWord;
+            }
+
+            if (crosswordTitle != null)
+            {
+                crosswordTitle.text = "Mots cachés (7×7) — " + (currentGridThemeLabel ?? "Congo");
+            }
+
+            crosswordSelectedCell = -1;
+            BuildWordSearchAndFillGrid();
             if (crosswordAnswerInput != null)
             {
                 crosswordAnswerInput.text = "";
@@ -672,7 +859,9 @@ namespace CongoGames.Presentation
 
             if (crosswordFeedback != null)
             {
-                crosswordFeedback.text = "";
+                string t = (CurrentScrambleTargetWord ?? "CONGO").Trim();
+                crosswordFeedback.text = "Trouve un mot caché en ligne ou en colonne (7×7) — tente " + t.Length
+                    + " lettres, mot " + gridMotsJeuSessionIndex + " / " + (currentGridAllWords != null ? currentGridAllWords.Count : 0) + " — thème " + (currentGridThemeLabel ?? "—");
             }
 
             if (crosswordButtons != null)
@@ -1635,36 +1824,52 @@ namespace CongoGames.Presentation
             if (demo.wordAnswerInput == null) return;
             string a = demo.wordAnswerInput.text?.Trim().ToUpperInvariant() ?? "";
             bool hadInput = !string.IsNullOrEmpty(a);
-            string target = (demo.CurrentScrambleAnswer ?? "CONGO").Trim().ToUpperInvariant();
+            string target = (demo.CurrentScrambleTargetWord ?? demo.CurrentScrambleAnswer ?? "CONGO").Trim().ToUpperInvariant();
             bool ok = hadInput && a == target;
             if (demo.wordFeedback != null)
             {
                 demo.wordFeedback.text = !hadInput
-                    ? "Réponse vide — passage au mode suivant."
-                    : (ok ? "Bravo — c’est " + target + " !" : "Pas exact — le mot était « " + target + " ».");
+                    ? "Réponse vide — tape le mot cible puis Valider."
+                    : (ok
+                        ? "Bravo — c’est " + target + " ! (" + (demo.currentGridSolved != null ? demo.currentGridSolved.Count : 0) + "/"
+                        + (demo.currentGridAllWords != null ? demo.currentGridAllWords.Count : 0) + " pour cette grille.)"
+                        : "Pas exact — le mot recherché maintenant : « " + target + " ».");
             }
 
             GameSfxHub.Instance?.PlayResult(ok);
-            MaybeAdvanceMiniGameAfterResponse();
+            if (ok && demo.currentGridSolved != null && !string.IsNullOrEmpty(target))
+            {
+                demo.currentGridSolved.Add(target);
+            }
+
+            if (ok) MaybeAdvanceMiniGameAfterResponse();
         }
 
         private static void OnCrosswordSubmit(MiniGamePanelContent demo)
         {
             if (demo.crosswordAnswerInput == null) return;
-            string a = demo.crosswordAnswerInput.text?.Trim().ToUpperInvariant() ?? "";
+            string a = GridThemeBank.SanitizeForGrid(demo.crosswordAnswerInput.text ?? "");
             bool hadInput = !string.IsNullOrEmpty(a);
-            bool ok = hadInput && (a == "CONGO" || a == "BANI");
+            string target = GridThemeBank.SanitizeForGrid(demo.CurrentScrambleTargetWord ?? demo.CurrentScrambleAnswer ?? "");
+            bool ok = hadInput && a == target;
             if (demo.crosswordFeedback != null)
             {
                 demo.crosswordFeedback.text = !hadInput
-                    ? "Réponse vide — passage au mode suivant."
+                    ? "Écris le mot caché exact (7×7) puis Valider."
                     : (ok
-                        ? "Bravo !"
-                        : "Pas exact — un mot attendu était CONGO ou BANI (regarde les mots en ligne dans la grille).");
+                        ? "Trouvé ! « " + a + " ». (" + (demo.currentGridSolved != null ? demo.currentGridSolved.Count : 0) + "/"
+                        + (demo.currentGridAllWords != null ? demo.currentGridAllWords.Count : 0) + " pour cette session.)"
+                        : "Essaie le mot cible actuel : « " + target + " » (même longueur que les lettres qu’on cherche ici).");
             }
 
             GameSfxHub.Instance?.PlayResult(ok);
-            MaybeAdvanceMiniGameAfterResponse();
+            if (ok)
+            {
+                if (demo.currentGridSolved != null) demo.currentGridSolved.Add(a);
+                demo.LastCrosswordGuessed = string.IsNullOrEmpty(demo.LastCrosswordGuessed) ? a : (demo.LastCrosswordGuessed + " · " + a);
+            }
+
+            if (ok) MaybeAdvanceMiniGameAfterResponse();
         }
 
         private static void OnMysterySubmit(MiniGamePanelContent demo)

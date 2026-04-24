@@ -144,6 +144,8 @@ Document de référence : vision production grande échelle, calibrée sur un **
 ## 9. Design jeu & méta live (TikTok)
 
 - Boucles courtes, récompenses visibles (pseudo, classement).  
+- **Mots sur grille (mots mélangés / mots cachés)** : chaque *session* du mode suit un **thème** (Congo) avec **5 à 12 mots** à enchaîner ; en *mots cachés*, les mots sont disposés en **ligne** ou **colonne** dans une grille 7×7, avec **plusieurs manches thématiques** avant de changer de mini-jeu (démo : au moins **2** grilles par passage sur le mode ; live : chrono hôte, sessions nombreuses, données versionnées).  
+- **Playlist congolaise (blind / ambiance)** : pistes `track01`, `track02`… par dossier `Theme/<modeId>/` + repli `Theme/BlindTest/` ; droits d’auteur explicites (featuring international possible, exception documentée), pas d’ingestion automatique de catalogues commerciaux.  
 - Mécaniques donation / likes **uniquement si conformes** plateforme et légalité locale.  
 - Outils modération : filtres, blocklist, rate limit.
 
