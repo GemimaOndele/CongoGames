@@ -92,7 +92,8 @@ namespace CongoGames.Presentation
 
             if (blindLoop != null)
             {
-                blindLoop.volume = volume * 0.58f * duckMultiplier;
+                // Bus blind un peu plus présent (extrait 30–60 s à écouter).
+                blindLoop.volume = volume * 0.72f * duckMultiplier;
             }
         }
 
@@ -113,13 +114,11 @@ namespace CongoGames.Presentation
             Destroy(drum, 2f);
         }
 
-        /// <summary>
-        /// Lance l’extrait blind : URL https si fournie, sinon fichier Theme/BlindTest/{base} ou Theme/{base}, sinon stub.
-        /// </summary>
         public void PlayBlindDemoMusic(int seed, string streamingFileBase = null, string remoteUrl = null)
         {
             StopBlindDemoMusic();
             if (blindLoop == null) return;
+            blindLoop.loop = true;
             blindMusicCo = StartCoroutine(CoLoadAndPlayBlindMusic(seed, streamingFileBase, remoteUrl));
         }
 
@@ -217,6 +216,7 @@ namespace CongoGames.Presentation
             blindLoopClip = loaded;
             blindLoop.clip = blindLoopClip;
             blindLoop.Play();
+            blindMusicCo = null;
         }
 
         private static AudioType GuessAudioTypeFromUrl(string urlLower)

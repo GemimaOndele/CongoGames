@@ -79,8 +79,37 @@ namespace CongoGames.Presentation
             }
 
             DrawMonumentSilhouette(tex, w, h, groundLine, monument, rng);
+            DrawCongoBrandingStrip(tex, w, h, groundLine, seed);
             tex.Apply(false, true);
             return tex;
+        }
+
+        private static void DrawCongoBrandingStrip(Texture2D tex, int w, int h, int groundLine, int seed)
+        {
+            // Bande drapeau (déco) si l’utilisateur n’a pas encore placé d’image réelle dans Theme/ImageGuess/
+            for (int y = groundLine - 3; y < Mathf.Min(groundLine + 5, h); y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    float t = x / (float)w;
+                    Color c;
+                    if (t < 0.33f)
+                    {
+                        c = new Color(0.12f, 0.52f, 0.24f, 1f);
+                    }
+                    else if (t < 0.66f)
+                    {
+                        c = new Color(0.95f, 0.8f, 0.1f, 1f);
+                    }
+                    else
+                    {
+                        c = new Color(0.82f, 0.12f, 0.15f, 1f);
+                    }
+
+                    float n = Mathf.PerlinNoise(x * 0.03f + seed * 0.01f, y * 0.08f) * 0.06f;
+                    tex.SetPixel(x, y, c + new Color(n, n * 0.5f, n * 0.4f, 0f));
+                }
+            }
         }
 
         private static void DrawMonumentSilhouette(Texture2D tex, int w, int h, int groundLine, Color fill, System.Random rng)

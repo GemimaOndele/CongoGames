@@ -159,7 +159,8 @@ namespace CongoGames.Audio
         public static AudioClip BuildBlindMusicStub(int seed)
         {
             int rate = 44100;
-            float dur = 9.2f;
+            // Boucle assez longue pour un extrait 30–60 s (fichier absent : la source boucle côté AudioSource).
+            float dur = 96f;
             int n = (int)(rate * dur);
             float[] samples = new float[n];
             int h = Mathf.Abs(seed);

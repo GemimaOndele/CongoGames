@@ -23,7 +23,14 @@ namespace CongoGames.Core
             /// <summary>Libellé court pour l’UI (ex. « Artiste / groupe », « Titre / thème »).</summary>
             public readonly string CategoryLabel;
 
-            public BlindRound(string prompt, string[] choices, int correct, string sub, string audioFileBase = null, string audioUrl = null, string categoryLabel = "Blind test")
+            public BlindRound(
+                string prompt,
+                string[] choices,
+                int correct,
+                string sub,
+                string audioFileBase = null,
+                string audioUrl = null,
+                string categoryLabel = "Blind test")
             {
                 Prompt = prompt;
                 Choices = choices;
@@ -59,10 +66,10 @@ namespace CongoGames.Core
                 "track01",
                 null),
             new BlindRound(
-                "Quel chanteur est associé à la rumba et aux scènes congolaises (réf. culture populaire) ?",
-                new[] { "Pépé Kallé (rumba)", "Elvis Presley", "Freddie Mercury", "Céline Dion" },
+                "Dans le pays « Congo » (Brazzaville), le ndombolo vient le plus souvent d’un mix …",
+                new[] { "Guitare, seben, rythme club / ndombolo", "Hipp-hop US pur", "Opéra wagnérien", "Jazz new-orléans" },
                 0,
-                "Indice : Zaïko / rumba.",
+                "Indice : danse de hanches + section rythmique. Ne pas confondre Congo (Brazzaville) et RDC (ex-Zaïre).",
                 "track02",
                 null),
             new BlindRound(
@@ -185,29 +192,51 @@ namespace CongoGames.Core
             public readonly string AnswerKey;
             public readonly int StyleSeed;
             public readonly string StreamingFileBase;
+            public readonly string AltAnswerKey;
+            public readonly string Trivia;
 
-            public ImageGuessRound(string hint, string answerKey, int styleSeed, string streamingFileBase = null)
+            public ImageGuessRound(
+                string hint,
+                string answerKey,
+                int styleSeed,
+                string streamingFileBase = null,
+                string altAnswerKey = null,
+                string trivia = null)
             {
                 Hint = hint;
                 AnswerKey = answerKey.Trim().ToUpperInvariant();
                 StyleSeed = styleSeed;
                 StreamingFileBase = streamingFileBase;
+                AltAnswerKey = string.IsNullOrWhiteSpace(altAnswerKey) ? null : altAnswerKey.Trim().ToUpperInvariant();
+                Trivia = trivia;
             }
         }
 
         private static readonly ImageGuessRound[] ImageGuessRounds =
         {
-            new ImageGuessRound("Capitale sur le fleuve — grande ville au bord de l’eau ?", "BRAZZAVILLE", 1101, "brazzaville"),
-            new ImageGuessRound("Ville côtière, pétrole et port sur l’océan ?", "POINTE NOIRE", 1202, "pointe_noire"),
-            new ImageGuessRound("Grand fleuve qui traverse le pays ?", "CONGO", 1303, "fleuve_congo"),
-            new ImageGuessRound("Grand mammifère des forêts du nord ?", "GORILLE", 1404, "gorille"),
-            new ImageGuessRound("Couleur au centre du drapeau (entre vert et rouge) ?", "JAUNE", 1505, "drapeau"),
-            new ImageGuessRound("Parc du nord connu pour la forêt et les gorilles (un mot) ?", "NOUABALE", 1606, "parc"),
-            new ImageGuessRound("Océan à l’ouest du pays ?", "ATLANTIQUE", 1707, null),
-            new ImageGuessRound("Région sèche au sud du pays (nom court) ?", "POOL", 1808, null),
-            new ImageGuessRound("Département du nord, forêts et eaux (un mot) ?", "LIKOUALA", 1909, null),
-            new ImageGuessRound("Département du nord, rivières Sanga, forêts (un mot) ?", "SANGHA", 2010, null),
-            new ImageGuessRound("Danse de hanches célèbre, nom court, souvent sur TikTok au Congo ?", "NDOMBOLO", 2212, null)
+            new ImageGuessRound(
+                "Capitale politique du pays (Congo) sur le fleuve — quelle ville ? (réponse courte)",
+                "BRAZZAVILLE",
+                1101,
+                "brazzaville",
+                "BRAZZA",
+                "Fête nationale : 15 août (indépendance). Placer un fichier brazzaville.png dans Theme/ImageGuess/."),
+            new ImageGuessRound(
+                "Ville côtière, pétrole, grand port (nom) ?",
+                "POINTE NOIRE",
+                1202,
+                "pointe_noire",
+                "POINTENOIRE",
+                "Ne pas confondre le Congo (capitale Brazzaville) et la RDC (ex-Zaïre, Kinshasa)."),
+            new ImageGuessRound("Grand fleuve (nom) qui baigne Brazzaville ?", "CONGO", 1303, "fleuve_congo", "FLEUVE", null),
+            new ImageGuessRound("Mammifère de forêt du nord (un mot) ? (gorille, éléphant…)", "GORILLE", 1404, "gorille", "ELEPHANT", null),
+            new ImageGuessRound("Bande centrale du drapeau (couleur) ?", "JAUNE", 1505, "drapeau", "JAUNE", null),
+            new ImageGuessRound("Parc du nord, gorilles, forêts (un mot du nom) ?", "NOUABALE", 1606, "parc", "NOUABALENDOKI", null),
+            new ImageGuessRound("Partie du globe à l’ouest de l’Afrique centrale (océan) ?", "ATLANTIQUE", 1707, null, null, null),
+            new ImageGuessRound("Département au sud autour de Brazzaville (un mot) ?", "POOL", 1808, null, "DEPARTEMENT", null),
+            new ImageGuessRound("Département du nord, marécages (un mot) ?", "LIKOUALA", 1909, null, "LIWILI", null),
+            new ImageGuessRound("Département nord, Sanga, forêts (un mot) ?", "SANGHA", 2010, null, "OUANZA", null),
+            new ImageGuessRound("Danse de hanches, nom court, très présente en fête (Congo) ?", "NDOMBOLO", 2212, null, "NDOMBO", null)
         };
 
         private static readonly Queue<int> ImageGuessOrder = new Queue<int>();
@@ -225,7 +254,14 @@ namespace CongoGames.Core
         {
             string u = NormalizeGuess(userInput);
             if (u.Length < 2) return false;
-            string key = NormalizeGuess(r.AnswerKey);
+            if (KeyMatches(r.AnswerKey, u)) return true;
+            if (!string.IsNullOrEmpty(r.AltAnswerKey) && KeyMatches(r.AltAnswerKey, u)) return true;
+            return false;
+        }
+
+        private static bool KeyMatches(string keyRaw, string u)
+        {
+            string key = NormalizeGuess(keyRaw);
             if (u == key) return true;
             if (u.Length >= 4 && (u.Contains(key) || key.Contains(u))) return true;
             return false;
@@ -288,7 +324,14 @@ namespace CongoGames.Core
                 if (order[k] == r.CorrectIndex) newCorrect = k;
             }
 
-            return new BlindRound(r.Prompt, o, newCorrect, r.SubLine, r.AudioFileBase, r.AudioUrl, r.CategoryLabel);
+            return new BlindRound(
+                r.Prompt,
+                o,
+                newCorrect,
+                r.SubLine,
+                r.AudioFileBase,
+                r.AudioUrl,
+                r.CategoryLabel);
         }
 
         private static void RefillBlind()

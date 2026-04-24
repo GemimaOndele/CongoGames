@@ -62,6 +62,16 @@ namespace CongoGames.Presentation
         public Text blindSub;
         public Text blindEmoji;
         public Text[] blindChoices = new Text[4];
+        private Button[] blindChoiceButtons;
+
+        [Tooltip("Pendant l’écoute, les choix A–D sont désactivés ; après la coupure, tu réponds.")]
+        [SerializeField] private float blindListenSeconds = 48f;
+        private bool blindInQuestionPhase;
+        private Coroutine blindListenCo;
+        private Image imageGuessVeil;
+        [SerializeField] private float imageGuessRevealSec = 15f;
+        private Coroutine imageRevealCo;
+        private const float ImageGuessRevealingAlpha = 0.42f;
 
         /// <summary>Mot cible pour la démo mots mélangés (Valider).</summary>
         public string CurrentScrambleAnswer { get; private set; } = "CONGO";
@@ -161,12 +171,25 @@ namespace CongoGames.Presentation
 
         private void OnDestroy()
         {
+            if (blindListenCo != null)
+            {
+                StopCoroutine(blindListenCo);
+                blindListenCo = null;
+            }
+
+            if (imageRevealCo != null)
+            {
+                StopCoroutine(imageRevealCo);
+                imageRevealCo = null;
+            }
+
             if (blindEmojiPulseCo != null)
             {
                 StopCoroutine(blindEmojiPulseCo);
                 blindEmojiPulseCo = null;
             }
 
+            GameSfxHub.Instance?.StopBlindDemoMusic();
             if (Instance == this) Instance = null;
         }
 
@@ -663,6 +686,12 @@ namespace CongoGames.Presentation
 
         private void ApplyBlindDemo()
         {
+            if (blindListenCo != null)
+            {
+                StopCoroutine(blindListenCo);
+                blindListenCo = null;
+            }
+
             if (blindEmojiPulseCo != null)
             {
                 StopCoroutine(blindEmojiPulseCo);
@@ -677,8 +706,10 @@ namespace CongoGames.Presentation
             if (blindPrompt != null) blindPrompt.text = r.Prompt;
             if (blindSub != null)
             {
+                int sec = Mathf.Clamp(Mathf.RoundToInt(blindListenSeconds), 15, 90);
                 blindSub.text = r.SubLine
-                    + "\n▶ L’extrait démarre tout de suite (Theme/BlindTest ou Theme + track01/02, ou URL F10) — écoute puis choisis.";
+                    + "\n▶ Écoute l’extrait " + sec
+                    + " s (fichier : StreamingAssets/Theme/BlindTest/ ou URL dans la banque) — la musique s’arrête, puis seulement tu choisis A–D.";
             }
 
             if (blindEmoji != null)
@@ -695,9 +726,39 @@ namespace CongoGames.Presentation
                 }
             }
 
+            blindInQuestionPhase = false;
+            SetBlindChoicesInteractable(false);
             GameSfxHub.Instance?.PlayBlindDrumCue();
             int musicSeed = (r.Prompt ?? "blind").GetHashCode();
+            float listen = blindListenSeconds < 0.5f ? 0f : blindListenSeconds;
+            blindListenCo = StartCoroutine(CoBlindListenThenQuestion(musicSeed, raw, listen));
+        }
+
+        private void SetBlindChoicesInteractable(bool on)
+        {
+            if (blindChoiceButtons == null) return;
+            foreach (Button b in blindChoiceButtons)
+            {
+                if (b != null) b.interactable = on;
+            }
+        }
+
+        private IEnumerator CoBlindListenThenQuestion(int musicSeed, MiniGameDemoBanks.BlindRound raw, float listen)
+        {
             GameSfxHub.Instance?.PlayBlindDemoMusic(musicSeed, raw.AudioFileBase, raw.AudioUrl);
+            float wait = listen > 0.01f ? listen : 0.35f;
+            yield return new WaitForSecondsRealtime(wait);
+            GameSfxHub.Instance?.StopBlindDemoMusic();
+            blindInQuestionPhase = true;
+            SetBlindChoicesInteractable(true);
+            if (blindSub != null)
+            {
+                blindSub.text = (string.IsNullOrEmpty(raw.SubLine) ? "" : raw.SubLine + "\n")
+                    + "L’écoute est terminée. Choisis A, B, C ou D ci-dessous.";
+            }
+
+            if (blindEmoji != null) blindEmoji.text = "?  Réponds  ?";
+            blindListenCo = null;
         }
 
         private IEnumerator CoPulseBlindEmoji()
@@ -716,6 +777,17 @@ namespace CongoGames.Presentation
 
         public void NotifyBlindPick(int choiceIndex)
         {
+            if (!blindInQuestionPhase)
+            {
+                return;
+            }
+
+            if (blindListenCo != null)
+            {
+                StopCoroutine(blindListenCo);
+                blindListenCo = null;
+            }
+
             if (blindEmojiPulseCo != null)
             {
                 StopCoroutine(blindEmojiPulseCo);
@@ -729,6 +801,8 @@ namespace CongoGames.Presentation
 
             GameSfxHub.Instance?.StopBlindDemoMusic();
             bool ok = choiceIndex == lastBlindCorrectDisplayIndex;
+            blindInQuestionPhase = false;
+            SetBlindChoicesInteractable(false);
             GameSfxHub.Instance?.PlayResult(ok);
             MaybeAdvanceMiniGameAfterResponse();
         }
@@ -1166,11 +1240,20 @@ namespace CongoGames.Presentation
 
         private void ApplyImageDemo()
         {
+            if (imageRevealCo != null)
+            {
+                StopCoroutine(imageRevealCo);
+                imageRevealCo = null;
+            }
+
             CurrentImageGuessRound = MiniGameDemoBanks.NextImageGuessRound();
-            if (imageTitle != null) imageTitle.text = "Devine l’image";
+            if (imageTitle != null) imageTitle.text = "Devine l’image — Congo";
             if (imageCaption != null)
             {
-                imageCaption.text = CurrentImageGuessRound.Hint;
+                string extra = string.IsNullOrEmpty(CurrentImageGuessRound.Trivia)
+                    ? ""
+                    : "\n" + CurrentImageGuessRound.Trivia;
+                imageCaption.text = CurrentImageGuessRound.Hint + extra;
             }
 
             if (imageGuessInput != null)
@@ -1180,6 +1263,7 @@ namespace CongoGames.Presentation
             }
 
             if (imageGuessFeedback != null) imageGuessFeedback.text = "";
+            if (imageGuessSubmit != null) imageGuessSubmit.interactable = false;
 
             if (imagePlaceholder != null)
             {
@@ -1194,8 +1278,100 @@ namespace CongoGames.Presentation
                     CurrentImageGuessRound.StreamingFileBase,
                     CurrentImageGuessRound.StyleSeed);
                 imagePlaceholder.texture = tex;
-                imagePlaceholder.color = Color.white;
+                imagePlaceholder.uvRect = new Rect(0f, 0f, 1f, 1f);
+                imagePlaceholder.color = new Color(1f, 1f, 1f, ImageGuessRevealingAlpha);
+                if (imageGuessVeil == null)
+                {
+                    imageGuessVeil = EnsureImageGuessVeil();
+                }
+
+                if (imageGuessVeil != null)
+                {
+                    imageGuessVeil.color = new Color(0.02f, 0.02f, 0.05f, 0.92f);
+                }
+
+                imageRevealCo = StartCoroutine(CoImageRevealUnblur(imageGuessRevealSec));
             }
+        }
+
+        private Image EnsureImageGuessVeil()
+        {
+            if (imagePlaceholder == null) return null;
+            Transform ph = imagePlaceholder.transform;
+            if (ph.Find("ImageGuessVeil") != null)
+            {
+                return ph.Find("ImageGuessVeil").GetComponent<Image>();
+            }
+
+            GameObject go = new GameObject("ImageGuessVeil");
+            go.transform.SetParent(ph, false);
+            RectTransform r = go.AddComponent<RectTransform>();
+            r.anchorMin = Vector2.zero;
+            r.anchorMax = Vector2.one;
+            r.offsetMin = Vector2.zero;
+            r.offsetMax = Vector2.zero;
+            r.SetAsLastSibling();
+            Image img = go.AddComponent<Image>();
+            img.sprite = White();
+            img.color = new Color(0.02f, 0.02f, 0.05f, 0.92f);
+            img.raycastTarget = false;
+            return img;
+        }
+
+        private IEnumerator CoImageRevealUnblur(float totalSec)
+        {
+            float total = totalSec < 0.2f ? 0.2f : totalSec;
+            float t0 = Time.unscaledTime;
+            if (imageGuessInput != null) imageGuessInput.interactable = false;
+            if (imageGuessSubmit != null) imageGuessSubmit.interactable = false;
+            if (imageCaption != null)
+            {
+                string baseHint = (CurrentImageGuessRound.Hint ?? "") +
+                    (string.IsNullOrEmpty(CurrentImageGuessRound.Trivia) ? "" : "\n" + CurrentImageGuessRound.Trivia);
+                imageCaption.text = "Image floue : devine d’abord, puis l’image se précise. " + baseHint;
+            }
+
+            while (Time.unscaledTime < t0 + total)
+            {
+                float a = (Time.unscaledTime - t0) / total;
+                if (a < 0f) a = 0f;
+                if (a > 1f) a = 1f;
+                float ease = 1f - (1f - a) * (1f - a);
+                if (imagePlaceholder != null)
+                {
+                    imagePlaceholder.color = new Color(1f, 1f, 1f, Mathf.Lerp(ImageGuessRevealingAlpha, 1f, ease));
+                }
+
+                if (imageGuessVeil != null)
+                {
+                    imageGuessVeil.color = new Color(0.02f, 0.02f, 0.05f, 0.92f * (1f - ease));
+                }
+
+                if (a > 0.12f)
+                {
+                    if (imagePlaceholder != null) imagePlaceholder.uvRect = new Rect(0f, 0f, 0.55f + 0.45f * ease, 0.75f + 0.25f * ease);
+                }
+
+                yield return null;
+            }
+
+            if (imagePlaceholder != null)
+            {
+                imagePlaceholder.color = Color.white;
+                imagePlaceholder.uvRect = new Rect(0f, 0f, 1f, 1f);
+            }
+
+            if (imageGuessVeil != null) imageGuessVeil.color = new Color(0.02f, 0.02f, 0.05f, 0f);
+            if (imageGuessInput != null) imageGuessInput.interactable = true;
+            if (imageGuessSubmit != null) imageGuessSubmit.interactable = true;
+            if (imageCaption != null)
+            {
+                string h = (CurrentImageGuessRound.Hint ?? "") +
+                    (string.IsNullOrEmpty(CurrentImageGuessRound.Trivia) ? "" : "\n" + CurrentImageGuessRound.Trivia);
+                imageCaption.text = "Image révélée. " + h;
+            }
+
+            imageRevealCo = null;
         }
 
         private static Transform CreateGridHost(Transform panel, string name, float verticalAnchor01, Vector2 anchoredPosition, Vector2 sizeDelta)
@@ -1383,7 +1559,7 @@ namespace CongoGames.Presentation
             Transform blindHost = CreateGridHost(blind.transform, "BlindEmojiHost", 0.52f, new Vector2(0f, 88f), new Vector2(920f, 140f));
             demo.blindEmoji = BigLettersCentered(blindHost, font, "BEmoji", 58);
             GameObject blindChoicesRoot = CreateRect(blind.transform, "BlindChoicesRoot", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 118f), new Vector2(940f, 240f));
-            demo.blindChoices = BlindChoiceColumn(blindChoicesRoot.transform, font, new Vector2(0f, -20f), 46f, demo);
+            BlindChoiceColumn(blindChoicesRoot.transform, font, new Vector2(0f, -20f), 46f, demo);
 
             GameObject myst = PanelShell(modeRoot, "PanelMystery", "mystery-word", new Color(0.07f, 0.09f, 0.13f, 0.96f), white, surf);
             demo.mysteryTitle = Title(myst.transform, font, "MTitle", "Mot mystère", new Vector2(0f, -30f));
@@ -1511,6 +1687,16 @@ namespace CongoGames.Presentation
 
         private static void OnImageGuessSubmit(MiniGamePanelContent demo)
         {
+            if (demo.imageRevealCo != null)
+            {
+                if (demo.imageGuessFeedback != null)
+                {
+                    demo.imageGuessFeedback.text = "Attends la fin de la révélation (flou → net), puis valide.";
+                }
+
+                return;
+            }
+
             if (demo.imageGuessInput == null) return;
             string t = demo.imageGuessInput.text?.Trim() ?? "";
             if (string.IsNullOrEmpty(t))
@@ -1655,9 +1841,10 @@ namespace CongoGames.Presentation
             return arr;
         }
 
-        private static Text[] BlindChoiceColumn(Transform parent, Font font, Vector2 start, float stepY, MiniGamePanelContent demo)
+        private static void BlindChoiceColumn(Transform parent, Font font, Vector2 start, float stepY, MiniGamePanelContent demo)
         {
             Text[] arr = new Text[4];
+            Button[] btns = new Button[4];
             for (int i = 0; i < 4; i++)
             {
                 GameObject go = CreateRect(parent, "BlindChoice" + i, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), start + new Vector2(0f, -i * stepY), new Vector2(920f, 46f));
@@ -1680,9 +1867,11 @@ namespace CongoGames.Presentation
                 t.color = new Color(0.96f, 0.96f, 0.98f, 1f);
                 t.raycastTarget = false;
                 arr[i] = t;
+                btns[i] = hit;
             }
 
-            return arr;
+            demo.blindChoices = arr;
+            demo.blindChoiceButtons = btns;
         }
 
         private static Button[] MemoryGrid(Transform parent, Font font, Sprite white, float cell = 118f, float gap = 14f)

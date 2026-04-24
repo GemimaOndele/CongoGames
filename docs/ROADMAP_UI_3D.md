@@ -1,6 +1,6 @@
 # Après le MVP (interface « type PS5 / TikTok live »)
 
-Le client actuel est un **HUD 2D** (texte, grilles, sons) branché WebSocket + TTS — c’est volontaire pour valider la boucle live. Un rendu « jeu console 3D » demande **d’autres pipelines** :
+Le client actuel est un **HUD 2D** (texte, grilles, fond animé `SyntheticVideoBackground`, révélation d’image en shader léger) branché WebSocket + TTS — c’est volontaire pour valider la boucle live. Un **rendu « jeu console 3D » complet** (personnages, scène 3D) demande **d’autres pipelines** (assets, rigging) :
 
 - **Modèles 3D** (robot, plateau, public), **éclairage**, **post-process** (URP), **caméras** cinématiques.
 - **Animations** (Timeline, Animator, VFX Shader Graph), **UI** World Space ou mix **Screen Space** + rendu 3D.

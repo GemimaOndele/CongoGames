@@ -12,6 +12,8 @@ Noms attendus par la banque (sans extension, le code essaie .png puis .jpg puis 
   drapeau
   parc
 
-Si un fichier est absent pour une manche, une image de secours est générée automatiquement (ciel + silhouette).
+Si un fichier est absent pour une manche, une image de secours est générée automatiquement (ciel + drapeau déco, pas de photo identifiante : pour un vrai visuel Congo, mets toi un PNG/JPEG local avec licence claire, ex. Wikimedia Commons, et renomme le fichier attendu).
+
+Pendant chaque manche, l’image est d’abord assombrie / recadrée puis se dévoile sur ~15 s (réglage côté Unity sur MiniGamePanelContent).
 
 Après ajout ou modification des fichiers, relance le jeu (Play) pour recharger.
