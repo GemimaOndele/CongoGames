@@ -96,16 +96,59 @@ namespace CongoGames.Core
 
             CreateFlagBadge(topBar.transform);
 
-            Text title = CreateText(canvasGo.transform, "Title", font, 48, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(72f, -40f), new Vector2(0f, 58f));
-            title.fontStyle = FontStyle.Bold;
-            title.color = new Color(1f, 0.92f, 0.2f);
-            title.text = "CONGOGAMES";
+            const float logoMaxH = 86f;
+            const float logoMaxW = 520f;
+            float headerLogoH = 0f;
+            Texture2D logoTex = Resources.Load<Texture2D>("Branding/CongoGameslogo");
+            if (logoTex != null)
+            {
+                float aspect = (float)logoTex.width / Mathf.Max(1, logoTex.height);
+                float lh = logoMaxH;
+                float lw = lh * aspect;
+                if (lw > logoMaxW)
+                {
+                    lw = logoMaxW;
+                    lh = lw / aspect;
+                }
 
-            Text brand = CreateText(canvasGo.transform, "Brand", font, 21, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -90f), new Vector2(0f, 36f));
+                headerLogoH = lh;
+                GameObject logoGo = new GameObject("CongoGamesLogo");
+                logoGo.transform.SetParent(canvasGo.transform, false);
+                RectTransform lrt = logoGo.AddComponent<RectTransform>();
+                lrt.anchorMin = new Vector2(0.5f, 1f);
+                lrt.anchorMax = new Vector2(0.5f, 1f);
+                lrt.pivot = new Vector2(0.5f, 1f);
+                lrt.anchoredPosition = new Vector2(0f, -10f);
+                lrt.sizeDelta = new Vector2(lw, lh);
+                RawImage logoRaw = logoGo.AddComponent<RawImage>();
+                logoRaw.texture = logoTex;
+                logoRaw.uvRect = new Rect(0f, 0f, 1f, 1f);
+                logoRaw.color = Color.white;
+                logoRaw.raycastTarget = false;
+            }
+            else
+            {
+                Text title = CreateText(canvasGo.transform, "Title", font, 48, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(72f, -40f), new Vector2(0f, 58f));
+                title.fontStyle = FontStyle.Bold;
+                title.color = new Color(1f, 0.92f, 0.2f);
+                title.text = "CONGOGAMES";
+                headerLogoH = 58f;
+            }
+
+            // Sous le logo (ou le titre texte) : aligné comme avant quand pas de PNG
+            float brandY = 10f + headerLogoH + 2f + 18f;
+            float modeY = 10f + headerLogoH + 2f + 36f + 8f + 20f;
+            if (logoTex == null)
+            {
+                brandY = 90f;
+                modeY = 122f;
+            }
+
+            Text brand = CreateText(canvasGo.transform, "Brand", font, 21, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -brandY), new Vector2(0f, 36f));
             brand.color = new Color(0.92f, 0.92f, 0.92f, 0.9f);
             brand.text = "Congo · tricolore vert · jaune · rouge · FR · Lingala · Kituba";
 
-            Text modeLabel = CreateText(canvasGo.transform, "ModeLabel", font, 28, TextAnchor.MiddleLeft, new Vector2(0f, 1f), new Vector2(0.48f, 1f), new Vector2(20f, -122f), new Vector2(0f, 40f));
+            Text modeLabel = CreateText(canvasGo.transform, "ModeLabel", font, 28, TextAnchor.MiddleLeft, new Vector2(0f, 1f), new Vector2(0.48f, 1f), new Vector2(20f, -modeY), new Vector2(0f, 40f));
             modeLabel.color = Color.white;
             modeLabel.horizontalOverflow = HorizontalWrapMode.Wrap;
             modeLabel.verticalOverflow = VerticalWrapMode.Overflow;
@@ -305,10 +348,36 @@ namespace CongoGames.Core
             dim.color = new Color(0.02f, 0.04f, 0.08f, 1f);
             dim.raycastTarget = true;
 
-            Text splashTitle = CreateText(splash.transform, "SplashTitle", font, 52, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.58f), new Vector2(0.5f, 0.58f), Vector2.zero, new Vector2(900f, 120f));
-            splashTitle.fontStyle = FontStyle.Bold;
-            splashTitle.color = new Color(1f, 0.92f, 0.2f);
-            splashTitle.text = "CONGOGAMES";
+            const float spMaxH = 200f;
+            const float spMaxW = 720f;
+            Texture2D splashLogo = Resources.Load<Texture2D>("Branding/CongoGameslogo");
+            if (splashLogo != null)
+            {
+                float asp = (float)splashLogo.width / Mathf.Max(1, splashLogo.height);
+                float sh = spMaxH;
+                float sw = sh * asp;
+                if (sw > spMaxW)
+                {
+                    sw = spMaxW;
+                    sh = sw / asp;
+                }
+
+                GameObject splashTitleGo = CreateUiRect(splash.transform, "SplashTitle", new Vector2(0.5f, 0.55f), new Vector2(0.5f, 0.55f), new Vector2(0f, 20f), new Vector2(sw, sh));
+                RectTransform sTrt = splashTitleGo.GetComponent<RectTransform>();
+                sTrt.pivot = new Vector2(0.5f, 0.5f);
+                RawImage spRaw = splashTitleGo.AddComponent<RawImage>();
+                spRaw.texture = splashLogo;
+                spRaw.uvRect = new Rect(0f, 0f, 1f, 1f);
+                spRaw.color = Color.white;
+                spRaw.raycastTarget = false;
+            }
+            else
+            {
+                Text splashTitle = CreateText(splash.transform, "SplashTitle", font, 52, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.58f), new Vector2(0.5f, 0.58f), Vector2.zero, new Vector2(900f, 120f));
+                splashTitle.fontStyle = FontStyle.Bold;
+                splashTitle.color = new Color(1f, 0.92f, 0.2f);
+                splashTitle.text = "CONGOGAMES";
+            }
 
             Text splashSub = CreateText(splash.transform, "SplashSub", font, 22, TextAnchor.UpperCenter, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 40f), new Vector2(800f, 80f));
             splashSub.color = new Color(0.9f, 0.9f, 0.9f, 0.92f);
