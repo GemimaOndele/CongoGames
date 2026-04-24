@@ -2077,6 +2077,22 @@ namespace CongoGames.Presentation
             return t;
         }
 
+        private static Text CreateText(Transform parent, string name, Font font, int fontSize, TextAnchor align,
+            Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, Vector2 sizeDelta)
+        {
+            GameObject go = CreateRect(parent, name, anchorMin, anchorMax, anchoredPosition, sizeDelta);
+            Text t = go.AddComponent<Text>();
+            t.font = font;
+            t.fontSize = fontSize;
+            t.alignment = align;
+            t.color = Color.white;
+            t.raycastTarget = false;
+            t.horizontalOverflow = HorizontalWrapMode.Wrap;
+            t.verticalOverflow = VerticalWrapMode.Overflow;
+            t.text = "";
+            return t;
+        }
+
         private static Text BigLetters(Transform parent, Font font, string name, Vector2 pos, int size)
         {
             GameObject go = CreateRect(parent, name, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), pos, new Vector2(1000f, 120f));
