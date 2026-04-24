@@ -33,6 +33,23 @@ app.use((req, res, next) => {
   next();
 });
 
+// Évite « Cannot GET / » dans l’aperçu Vercel ; l’app Unity utilise /tts, /health, etc.
+app.get("/", (_req, res) => {
+  res
+    .type("html")
+    .send(
+      "<!DOCTYPE html><html lang=fr><head><meta charset=utf-8><title>CongoGames API</title>" +
+        "<style>body{font-family:system-ui,sans-serif;max-width:36rem;margin:2rem auto;padding:0 1rem;line-height:1.5}" +
+        "a{color:#0a6}code{background:#eee;padding:2px 6px;border-radius:4px}</style></head><body>" +
+        "<h1>API CongoGames (backend)</h1>" +
+        "<p>Il n’y a pas d’interface web ici. Points utiles : " +
+        "<a href=\"/health\">/health</a>, " +
+        "<a href=\"/tts/status\">/tts/status</a>, " +
+        "<a href=\"/metrics\">/metrics</a> — " +
+        "POST <code>/tts</code> (TTS, formulaire <code>text=…</code>).</p></body></html>"
+    );
+});
+
 const giftEngine = new GiftEngine(path.join(__dirname, "..", "src", "config", "gift-balance.json"));
 const questionGenerator = new QuestionGenerator(process.env.OPENAI_API_KEY);
 const recentEvents = [];

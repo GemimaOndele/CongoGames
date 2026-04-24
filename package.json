@@ -15,6 +15,7 @@
     "dataset:commons": "node scripts/fetch-commons-assets.mjs",
     "theme:import-youtube": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/fetch-youtube-theme.ps1",
     "webgl:vercel": "npx --yes vercel@latest --prod webgl-site",
-    "webgl:help": "node -e \"console.log('1) Build WebGL dans Unity. 2) .\\\\webgl-site\\\\copy-into-webgl-site.ps1 -SourcePath C:\\\\chemin\\\\vers\\\\build. 3) npm run webgl:vercel')\""
+    "backend:vercel": "node scripts/vercel-backend.mjs",
+    "webgl:help": "node -e \"console.log('WebGL: npm run webgl:vercel. API: npm run backend:vercel (a la racine du depot) si Vercel Root Directory = Backend — pas de vercel depuis C:\\\\Congogame\\\\Backend sinon erreur Backend\\\\Backend. Alternative: vider Root Directory sur le projet API, puis vercel --prod dans Backend.')\""
   }
 }
