@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "deploy:vercel": "vercel --prod",
-    "backend:vercel": "node ../scripts/vercel-backend.mjs"
+    "backend:vercel": "node ../scripts/vercel-backend.mjs",
+    "backend:vercel:env": "node ../scripts/vercel-env-from-dotenv.mjs"
   },
   "dependencies": {
     "audio-decode": "^3.10.1",

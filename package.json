@@ -16,6 +16,7 @@
     "theme:import-youtube": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/fetch-youtube-theme.ps1",
     "webgl:vercel": "npx --yes vercel@latest deploy --prod",
     "backend:vercel": "node scripts/vercel-backend.mjs",
+    "backend:vercel:env": "node scripts/vercel-env-from-dotenv.mjs",
     "webgl:help": "node -e \"console.log('webgl: a la racine du depot: npm run webgl:vercel (pas cd webgl-site: Root Vercel=webgl-site => doublon). API: npm run backend:vercel ou cd Backend && npm run backend:vercel.')\""
   },
   "dependencies": {
