@@ -15,7 +15,7 @@ namespace CongoGames.EditorTools
         [MenuItem("CongoGames/UI/Ajouter RoundVictoryOverlay (scène perso, sans RuntimeBootstrap)", false, MenuOrder)]
         public static void AddOverlayToCurrentScene()
         {
-            RoundVictoryOverlay existing = Object.FindFirstObjectByType<RoundVictoryOverlay>(FindObjectsInactive.Include);
+            RoundVictoryOverlay existing = Object.FindAnyObjectByType<RoundVictoryOverlay>(FindObjectsInactive.Include);
             if (existing != null)
             {
                 if (!EditorUtility.DisplayDialog(
