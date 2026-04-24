@@ -150,7 +150,7 @@ Tu dois voir dans Unity : questions, scores, éventuellement la voix (si `POST /
 
 Ordre suggéré pour avancer sans tout mélanger :
 
-1. **Validation locale** : `start-all` + Unity **Play** + `demo:local` ; parcourir les modes (**1–9**, hors champ texte) et **F10** (barre URL) ; vérifier TTS, chrono, classement, pas d’erreurs rouges dans la Console.
+1. **Validation locale** : `start-all` + Unity **Play** + `demo:local` ; parcourir les modes (**1–9**, hors champ texte) et **F10** (barre URL) ; vérifier TTS, chrono, classement, pas d’erreurs rouges dans la Console. Recette guidée en ~5 min (cases à cocher) : [RECETTE_SMOKE_TEST_5MIN.md](RECETTE_SMOKE_TEST_5MIN.md).
 2. **Polish UI** : lisibilité 1080p, contrastes, réactions SFX/VFX, textes qui ne débordent pas ; noter les écrans à ajuster dans une scène dédiée si tu quittes le bootstrap seul.
 3. **Build Windows** : **File > Build Settings** — ajouter au moins une **scène de démarrage** ; générer un **Standalone** ; smoke test (exe + backend sur la même machine ou URL dans `.env`).
 4. **Prépa TikTok (sans live obligatoire)** : lire `TIKTOK_*` dans `Backend/.env.example` ; quand tu es prêt, tester `start-all:live` dans un environnement isolé ; conformité produit / TikTok hors dépôt.
