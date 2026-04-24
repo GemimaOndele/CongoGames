@@ -16,6 +16,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Vercel : chemin reçu parfois en /api/tts/... — normaliser vers /tts/... pour les routes Express.
+app.use((req, res, next) => {
+  if (typeof req.url === "string" && req.url.startsWith("/api")) {
+    req.url = req.url.replace(/^\/api(\/|$)/, "/") || "/";
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
