@@ -4,13 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { GiftEngine } from "../src/services/giftEngine.js";
 import { QuestionGenerator } from "../src/services/questionGenerator.js";
-import {
-  isTtsConfigured,
-  synthesizeToAudioBase64,
-  isElevenLabsReady
-} from "../src/services/ttsService.js";
-import { isEdgeTtsEnabled } from "../src/services/edgeTtsService.js";
-import { isOpenAiSpeechReady } from "../src/services/openAiSpeechService.js";
+import { isTtsConfigured } from "../src/services/ttsService.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,45 +51,7 @@ app.get("/health", (_req, res) => {
   });
 });
 
-// Unity WebGL (TtsClient.Probe + FetchClip) : exposé comme sur src/server.js
-app.get("/tts/status", (_req, res) => {
-  res.json({
-    ok: true,
-    enabled: isTtsConfigured(),
-    edge: isEdgeTtsEnabled(),
-    elevenLabs: isElevenLabsReady(),
-    openAi: isOpenAiSpeechReady()
-  });
-});
-
-app.post("/tts", async (req, res) => {
-  const text = req.body?.text ?? req.body?.message;
-  if (!text || typeof text !== "string") {
-    return res.status(400).json({ ok: false, error: "text (string) requis" });
-  }
-  if (!isTtsConfigured()) {
-    return res.status(503).json({
-      ok: false,
-      error:
-        "TTS non disponible : active TTS Edge (TTS_EDGE_ENABLED=1 par défaut) ou ajoute OPENAI_API_KEY / ElevenLabs sur Vercel (Variables d’environnement)"
-    });
-  }
-  try {
-    const preferPcm = String(req.body?.prefer_pcm ?? "1") !== "0";
-    const audio = await synthesizeToAudioBase64(text, { preferPcm });
-    res.json({ ok: true, ...audio });
-  } catch (err) {
-    const status = Number(err?.status ?? err?.response?.status);
-    const httpStatus = status === 429 || status === 401 || status === 403 ? status : 502;
-    const message = err?.message || "tts_error";
-    console.error("[tts] POST /tts:", message);
-    res.status(httpStatus).json({
-      ok: false,
-      error: message,
-      code: status === 429 ? "openai_quota" : undefined
-    });
-  }
-});
+// TTS : voir api/tts.js + api/tts/status.js + rewrites vercel.json
 
 app.get("/metrics", (_req, res) => {
   res.json({
