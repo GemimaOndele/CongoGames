@@ -14,8 +14,8 @@
     "smoke:live": "node scripts/smoke-test-live.mjs",
     "dataset:commons": "node scripts/fetch-commons-assets.mjs",
     "theme:import-youtube": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/fetch-youtube-theme.ps1",
-    "webgl:vercel": "npx --yes vercel@latest --prod webgl-site",
+    "webgl:vercel": "npx --yes vercel@latest deploy --prod",
     "backend:vercel": "node scripts/vercel-backend.mjs",
-    "webgl:help": "node -e \"console.log('WebGL: npm run webgl:vercel -> congogames.vercel.app. API: npm run backend:vercel. Si l URL d API directe (rewrites) change, editer webgl-site/vercel.json (destination https://...). Root Directory congogames-backend-cg: vide, deploy depuis le depot avec le script, pas de doublon Backend/Backend.')\""
+    "webgl:help": "node -e \"console.log('webgl: a la racine du depot: npm run webgl:vercel (pas cd webgl-site: Root Vercel=webgl-site => doublon). API: npm run backend:vercel ou cd Backend && npm run backend:vercel.')\""
   }
 }

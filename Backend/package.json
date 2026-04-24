@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "API Node (TTS, events). Déploiement : depuis la racine du dépôt, npm run backend:vercel. URL publique Unity : https://congogames.vercel.app (proxy dans webgl-site/vercel.json). Vercel : projet congogames-backend-cg, Root Directory vide, lien depuis Backend. Erreur Backend\\\\Backend : ne pas lancer vercel dans Backend si le réglage Vercel duplique déjà le dossier.",
+  "description": "API Node (TTS, events). Vercel : congogames-backend-cg, Root Directory Backend. Depuis la racine : npm run backend:vercel ; depuis ce dossier : npm run backend:vercel. URL Unity : https://congogames.vercel.app (proxy, voir webgl-site/vercel.json et vercel.json racine).",
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "deploy:vercel": "vercel --prod"
+    "deploy:vercel": "vercel --prod",
+    "backend:vercel": "node ../scripts/vercel-backend.mjs"
   },
   "dependencies": {
     "audio-decode": "^3.10.1",

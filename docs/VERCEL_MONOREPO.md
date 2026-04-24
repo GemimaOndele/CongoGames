@@ -46,7 +46,7 @@ Puis, dans le **dashboard** Vercel → **congogames** → **Settings** → **Git
 
 Si tu modifies les **rewrites** (URL de l’API) et que les deux `vercel.json` coexistent, **mets-les à jour en parallèle** (`/` et `webgl-site/`) pour éviter la dérive, **ou** ne garde qu’une seule config en fixant le Root Directory côté Vercel.
 
-`npm run webgl:vercel` (racine du repo) continue de cibler le dossier `webgl-site` comme avant pour un déploiement manuel.
+**Déploiement manuel WebGL** : à la **racine** du clone (`npm run webgl:vercel`). Ne pas lancer `vercel` **depuis** le seul dossier `webgl-site` si le réglage Vercel du projet indique déjà **Root Directory = `webgl-site`** (sinon erreur `…\webgl-site\webgl-site`). Le lien `.vercel` à la racine du dépôt cible le projet **congogames** ; le `vercel.json` à la racine sert le build avec `"outputDirectory": "webgl-site"`.
 
 ---
 
