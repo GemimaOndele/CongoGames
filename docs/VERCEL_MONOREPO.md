@@ -60,7 +60,7 @@ Si tu modifies les **rewrites** (URL de l’API) et que les deux `vercel.json` c
 
 Si le build échoue, ouvre le log du déploiement ; souvent : mauvais dossier racine, ou branche qui ne correspond pas.
 
-**Déploiement manuel** (sans Git) : depuis la machine, à la racine du clone : `npm run backend:vercel` (déjà configuré pour lancer Vercel dans `Backend/`).
+**Déploiement manuel** (sans Git) : à la racine du clone : `npm run backend:vercel` (le script lance Vercel **depuis la racine** du monorepo avec `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` lus dans `Backend/.vercel`, pour éviter l’erreur `Backend\Backend` quand le réglage Vercel indique Root = `Backend`).
 
 ---
 
