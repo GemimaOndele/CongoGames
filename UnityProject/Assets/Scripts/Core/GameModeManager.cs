@@ -22,6 +22,9 @@ namespace CongoGames.Core
         [SerializeField] private float quizSessionDurationSec = 180f;
         [Tooltip("Démo locale : touches 1–9 (pavé ou ligne) pour choisir le mini-jeu (si le focus n’est pas dans un champ texte).")]
         [SerializeField] private bool keyboardPickModeInEditor = true;
+        [Tooltip("Démo locale : garde le même mini-jeu en boucle au lieu d'enchaîner la rotation.")]
+        [SerializeField] private bool lockToSingleModeInLocalDemo = false;
+        [SerializeField] private string lockedModeId = "blind-test";
 
         private readonly Dictionary<string, IGameMode> modes = new Dictionary<string, IGameMode>();
         private readonly List<string> modeRotation = new List<string>
@@ -62,6 +65,7 @@ namespace CongoGames.Core
 
         public float RoundDuration => displayedRoundDuration;
         public float RoundTimeRemaining => Mathf.Max(0f, timer);
+        public IReadOnlyList<string> ModeRotation => modeRotation;
 
         public void SetRoundTimeRemaining(float seconds)
         {
@@ -69,6 +73,38 @@ namespace CongoGames.Core
             timer = s;
             displayedRoundDuration = Mathf.Max(0.01f, s);
         }
+
+        public void SetDefaultRoundDuration(float seconds)
+        {
+            roundDurationSec = Mathf.Clamp(seconds, 5f, 3600f);
+            if (activeMode != null && !string.Equals(activeMode.ModeId, "quiz", StringComparison.OrdinalIgnoreCase))
+            {
+                displayedRoundDuration = roundDurationSec;
+                timer = Mathf.Min(timer, roundDurationSec);
+            }
+        }
+
+        public void SetQuizSessionDuration(float seconds)
+        {
+            quizSessionDurationSec = Mathf.Clamp(seconds, 10f, 7200f);
+            if (activeMode != null && string.Equals(activeMode.ModeId, "quiz", StringComparison.OrdinalIgnoreCase))
+            {
+                displayedRoundDuration = quizSessionDurationSec;
+                timer = Mathf.Min(timer, quizSessionDurationSec);
+            }
+        }
+
+        public void SetLocalDemoModeLock(bool enabled, string modeId)
+        {
+            lockToSingleModeInLocalDemo = enabled;
+            if (!string.IsNullOrEmpty(modeId))
+            {
+                lockedModeId = modeId;
+            }
+        }
+
+        public bool IsLocalDemoModeLocked => lockToSingleModeInLocalDemo;
+        public string LockedModeId => lockedModeId ?? "";
         public string ActiveModeId => activeMode != null ? activeMode.ModeId : "";
 
         public void SetGridThematicBlockComplete()
@@ -168,14 +204,16 @@ namespace CongoGames.Core
                 GameObject sel = EventSystem.current.currentSelectedGameObject;
                 if (sel == null || sel.GetComponent<InputField>() == null)
                 {
-                    for (int i = 0; i < modeRotation.Count && i < 9; i++)
+                    if (GameInput.TryGetModeSlotKey0To8Down(out int slot) && slot < modeRotation.Count)
                     {
-                        if (Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
+                        modeIndex = slot;
+                        string selected = modeRotation[slot];
+                        if (lockToSingleModeInLocalDemo)
                         {
-                            modeIndex = i;
-                            StartMode(modeRotation[i]);
-                            return;
+                            lockedModeId = selected;
                         }
+                        StartMode(selected);
+                        return;
                     }
                 }
             }
@@ -196,7 +234,14 @@ namespace CongoGames.Core
                     return;
                 }
 
-                NextMode();
+                if (lockToSingleModeInLocalDemo && !IsLiveTikTokConnected() && !string.IsNullOrEmpty(lockedModeId))
+                {
+                    StartMode(lockedModeId);
+                }
+                else
+                {
+                    NextMode();
+                }
             }
         }
 

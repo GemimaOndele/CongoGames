@@ -1,4 +1,7 @@
 using UnityEngine;
+#if UNITY_WEBGL && !UNITY_EDITOR
+using UnityEngine.InputSystem.EnhancedTouch;
+#endif
 
 namespace CongoGames.Presentation
 {
@@ -11,6 +14,7 @@ namespace CongoGames.Presentation
         private void OnEnable()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
+            EnhancedTouchSupport.Enable();
             WebGlCanvasTuning.RefreshAll();
 #endif
         }
@@ -25,21 +29,22 @@ namespace CongoGames.Presentation
         private void Update()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            if (Input.touchCount != 2)
+            if (Touch.activeTouches.Count != 2)
             {
                 _lastPinchDist = -1f;
                 return;
             }
 
-            UnityEngine.Touch t0 = Input.GetTouch(0);
-            UnityEngine.Touch t1 = Input.GetTouch(1);
-            float d = (t0.position - t1.position).magnitude;
+            UnityEngine.InputSystem.EnhancedTouch.Touch t0 = Touch.activeTouches[0];
+            UnityEngine.InputSystem.EnhancedTouch.Touch t1 = Touch.activeTouches[1];
+            float d = (t0.screenPosition - t1.screenPosition).magnitude;
             if (_lastPinchDist < 0.5f)
             {
-                if (t0.phase == UnityEngine.TouchPhase.Began || t1.phase == UnityEngine.TouchPhase.Began)
+                if (t0.phase == TouchPhase.Began || t1.phase == TouchPhase.Began)
                 {
                     _lastPinchDist = d;
                 }
+
                 return;
             }
 

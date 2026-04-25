@@ -318,13 +318,22 @@ namespace CongoGames.AI
                 || err.IndexOf("quota", StringComparison.OrdinalIgnoreCase) >= 0
                 || err.IndexOf("crédits", StringComparison.OrdinalIgnoreCase) >= 0
                 || err.IndexOf("credits", StringComparison.OrdinalIgnoreCase) >= 0;
+            bool networkReset = err.IndexOf("Connection was reset", StringComparison.OrdinalIgnoreCase) >= 0
+                || err.IndexOf("Recv failure", StringComparison.OrdinalIgnoreCase) >= 0
+                || err.IndexOf("Failed to receive data", StringComparison.OrdinalIgnoreCase) >= 0
+                || err.IndexOf("Curl error 56", StringComparison.OrdinalIgnoreCase) >= 0;
 
             if (quota)
             {
                 ttsSuspendedUntil = Time.unscaledTime + Mathf.Max(30f, ttsQuotaCooldownSec);
             }
+            else if (networkReset)
+            {
+                // Backend local instable : on évite les retries agressifs pendant un court laps de temps.
+                ttsSuspendedUntil = Time.unscaledTime + 120f;
+            }
 
-            string kind = quota ? "quota" : "err";
+            string kind = quota ? "quota" : (networkReset ? "net" : "err");
             if (kind == lastTtsThrottleKey && Time.unscaledTime - lastTtsThrottleTime < 45f)
             {
                 return;
@@ -338,6 +347,12 @@ namespace CongoGames.AI
                 Debug.LogWarning(
                     "CongoGames — quota TTS API dépassé (ex. OpenAI) : la voix est suspendue quelques minutes. " +
                     "En local, le backend peut utiliser le TTS Edge gratuit (voir docs/TTS_LOCAL.md) — le jeu continue avec des bips.");
+            }
+            else if (networkReset)
+            {
+                Debug.LogWarning(
+                    "CongoGames — connexion TTS instable (backend local interrompu/réinitialisé). " +
+                    "Passage temporaire en bip de secours pendant ~2 min, puis reprise auto.");
             }
             else
             {

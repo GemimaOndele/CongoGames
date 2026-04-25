@@ -84,7 +84,7 @@ namespace CongoGames.Presentation
                 return;
             }
 
-            if (Input.GetMouseButtonDown(0) || (Input.touchSupported && Input.touchCount > 0))
+            if (GameInput.AnyPrimaryPointerDown())
             {
                 music.Play();
             }

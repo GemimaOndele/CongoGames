@@ -1,4 +1,5 @@
 using UnityEngine;
+using CongoGames.Core;
 
 namespace CongoGames.Presentation
 {
@@ -14,7 +15,7 @@ namespace CongoGames.Presentation
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F10))
+            if (GameInput.F10Down())
             {
                 visible = !visible;
             }

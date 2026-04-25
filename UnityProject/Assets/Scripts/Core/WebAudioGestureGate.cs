@@ -23,7 +23,7 @@ namespace CongoGames.Core
 
             while (!Unlocked)
             {
-                if (Input.GetMouseButtonDown(0) || (Input.touchSupported && Input.touchCount > 0))
+                if (GameInput.AnyPrimaryPointerDown())
                 {
                     Unlocked = true;
                     yield break;

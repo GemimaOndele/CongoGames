@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using CongoGames.AI;
 using CongoGames.Network;
@@ -71,7 +72,7 @@ namespace CongoGames.Core
 
             GameObject es = new GameObject("EventSystem");
             es.AddComponent<EventSystem>();
-            es.AddComponent<StandaloneInputModule>();
+            es.AddComponent<InputSystemUIInputModule>();
 
             RectTransform canvasRt = canvasGo.GetComponent<RectTransform>();
             canvasRt.anchorMin = Vector2.zero;
@@ -100,8 +101,8 @@ namespace CongoGames.Core
 
             CreateFlagBadge(topBar.transform);
 
-            const float logoMaxH = 80f;
-            const float logoMaxW = 440f;
+            const float logoMaxH = 108f;
+            const float logoMaxW = 560f;
             float headerLogoH = 0f;
             GameObject headerLogoInstance = null;
             Texture2D logoTex = Resources.Load<Texture2D>("Branding/CongoGameslogo");
@@ -150,11 +151,11 @@ namespace CongoGames.Core
                 modeY = 122f;
             }
 
-            Text brand = CreateText(canvasGo.transform, "Brand", font, 21, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -brandY), new Vector2(0f, 36f));
+            Text brand = CreateText(canvasGo.transform, "Brand", font, 24, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -brandY), new Vector2(0f, 42f));
             brand.color = new Color(0.92f, 0.92f, 0.92f, 0.9f);
             brand.text = "Congo · tricolore vert · jaune · rouge · FR · Lingala · Kituba";
 
-            Text modeLabel = CreateText(canvasGo.transform, "ModeLabel", font, 28, TextAnchor.MiddleLeft, new Vector2(0f, 1f), new Vector2(0.36f, 1f), new Vector2(16f, -modeY), new Vector2(0f, 40f));
+            Text modeLabel = CreateText(canvasGo.transform, "ModeLabel", font, 32, TextAnchor.MiddleLeft, new Vector2(0f, 1f), new Vector2(0.42f, 1f), new Vector2(20f, -modeY), new Vector2(0f, 46f));
             modeLabel.color = Color.white;
             modeLabel.horizontalOverflow = HorizontalWrapMode.Wrap;
             modeLabel.verticalOverflow = VerticalWrapMode.Overflow;
@@ -162,12 +163,12 @@ namespace CongoGames.Core
             modeLabel.resizeTextMinSize = 18;
             modeLabel.resizeTextMaxSize = 30;
 
-            // Minuteur : bande haute, à gauche du panneau Classement (aucun chevauchement : fin avant anchor ~0,72)
-            GameObject timerBlock = CreateUiRect(canvasGo.transform, "TimerBlock", new Vector2(0.57f, 0.84f), new Vector2(0.71f, 0.98f), Vector2.zero, Vector2.zero);
+            // Minuteur compact en haut-gauche (zone dédiée), hors contenu des panels.
+            GameObject timerBlock = CreateUiRect(canvasGo.transform, "TimerBlock", new Vector2(0.015f, 0.79f), new Vector2(0.095f, 0.92f), Vector2.zero, Vector2.zero);
             RectTransform timerRt = timerBlock.GetComponent<RectTransform>();
             timerRt.pivot = new Vector2(0.5f, 0.5f);
-            timerRt.offsetMin = new Vector2(3f, 3f);
-            timerRt.offsetMax = new Vector2(-3f, -3f);
+            timerRt.offsetMin = new Vector2(2f, 2f);
+            timerRt.offsetMax = new Vector2(-2f, -2f);
             Image ringBg = timerBlock.AddComponent<Image>();
             ringBg.sprite = GetWhiteSprite();
             ringBg.color = new Color(0.15f, 0.15f, 0.18f, 0.9f);
@@ -182,7 +183,7 @@ namespace CongoGames.Core
             ring.fillAmount = 1f;
             ring.raycastTarget = false;
 
-            Text timerSec = CreateText(timerBlock.transform, "TimerSec", font, 34, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(110f, 60f));
+            Text timerSec = CreateText(timerBlock.transform, "TimerSec", font, 26, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(96f, 56f));
             timerSec.fontStyle = FontStyle.Bold;
             timerSec.color = Color.white;
             if (headerLogoInstance != null)
@@ -190,10 +191,13 @@ namespace CongoGames.Core
                 headerLogoInstance.transform.SetSiblingIndex(timerBlock.transform.GetSiblingIndex() + 1);
             }
 
-            GameObject lbPanel = CreateUiRect(canvasGo.transform, "LeaderboardPanel", new Vector2(0.73f, 0.1f), new Vector2(0.99f, 0.9f), Vector2.zero, Vector2.zero);
+            GameObject lbPanel = CreateUiRect(canvasGo.transform, "LeaderboardPanel", new Vector2(0.73f, 0.12f), new Vector2(0.99f, 0.9f), Vector2.zero, Vector2.zero);
             Image lbBg = lbPanel.AddComponent<Image>();
             lbBg.sprite = GetWhiteSprite();
             lbBg.color = new Color(0.08f, 0.1f, 0.14f, 0.92f);
+            Outline lbOutline = lbPanel.AddComponent<Outline>();
+            lbOutline.effectColor = new Color(0.96f, 0.82f, 0.18f, 0.45f);
+            lbOutline.effectDistance = new Vector2(2f, -2f);
             RectTransform lbPanelRt = lbPanel.GetComponent<RectTransform>();
             lbPanelRt.offsetMin = new Vector2(10f, 10f);
             lbPanelRt.offsetMax = new Vector2(-10f, -10f);
@@ -220,8 +224,8 @@ namespace CongoGames.Core
             LeaderboardUI lbUi = lbPanel.AddComponent<LeaderboardUI>();
             lbUi.BindRuntime(lbBody);
 
-            // Ne pas monter sous ~22 % du haut : laisse le logo / en-tête visibles (évite de recouvrir le centre).
-            GameObject modeRoot = CreateUiRect(canvasGo.transform, "ModePanelsRoot", new Vector2(0.015f, 0.08f), new Vector2(0.70f, 0.78f), Vector2.zero, Vector2.zero);
+            // Zone de jeu agrandie verticalement pour éviter le tassement des éléments.
+            GameObject modeRoot = CreateUiRect(canvasGo.transform, "ModePanelsRoot", new Vector2(0.015f, 0.10f), new Vector2(0.70f, 0.88f), Vector2.zero, Vector2.zero);
             RectTransform modeRootRt = modeRoot.GetComponent<RectTransform>();
             modeRootRt.offsetMin = new Vector2(6f, 6f);
             modeRootRt.offsetMax = new Vector2(-8f, -6f);
@@ -297,10 +301,10 @@ namespace CongoGames.Core
             bsRt.anchorMax = new Vector2(1f, 0f);
             bsRt.pivot = new Vector2(0.5f, 0f);
             bsRt.anchoredPosition = Vector2.zero;
-            bsRt.sizeDelta = new Vector2(0f, 152f);
+            bsRt.sizeDelta = new Vector2(0f, 96f);
             RawImage bsRaw = bottomStripGo.AddComponent<RawImage>();
             bsRaw.raycastTarget = false;
-            bsRaw.color = new Color(0.05f, 0.05f, 0.08f, 0.88f);
+            bsRaw.color = new Color(0.05f, 0.05f, 0.08f, 0.76f);
             BottomThemeVideoStrip bottomStrip = bottomStripGo.AddComponent<BottomThemeVideoStrip>();
             bottomStrip.Bind(bsRaw);
             bottomStripGo.transform.SetSiblingIndex(modeRoot.transform.GetSiblingIndex() + 1);
@@ -553,7 +557,7 @@ namespace CongoGames.Core
 
         private static void CreateFlagBadge(Transform topBar)
         {
-            GameObject holder = CreateUiRect(topBar, "FlagBadge", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(20f, 0f), new Vector2(56f, 40f));
+            GameObject holder = CreateUiRect(topBar, "FlagBadge", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(24f, 0f), new Vector2(88f, 56f));
             holder.transform.SetAsLastSibling();
 
             Color green = new Color(0f, 0.55f, 0.24f, 1f);

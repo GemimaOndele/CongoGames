@@ -151,7 +151,6 @@ namespace CongoGames.Core
                 case "PEKO": return "un peu";
                 case "ZALA": return "être";
                 case "SALUT": return "salut";
-                case "NZOTO": return "corps";
                 case "SANTU": return "saint / sainte (souvent)";
                 case "MUNTU": return "personne / être humain (souvent)";
                 case "BANTU": return "pluriel de muntu (souvent)";

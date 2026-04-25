@@ -281,7 +281,10 @@ namespace CongoGames.Core
                 "Image : parc.png (Nouabalé-Ndoki ou scène forêt équatoriale congolaise, licence autorisée)."),
             new ImageGuessRound(
                 "Océan visible à l’ouest du pays sur la carte côtière : lequel (un mot) ?",
-                "ATLANTIQUE", 1707, "ocean", null, null,
+                "ATLANTIQUE",
+                1707,
+                "ocean",
+                null,
                 "Image optionnelle ocean.png (côte, barrière de corail, ou cartographie)."),
             new ImageGuessRound(
                 "Carte / relief : département au sud autour de la région de la capitale (un mot) ?",
@@ -422,22 +425,28 @@ namespace CongoGames.Core
             {
                 BlindPlaylistMetaFile f = JsonUtility.FromJson<BlindPlaylistMetaFile>(ta.text);
                 if (f?.items == null || f.items.Length == 0) return;
-                var titles = f.items
-                    .Select(x => x != null && !string.IsNullOrEmpty(x.title) ? x.title.Trim() : null)
+                var normalized = f.items
+                    .Where(x => x != null && !string.IsNullOrEmpty(x.fileBase))
+                    .Select(NormalizeBlindMetaItem)
+                    .Where(x => x.HasValue)
+                    .Select(x => x.Value)
+                    .ToList();
+                if (normalized.Count == 0) return;
+                var titles = normalized
+                    .Select(x => x.title)
                     .Where(x => !string.IsNullOrEmpty(x))
                     .Distinct()
                     .ToList();
-                var artists = f.items
-                    .Select(x => x != null && !string.IsNullOrEmpty(x.artist) ? x.artist.Trim() : null)
+                var artists = normalized
+                    .Select(x => x.artist)
                     .Where(x => !string.IsNullOrEmpty(x))
                     .Distinct()
                     .ToList();
                 if (titles.Count < 1 || artists.Count < 1) return;
-                foreach (BlindMetaItem it in f.items)
+                foreach (var it in normalized)
                 {
-                    if (it == null || string.IsNullOrEmpty(it.fileBase)) continue;
-                    string t = (it.title ?? "").Trim();
-                    string a = (it.artist ?? "").Trim();
+                    string t = it.title;
+                    string a = it.artist;
                     if (t.Length < 1 || a.Length < 1) continue;
                     string[] tChoices = BuildFourUniques(t, titles);
                     int ti = System.Array.IndexOf(tChoices, t);
@@ -446,8 +455,8 @@ namespace CongoGames.Core
                         "Après l’extrait (~1 min), quel est le titre de ce morceau ?",
                         tChoices,
                         ti,
-                        "Indice : le nom de fichier ressemble souvent à « Artiste - Titre ».",
-                        it.fileBase.Trim(),
+                        "Indice : le nom de fichier suit en général « Artiste - Titre ».",
+                        it.fileBase,
                         null,
                         "Titre (playlist)"));
                     string[] aChoices = BuildFourUniques(a, artists);
@@ -457,8 +466,8 @@ namespace CongoGames.Core
                         "Après l’extrait, qui interprète ce morceau (artiste ou groupe) ?",
                         aChoices,
                         ai,
-                        "Indice : l’artiste est souvent la première partie du nom de fichier.",
-                        it.fileBase.Trim(),
+                        "Indice : l’artiste est en général placé avant le tiret.",
+                        it.fileBase,
                         null,
                         "Artiste (playlist)"));
                 }
@@ -466,6 +475,58 @@ namespace CongoGames.Core
             catch (Exception e)
             {
                 Debug.LogWarning("blind_playlist_meta : " + e.Message);
+            }
+        }
+
+        private static (string fileBase, string artist, string title)? NormalizeBlindMetaItem(BlindMetaItem item)
+        {
+            if (item == null || string.IsNullOrWhiteSpace(item.fileBase))
+            {
+                return null;
+            }
+
+            string fileBase = item.fileBase.Trim();
+            string artist = string.IsNullOrWhiteSpace(item.artist) ? null : item.artist.Trim();
+            string title = string.IsNullOrWhiteSpace(item.title) ? null : item.title.Trim();
+
+            if (string.IsNullOrEmpty(artist) || string.IsNullOrEmpty(title))
+            {
+                ParseArtistTitleFromFileBase(fileBase, out string parsedArtist, out string parsedTitle);
+                if (string.IsNullOrEmpty(artist)) artist = parsedArtist;
+                if (string.IsNullOrEmpty(title)) title = parsedTitle;
+            }
+
+            if (string.IsNullOrEmpty(artist) || string.IsNullOrEmpty(title))
+            {
+                return null;
+            }
+
+            return (fileBase, artist, title);
+        }
+
+        private static void ParseArtistTitleFromFileBase(string fileBase, out string artist, out string title)
+        {
+            artist = null;
+            title = null;
+            if (string.IsNullOrWhiteSpace(fileBase))
+            {
+                return;
+            }
+
+            string cleaned = fileBase.Trim().Replace('_', ' ');
+            int sep = cleaned.IndexOf(" - ", StringComparison.Ordinal);
+            if (sep < 0) sep = cleaned.IndexOf('-', StringComparison.Ordinal);
+            if (sep <= 0 || sep >= cleaned.Length - 1)
+            {
+                return;
+            }
+
+            artist = cleaned.Substring(0, sep).Trim();
+            title = cleaned.Substring(sep + (cleaned[sep] == '-' ? 1 : 3)).Trim();
+            if (string.IsNullOrEmpty(artist) || string.IsNullOrEmpty(title))
+            {
+                artist = null;
+                title = null;
             }
         }
 
