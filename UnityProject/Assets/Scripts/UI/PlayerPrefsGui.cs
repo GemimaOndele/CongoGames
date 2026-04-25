@@ -67,7 +67,17 @@ namespace CongoGames.UI
 
         private void OnGUI()
         {
-            if (!show) return;
+            if (!show)
+            {
+                float btnW = 170f;
+                float btnH = 30f;
+                Rect quick = new Rect(Screen.width - btnW - 12f, Screen.height - btnH - 12f, btnW, btnH);
+                if (GUI.Button(quick, "Tests rapides (F9)"))
+                {
+                    show = true;
+                }
+                return;
+            }
             LiveEventClient c = Object.FindAnyObjectByType<LiveEventClient>();
             if (c != null && c.IsConnected)
             {

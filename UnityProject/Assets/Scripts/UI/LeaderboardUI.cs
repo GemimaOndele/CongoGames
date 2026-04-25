@@ -48,19 +48,25 @@ namespace CongoGames.UI
             if (leaderboardText == null) return;
             var sb = new StringBuilder();
             string today = DateTime.Now.ToString("d MMM yy", CultureInfo.GetCultureInfo("fr-FR"));
+            bool portrait = Screen.height > Screen.width;
             sb.Append(today).Append(" · ");
             int n = ScoreManager.Instance != null ? ScoreManager.Instance.GetRegisteredPlayerCount() : players.Count;
             sb.Append(n).Append(" joueur(s)\n");
-            sb.Append("Session: ").Append(ScoreHistoryStore.BuildSummaryLine()).Append("\n");
-            sb.Append("────────────────\n");
-            for (int i = 0; i < players.Count; i++)
+            if (!portrait)
+            {
+                sb.Append("Session: ").Append(ScoreHistoryStore.BuildSummaryLine()).Append("\n");
+                sb.Append("────────────────\n");
+            }
+
+            int maxRows = portrait ? 3 : players.Count;
+            for (int i = 0; i < players.Count && i < maxRows; i++)
             {
                 string u = players[i].Username;
                 if (string.IsNullOrEmpty(u)) u = "Joueur";
-                if (u.Length > 15) u = u.Substring(0, 14) + "…";
+                if (u.Length > (portrait ? 10 : 15)) u = u.Substring(0, portrait ? 9 : 14) + "…";
                 string rank = (i + 1).ToString("00");
-                string score = players[i].Score.ToString(CultureInfo.InvariantCulture).PadLeft(4, ' ');
-                sb.Append('#').Append(rank).Append("  ").Append(u.PadRight(16, ' ')).Append(score).Append('\n');
+                string score = players[i].Score.ToString(CultureInfo.InvariantCulture).PadLeft(portrait ? 3 : 4, ' ');
+                sb.Append('#').Append(rank).Append("  ").Append(u.PadRight(portrait ? 11 : 16, ' ')).Append(score).Append('\n');
             }
 
             leaderboardText.text = sb.ToString();

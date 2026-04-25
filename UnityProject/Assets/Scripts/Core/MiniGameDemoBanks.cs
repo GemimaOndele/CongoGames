@@ -229,6 +229,8 @@ namespace CongoGames.Core
             public readonly string StreamingFileBase;
             public readonly string AltAnswerKey;
             public readonly string Trivia;
+            public readonly string AudioFileBase;
+            public readonly string AudioUrl;
 
             public ImageGuessRound(
                 string hint,
@@ -236,7 +238,9 @@ namespace CongoGames.Core
                 int styleSeed,
                 string streamingFileBase = null,
                 string altAnswerKey = null,
-                string trivia = null)
+                string trivia = null,
+                string audioFileBase = null,
+                string audioUrl = null)
             {
                 Hint = hint;
                 AnswerKey = answerKey.Trim().ToUpperInvariant();
@@ -244,6 +248,8 @@ namespace CongoGames.Core
                 StreamingFileBase = streamingFileBase;
                 AltAnswerKey = string.IsNullOrWhiteSpace(altAnswerKey) ? null : altAnswerKey.Trim().ToUpperInvariant();
                 Trivia = trivia;
+                AudioFileBase = string.IsNullOrWhiteSpace(audioFileBase) ? null : audioFileBase.Trim();
+                AudioUrl = string.IsNullOrWhiteSpace(audioUrl) ? null : audioUrl.Trim();
             }
         }
 
@@ -346,6 +352,8 @@ namespace CongoGames.Core
             public string streamingFileBase;
             public string altAnswerKey;
             public string trivia;
+            public string audioFileBase;
+            public string audioUrl;
         }
 
         private static BlindRound[] GetBlindRoundsMerged()
@@ -416,6 +424,58 @@ namespace CongoGames.Core
             public string title;
         }
 
+        private static readonly string[] ArtistTrapChoices =
+        {
+            "Daft Punk",
+            "Taylor Swift",
+            "Eminem",
+            "Ariana Grande",
+            "Bad Bunny",
+            "The Weeknd"
+        };
+
+        private static readonly string[] TitleTrapChoices =
+        {
+            "Smells Like Teen Spirit",
+            "Shape of You",
+            "Bohemian Rhapsody",
+            "Billie Jean",
+            "Gangnam Style",
+            "Despacito"
+        };
+
+        private static readonly string[] ArtistTrapClassique =
+        {
+            "Franco Luambo",
+            "Tabu Ley Rochereau",
+            "Miriam Makeba",
+            "Salif Keita"
+        };
+
+        private static readonly string[] ArtistTrapModerne =
+        {
+            "Fally Ipupa",
+            "Davido",
+            "Burna Boy",
+            "Aya Nakamura"
+        };
+
+        private static readonly string[] TitleTrapClassique =
+        {
+            "Independance Cha Cha",
+            "Mario",
+            "Sodade",
+            "Yeke Yeke"
+        };
+
+        private static readonly string[] TitleTrapModerne =
+        {
+            "Djadja",
+            "Calm Down",
+            "Mon Soleil",
+            "Jerusalema"
+        };
+
         private static void AppendBlindRoundsFromPlaylistMeta(List<BlindRound> list)
         {
             if (list == null) return;
@@ -445,10 +505,13 @@ namespace CongoGames.Core
                 if (titles.Count < 1 || artists.Count < 1) return;
                 foreach (var it in normalized)
                 {
-                    string t = it.title;
-                    string a = it.artist;
+                    string t = NormalizeTitleDisplay(it.title);
+                    string a = NormalizeArtistDisplay(it.artist);
                     if (t.Length < 1 || a.Length < 1) continue;
-                    string[] tChoices = BuildFourUniques(t, titles);
+                    bool classic = IsClassicArtist(a);
+                    string[] tChoices = BuildFourUniques(t, titles, MergeTrapChoices(
+                        TitleTrapChoices,
+                        classic ? TitleTrapClassique : TitleTrapModerne));
                     int ti = System.Array.IndexOf(tChoices, t);
                     if (ti < 0) ti = 0;
                     list.Add(new BlindRound(
@@ -458,8 +521,10 @@ namespace CongoGames.Core
                         "Indice : le nom de fichier suit en général « Artiste - Titre ».",
                         it.fileBase,
                         null,
-                        "Titre (playlist)"));
-                    string[] aChoices = BuildFourUniques(a, artists);
+                        classic ? "Titre (playlist • classique)" : "Titre (playlist • moderne)"));
+                    string[] aChoices = BuildFourUniques(a, artists, MergeTrapChoices(
+                        ArtistTrapChoices,
+                        classic ? ArtistTrapClassique : ArtistTrapModerne));
                     int ai = System.Array.IndexOf(aChoices, a);
                     if (ai < 0) ai = 0;
                     list.Add(new BlindRound(
@@ -469,13 +534,33 @@ namespace CongoGames.Core
                         "Indice : l’artiste est en général placé avant le tiret.",
                         it.fileBase,
                         null,
-                        "Artiste (playlist)"));
+                        classic ? "Artiste (playlist • classique)" : "Artiste (playlist • moderne)"));
                 }
             }
             catch (Exception e)
             {
                 Debug.LogWarning("blind_playlist_meta : " + e.Message);
             }
+        }
+
+        private static bool IsClassicArtist(string artist)
+        {
+            string a = (artist ?? "").ToLowerInvariant();
+            return a.Contains("casimir zao")
+                || a.Contains("franklin boukaka")
+                || a.Contains("bantous")
+                || a.Contains("pamelo")
+                || a.Contains("pierrette adams")
+                || a.Contains("pierre moutouari")
+                || a.Contains("youlou mabiala");
+        }
+
+        private static IReadOnlyList<string> MergeTrapChoices(IReadOnlyList<string> a, IReadOnlyList<string> b)
+        {
+            var list = new List<string>();
+            if (a != null) list.AddRange(a);
+            if (b != null) list.AddRange(b);
+            return list;
         }
 
         private static (string fileBase, string artist, string title)? NormalizeBlindMetaItem(BlindMetaItem item)
@@ -501,6 +586,8 @@ namespace CongoGames.Core
                 return null;
             }
 
+            artist = NormalizeArtistDisplay(artist);
+            title = NormalizeTitleDisplay(title);
             return (fileBase, artist, title);
         }
 
@@ -530,13 +617,25 @@ namespace CongoGames.Core
             }
         }
 
-        private static string[] BuildFourUniques(string correct, List<string> pool)
+        private static string[] BuildFourUniques(string correct, List<string> pool, IReadOnlyList<string> traps)
         {
             if (string.IsNullOrEmpty(correct)) correct = "?";
             List<string> wrong = pool
                 .Where(s => s != null && s != correct)
                 .Distinct()
                 .ToList();
+            if (traps != null)
+            {
+                foreach (string trap in traps)
+                {
+                    if (!string.IsNullOrWhiteSpace(trap) && trap != correct)
+                    {
+                        wrong.Add(trap.Trim());
+                    }
+                }
+            }
+
+            wrong = wrong.Distinct().ToList();
             for (int i = wrong.Count - 1; i > 0; i--)
             {
                 int j = Random.Range(0, i + 1);
@@ -548,6 +647,36 @@ namespace CongoGames.Core
             int pad = 0;
             while (pick.Count < 4) pick.Add("— (autre morceau) " + (++pad));
             return pick.Take(4).ToArray();
+        }
+
+        private static string NormalizeArtistDisplay(string raw)
+        {
+            string s = (raw ?? "").Trim();
+            if (s.Length == 0) return "";
+            int p = s.IndexOf('(');
+            if (p > 0) s = s.Substring(0, p).Trim();
+            string low = s.ToLowerInvariant();
+            string[] markers = { " feat ", " ft ", " x ", " & ", "," };
+            int cut = -1;
+            foreach (string m in markers)
+            {
+                int k = low.IndexOf(m, StringComparison.Ordinal);
+                if (k > 1 && (cut < 0 || k < cut)) cut = k;
+            }
+
+            if (cut > 1) s = s.Substring(0, cut).Trim();
+            if (s.Length > 36) s = s.Substring(0, 35).TrimEnd() + "…";
+            return s;
+        }
+
+        private static string NormalizeTitleDisplay(string raw)
+        {
+            string s = (raw ?? "").Trim();
+            if (s.Length == 0) return "";
+            int p = s.IndexOf('(');
+            if (p > 0) s = s.Substring(0, p).Trim();
+            if (s.Length > 44) s = s.Substring(0, 43).TrimEnd() + "…";
+            return s;
         }
 
         private static void AppendBlindExtrasFromJsonString(List<BlindRound> list, string json)
@@ -651,7 +780,9 @@ namespace CongoGames.Core
                     row.styleSeed,
                     row.streamingFileBase,
                     row.altAnswerKey,
-                    row.trivia));
+                    row.trivia,
+                    row.audioFileBase,
+                    row.audioUrl));
             }
         }
 

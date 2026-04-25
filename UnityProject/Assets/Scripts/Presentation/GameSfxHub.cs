@@ -217,6 +217,7 @@ namespace CongoGames.Presentation
                     string[] rootFolders =
                     {
                         Path.Combine(Application.streamingAssetsPath, "Theme", "BlindTest"),
+                        Path.Combine(Application.streamingAssetsPath, "Theme", "playlist"),
                         Path.Combine(Application.streamingAssetsPath, "Theme")
                     };
                     foreach (string root in rootFolders)

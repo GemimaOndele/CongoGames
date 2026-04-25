@@ -177,6 +177,11 @@ namespace CongoGames.AI
 
             while (speechQueue.Count > 0)
             {
+                if (!ttsAvailable && Time.unscaledTime >= ttsSuspendedUntil)
+                {
+                    yield return ReprobeTts();
+                }
+
                 string line = speechQueue.Dequeue();
                 bool playedAudio = false;
 
@@ -333,7 +338,8 @@ namespace CongoGames.AI
             else if (networkReset)
             {
                 // Backend local instable : on évite les retries agressifs pendant un court laps de temps.
-                ttsSuspendedUntil = Time.unscaledTime + 120f;
+                ttsSuspendedUntil = Time.unscaledTime + 300f;
+                ttsAvailable = false;
             }
 
             string kind = quota ? "quota" : (networkReset ? "net" : "err");
@@ -353,9 +359,12 @@ namespace CongoGames.AI
             }
             else if (networkReset)
             {
-                Debug.LogWarning(
-                    "CongoGames — connexion TTS instable (backend local interrompu/réinitialisé). " +
-                    "Passage temporaire en bip de secours pendant ~2 min, puis reprise auto.");
+                if (logHostLinesToConsole)
+                {
+                    Debug.Log(
+                        "CongoGames — connexion TTS instable (backend local interrompu/réinitialisé). " +
+                        "Passage temporaire en bip de secours pendant ~5 min, puis reprise auto.");
+                }
             }
             else
             {

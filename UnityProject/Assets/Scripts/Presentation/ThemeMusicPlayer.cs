@@ -134,6 +134,12 @@ namespace CongoGames.Presentation
             yield return WebGlStreamingPrewarm.CoRunOnce();
             yield return TikTokGiftModeRegistry.CoPrewarmIfWebGl();
             yield return WebAudioGestureGate.CoWaitForUnlock();
+            // Image Guess: la musique de manche est pilotée par MiniGamePanelContent
+            // uniquement quand l'image affichée possède un lien audio explicite.
+            if (string.Equals(modeId, "image-guess", StringComparison.OrdinalIgnoreCase))
+            {
+                yield break;
+            }
             RemoteModeMediaEntry remote = RemoteThemeMediaConfig.Resolve(modeId);
             string bottomU = (remote.bottomVideoUrl ?? "").Trim();
             bool bottomProvidesAudio = !string.IsNullOrEmpty(bottomU) && !StreamingMediaUrlPolicy.IsNonStreamableContentPageUrl(bottomU);

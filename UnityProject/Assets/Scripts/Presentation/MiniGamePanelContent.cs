@@ -46,6 +46,49 @@ namespace CongoGames.Presentation
 
         /// <summary>Mot attendu pour la démo « associations » (sans l’afficher si faux).</summary>
         public string CurrentSemanticTarget { get; private set; } = "CON";
+        private int semanticRoundCursor = -1;
+
+        private readonly struct SemanticRound
+        {
+            public readonly string Target;
+            public readonly string Theme;
+            public readonly string Prompt;
+            public readonly string[] Decoys;
+
+            public SemanticRound(string target, string theme, string prompt, params string[] decoys)
+            {
+                Target = (target ?? "").Trim().ToUpperInvariant();
+                Theme = (theme ?? "").Trim();
+                Prompt = (prompt ?? "").Trim();
+                Decoys = decoys ?? Array.Empty<string>();
+            }
+        }
+
+        private static readonly SemanticRound[] SemanticRounds =
+        {
+            new SemanticRound("CONGO", "Culture Congo", "Trouve le mot lié au pays.", "RUMBA", "MBOTE", "FLEUVE"),
+            new SemanticRound("RUMBA", "Musique", "Mot-clé d’un style musical congolais.", "NGOMA", "DANSE", "SEBEN"),
+            new SemanticRound("MBOTE", "Langues", "Salutation très connue en lingala.", "MALAMU", "BISO", "MWANA"),
+            new SemanticRound("SANGHA", "Géographie", "Département/zone forestière du nord.", "POOL", "NIARI", "LEFINI"),
+            new SemanticRound("BRAZA", "Villes", "Abréviation courante de la capitale.", "KINTELE", "POINTE", "LOANGO"),
+            new SemanticRound("NDOMBO", "Danse", "Forme courte associée à ndombolo.", "SEBEN", "CHANT", "FETE"),
+            new SemanticRound("LIKOUA", "Nature", "Forme courte inspirée de Likouala.", "SANGHA", "OCEAN", "FAUNE"),
+            new SemanticRound("KITUBA", "Langues", "Deuxième langue nationale souvent citée.", "LINGALA", "LARI", "MBOCHI"),
+            new SemanticRound("SEBEN", "Musique", "Phase instrumentale/rythmique en rumba.", "RUMBA", "NGOMA", "DANSE"),
+            new SemanticRound("LOANGO", "Histoire", "Nom lié à l’histoire régionale côtière.", "KOUILOU", "NOIRE", "BANIO")
+        };
+
+        private static readonly Dictionary<string, string> MysteryHints = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "CONGO", "Pays au centre du jeu et des thèmes." },
+            { "RUMBA", "Style musical majeur d’Afrique centrale." },
+            { "KINTELE", "Toponyme souvent cité autour de la capitale." },
+            { "NGOMA", "Mot lié au rythme, au chant et à la danse." },
+            { "MBOTE", "Salutation courante en lingala." },
+            { "SANZA", "Mot culturel lié à la musique traditionnelle." },
+            { "LIKOUALA", "Zone/département du nord du pays." },
+            { "NDOMBOLO", "Danse/musique populaire contemporaine." }
+        };
 
         [Header("Mots — historique (grilles)")]
         [Tooltip("Liste des mots déjà validés (mots mélangés).")]
@@ -102,7 +145,7 @@ namespace CongoGames.Presentation
         public Text memoryTitle;
         public Text memorySubtitle;
         public Button[] memoryCards = new Button[8];
-        private readonly string[] memoryPairLetters = { "A", "A", "B", "B", "C", "C", "D", "D" };
+        private readonly string[] memoryPairLetters = { "CO", "CO", "NG", "NG", "MB", "MB", "RU", "RU" };
         private readonly bool[] memoryCardMatched = new bool[8];
         private int memorySeed;
         private int memoryFirstPickIndex = -1;
@@ -448,6 +491,12 @@ namespace CongoGames.Presentation
 
         public void Populate(string modeId)
         {
+            if (!string.Equals(modeId, "blind-test", StringComparison.Ordinal)
+                && !string.Equals(modeId, "image-guess", StringComparison.Ordinal))
+            {
+                GameSfxHub.Instance?.StopBlindDemoMusic();
+            }
+
             if (!string.Equals(modeId, "speed-chrono", StringComparison.OrdinalIgnoreCase))
             {
                 chronoModeActive = false;
@@ -499,19 +548,15 @@ namespace CongoGames.Presentation
         {
             LiveEventClient live = FindAnyObjectByType<LiveEventClient>();
             bool liveMode = live != null && live.IsConnected;
-            CurrentSemanticTarget = "CON";
+            SemanticRound round = NextSemanticRound();
+            CurrentSemanticTarget = round.Target;
 
             if (semanticTitle != null)
             {
-                semanticTitle.text = "Associations — lettres uniquement (démo)";
+                semanticTitle.text = "Associations — " + round.Theme;
             }
 
-            string[] cells =
-            {
-                "C", "O", "N",
-                "G", "O", "H",
-                "R", "I", "V"
-            };
+            string[] cells = BuildSemanticGridLetters(round);
             Color[] cellBack = new Color[9];
             for (int i = 0; i < cellBack.Length; i++)
             {
@@ -538,8 +583,8 @@ namespace CongoGames.Presentation
             if (semanticHint != null)
             {
                 semanticHint.text = liveMode
-                    ? "Mode live : propose ta réponse dans le chat."
-                    : "Associe les lettres de la grille à un mot ; tape ta proposition puis Valider.";
+                    ? "Mode live : réponds dans le chat. Indice : " + round.Prompt
+                    : "Indice : " + round.Prompt + " Tape le mot, puis Valider.";
             }
 
             if (semanticAnswerInput != null)
@@ -562,6 +607,62 @@ namespace CongoGames.Presentation
             }
 
             if (semanticFeedback != null) semanticFeedback.text = "";
+        }
+
+        private SemanticRound NextSemanticRound()
+        {
+            if (SemanticRounds.Length == 0)
+            {
+                return new SemanticRound("CONGO", "Associations", "Trouve le mot attendu.", "RUMBA", "MBOTE");
+            }
+
+            semanticRoundCursor = (semanticRoundCursor + 1) % SemanticRounds.Length;
+            return SemanticRounds[semanticRoundCursor];
+        }
+
+        private static string[] BuildSemanticGridLetters(SemanticRound round)
+        {
+            const int cellCount = 9;
+            string target = (round.Target ?? "CONGO").Trim().ToUpperInvariant();
+            if (target.Length < 3) target = "CONGO";
+
+            var letters = new List<string>(cellCount);
+            foreach (char c in target)
+            {
+                if (char.IsLetter(c))
+                {
+                    letters.Add(c.ToString());
+                    if (letters.Count >= 6) break;
+                }
+            }
+
+            foreach (string d in round.Decoys ?? Array.Empty<string>())
+            {
+                string w = (d ?? "").Trim().ToUpperInvariant();
+                for (int i = 0; i < w.Length && letters.Count < cellCount; i++)
+                {
+                    char c = w[i];
+                    if (char.IsLetter(c)) letters.Add(c.ToString());
+                }
+
+                if (letters.Count >= cellCount) break;
+            }
+
+            const string fallback = "CONGORUMBANGOMA";
+            int f = 0;
+            while (letters.Count < cellCount)
+            {
+                letters.Add(fallback[f % fallback.Length].ToString());
+                f++;
+            }
+
+            for (int i = letters.Count - 1; i > 0; i--)
+            {
+                int j = UnityEngine.Random.Range(0, i + 1);
+                (letters[i], letters[j]) = (letters[j], letters[i]);
+            }
+
+            return letters.ToArray();
         }
 
         private void ApplyWordScrambleDemo()
@@ -695,8 +796,8 @@ namespace CongoGames.Presentation
                 if (n > 0)
                 {
                     wordHint.text = liveMode
-                        ? "Thème : " + th + " — " + n + " lettres · mot " + gridMotsJeuSessionIndex + "/" + (currentGridAllWords != null ? currentGridAllWords.Count : 0) + "."
-                        : "Thème : " + th + " — mot " + gridMotsJeuSessionIndex + "/" + (currentGridAllWords != null ? currentGridAllWords.Count : 0) + " · " + n + " lettres.";
+                        ? "Live • " + th + " • " + n + " lettres • " + gridMotsJeuSessionIndex + "/" + (currentGridAllWords != null ? currentGridAllWords.Count : 0)
+                        : "Thème " + th + " • " + n + " lettres • mot " + gridMotsJeuSessionIndex + "/" + (currentGridAllWords != null ? currentGridAllWords.Count : 0);
                 }
             }
 
@@ -920,8 +1021,9 @@ namespace CongoGames.Presentation
             if (crosswordFeedback != null)
             {
                 string t = (CurrentScrambleTargetWord ?? "CONGO").Trim();
-                crosswordFeedback.text = "Trouve un mot caché en ligne ou en colonne (7×7) — tente " + t.Length
-                    + " lettres, mot " + gridMotsJeuSessionIndex + " / " + (currentGridAllWords != null ? currentGridAllWords.Count : 0) + " — thème " + (currentGridThemeLabel ?? "—");
+                crosswordFeedback.text = "Trouve un mot (" + t.Length + " lettres) • "
+                    + gridMotsJeuSessionIndex + "/" + (currentGridAllWords != null ? currentGridAllWords.Count : 0)
+                    + " • thème " + (currentGridThemeLabel ?? "—");
             }
 
             if (crosswordButtons != null)
@@ -957,9 +1059,10 @@ namespace CongoGames.Presentation
             if (blindSub != null)
             {
                 int sec = Mathf.Clamp(Mathf.RoundToInt(blindListenSeconds), 15, 90);
-                blindSub.text = r.SubLine
-                    + "\n▶ Écoute l’extrait " + sec
-                    + " s (fichier : StreamingAssets/Theme/BlindTest/ ou URL dans la banque) — la musique s’arrête, puis seulement tu choisis A–D.";
+                string hint = string.IsNullOrEmpty(r.SubLine) ? "" : (r.SubLine + "\n");
+                blindSub.text = hint
+                    + "▶ Écoute l’extrait " + sec
+                    + " s, puis choisis A, B, C ou D.";
             }
 
             if (blindEmoji != null)
@@ -1068,7 +1171,9 @@ namespace CongoGames.Presentation
             bool liveMode = live != null && live.IsConnected;
             string w = MiniGameDemoBanks.NextMysteryWord();
             CurrentMysteryAnswer = (w ?? "CONGO").Trim().ToUpperInvariant();
-            if (mysteryTitle != null) mysteryTitle.text = "Mot mystère — devine le mot (indices ci-dessous)";
+            int len = CurrentMysteryAnswer.Length;
+            string level = len <= 5 ? "Niveau 1/3" : (len <= 7 ? "Niveau 2/3" : "Niveau 3/3");
+            if (mysteryTitle != null) mysteryTitle.text = "Mot mystère — " + level;
             if (mysteryMask != null) mysteryMask.text = MiniGameDemoBanks.MysteryDisplayLine(w);
 
             if (mysteryAnswerInput != null)
@@ -1090,15 +1195,21 @@ namespace CongoGames.Presentation
                 mysterySubmitButton.interactable = true;
             }
 
-            if (mysteryFeedback != null) mysteryFeedback.text = "";
+            if (mysteryFeedback != null)
+            {
+                string hint = MysteryHints.TryGetValue(CurrentMysteryAnswer, out string h) ? h : "Observe les lettres affichées.";
+                mysteryFeedback.text = liveMode
+                    ? "Indice: " + hint + " Réponds dans le chat."
+                    : "Indice: " + hint;
+            }
         }
 
         private void ApplyMemoryDemo()
         {
-            if (memoryTitle != null) memoryTitle.text = "Mémoire — les paires cachées";
+            if (memoryTitle != null) memoryTitle.text = "Mémoire — paires Congo";
             if (memorySubtitle != null)
             {
-                memorySubtitle.text = "Touche deux cartes : si les deux lettres sont pareilles, la paire reste ouverte.";
+                memorySubtitle.text = "Trouve les paires CO/NG/MB/RU. Deux cartes identiques restent ouvertes.";
             }
 
             memorySeed = UnityEngine.Random.Range(0, 99999);
@@ -1132,7 +1243,7 @@ namespace CongoGames.Presentation
                 if (tx != null)
                 {
                     tx.text = "?";
-                    tx.fontSize = 52;
+                    tx.fontSize = 46;
                     tx.fontStyle = FontStyle.Bold;
                 }
 
@@ -1171,7 +1282,7 @@ namespace CongoGames.Presentation
                 tx.text = memoryDeckOrder[index];
                 if (memorySubtitle != null)
                 {
-                    memorySubtitle.text = "Bien — ouvre une autre carte pour trouver la même lettre.";
+                    memorySubtitle.text = "Bien. Ouvre une 2e carte pour chercher la paire.";
                 }
 
                 return;
@@ -1205,7 +1316,7 @@ namespace CongoGames.Presentation
                 {
                     memorySubtitle.text = openLeft == 0
                         ? "Toutes les paires trouvées — bravo !"
-                        : "Paire trouvée — il reste " + pairsLeft + " paire(s) à trouver.";
+                        : "Paire trouvée. Reste " + pairsLeft + " paire(s).";
                 }
 
                 if (openLeft == 0)
@@ -1218,7 +1329,7 @@ namespace CongoGames.Presentation
 
             if (memorySubtitle != null)
             {
-                memorySubtitle.text = "Pas la même — les cartes se referment.";
+                memorySubtitle.text = "Pas la même. Les cartes se referment.";
             }
 
             memoryMismatchCo = StartCoroutine(CoMemoryFlipBack(first, index, firstTx, tx));
@@ -1232,7 +1343,7 @@ namespace CongoGames.Presentation
             memoryMismatchCo = null;
             if (memorySubtitle != null)
             {
-                memorySubtitle.text = "Touche deux cartes : si les deux lettres sont pareilles, la paire reste ouverte.";
+                memorySubtitle.text = "Trouve les paires CO/NG/MB/RU.";
             }
         }
 
@@ -1243,7 +1354,7 @@ namespace CongoGames.Presentation
             chronoSessionScore = 0;
             chronoStreak = 0;
             chronoRoundInSession = 0;
-            if (chronoTitle != null) chronoTitle.text = "Chrono vitesse — 3 vagues (réagis vite)";
+            if (chronoTitle != null) chronoTitle.text = "Chrono vitesse — 3 vagues";
 
             StartChronoNewRound(1);
         }
@@ -1275,7 +1386,7 @@ namespace CongoGames.Presentation
             {
                 chronoStreak = 0;
                 chronoLastRoundPoints = 0;
-                chronoResultFlash = "Temps ! c’était " + (1 + chronoTargetSlot) + " (touches 1–4). Aucun point : tu n’as pas appuyé à temps — ce n’est pas une « mauvaise réponse ».";
+                chronoResultFlash = "Temps écoulé. C'était " + (1 + chronoTargetSlot) + " (touches 1-4).";
                 // Pas de buzz « faux » ni punchline négative : l’utilisateur n’a pas saisi d’action volontaire.
                 GameSfxHub.Instance?.PlayResult(false, hostVoiceCommentary: false, neutralNoWrongTone: true);
                 chronoPhase = 2;
@@ -1544,6 +1655,7 @@ namespace CongoGames.Presentation
         private IEnumerator CoApplyImageDemo()
         {
             imageRevealEndUnscaled = 0f;
+            GameSfxHub.Instance?.StopBlindDemoMusic();
             if (imageRevealCo != null)
             {
                 StopCoroutine(imageRevealCo);
@@ -1565,6 +1677,12 @@ namespace CongoGames.Presentation
 
             if (imageGuessFeedback != null) imageGuessFeedback.text = "";
             if (imageGuessSubmit != null) imageGuessSubmit.interactable = false;
+            if (!string.IsNullOrWhiteSpace(CurrentImageGuessRound.AudioFileBase)
+                || !string.IsNullOrWhiteSpace(CurrentImageGuessRound.AudioUrl))
+            {
+                int seed = (CurrentImageGuessRound.Hint ?? "image").GetHashCode();
+                GameSfxHub.Instance?.PlayBlindDemoMusic(seed, CurrentImageGuessRound.AudioFileBase, CurrentImageGuessRound.AudioUrl);
+            }
 
             if (imagePlaceholder != null)
             {
@@ -1803,7 +1921,8 @@ namespace CongoGames.Presentation
             semFootBg.color = new Color(0.04f, 0.06f, 0.08f, 0.65f);
             semFootBg.raycastTarget = false;
             demo.semanticHint = Sub(semFoot.transform, font, "SemHint", new Vector2(0f, -18f));
-            demo.semanticHint.rectTransform.sizeDelta = new Vector2(820f, 48f);
+            demo.semanticHint.rectTransform.sizeDelta = new Vector2(860f, 62f);
+            demo.semanticHint.fontSize = 22;
             demo.semanticAnswerInput = BuildInputField(semFoot.transform, font, "SemAnswer", new Vector2(15f, -72f), 360f, "Tape ta réponse…");
             demo.semanticClearButton = BuildSecondaryButton(semFoot.transform, font, "Effacer", new Vector2(-280f, -72f), () =>
             {
@@ -1991,14 +2110,20 @@ namespace CongoGames.Presentation
 
             GameObject img = PanelShell(modeRoot, "PanelImageGuess", "image-guess", new Color(0.08f, 0.09f, 0.11f, 0.96f), white, surf);
             demo.imageTitle = Title(img.transform, font, "ImgTitle", "Devine l’image", new Vector2(0f, -24f));
-            Transform imgHost = CreateGridHost(img.transform, "ImageBlockHost", 0.58f, new Vector2(0f, 88f), new Vector2(980f, 440f));
-            demo.imagePlaceholder = ImageBlockCentered(imgHost, white, new Vector2(860f, 420f));
-            demo.imageCaption = Sub(img.transform, font, "ImgCap", new Vector2(0f, -344f));
+            Transform imgHost = CreateGridHost(img.transform, "ImageBlockHost", 0.58f, new Vector2(0f, 112f), new Vector2(980f, 400f));
+            demo.imagePlaceholder = ImageBlockCentered(imgHost, white, new Vector2(870f, 380f));
+            GameObject imgCapBox = CreateRect(img.transform, "ImgCaptionBox", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -318f), new Vector2(956f, 88f));
+            Image imgCapBg = imgCapBox.AddComponent<Image>();
+            imgCapBg.sprite = white;
+            imgCapBg.color = new Color(0.02f, 0.03f, 0.07f, 0.74f);
+            imgCapBg.raycastTarget = false;
+            demo.imageCaption = Sub(imgCapBox.transform, font, "ImgCap", new Vector2(0f, -44f));
             RectTransform capRt = demo.imageCaption.rectTransform;
-            capRt.sizeDelta = new Vector2(940f, 76f);
+            capRt.sizeDelta = new Vector2(924f, 74f);
             demo.imageCaption.fontSize = 24;
+            demo.imageCaption.color = new Color(0.98f, 0.95f, 0.76f, 0.98f);
 
-            GameObject imgFoot = CreateRect(img.transform, "ImageGuessFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 58f), new Vector2(980f, 154f));
+            GameObject imgFoot = CreateRect(img.transform, "ImageGuessFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 42f), new Vector2(980f, 158f));
             Image imgFootBg = imgFoot.AddComponent<Image>();
             imgFootBg.sprite = white;
             imgFootBg.color = new Color(0.05f, 0.06f, 0.09f, 0.58f);
@@ -2038,11 +2163,11 @@ namespace CongoGames.Presentation
             if (demo.wordFeedback != null)
             {
                 demo.wordFeedback.text = !hadInput
-                    ? "Réponse vide — tape le mot cible puis Valider."
+                    ? "Réponse vide — tape le mot puis Valider."
                     : (ok
                         ? "Bravo — c’est " + target + " ! (" + (demo.currentGridSolved != null ? demo.currentGridSolved.Count : 0) + "/"
                         + (demo.currentGridAllWords != null ? demo.currentGridAllWords.Count : 0) + " pour cette grille.)"
-                        : "Pas exact — le mot recherché maintenant : « " + target + " ».");
+                        : "Pas exact — mot attendu : « " + target + " ».");
             }
 
             GameSfxHub.Instance?.PlayResult(ok);
@@ -2065,11 +2190,11 @@ namespace CongoGames.Presentation
             if (demo.crosswordFeedback != null)
             {
                 demo.crosswordFeedback.text = !hadInput
-                    ? "Écris le mot caché exact (7×7) puis Valider."
+                    ? "Écris un mot caché puis Valider."
                     : (ok
                         ? "Trouvé ! « " + a + " ». (" + (demo.currentGridSolved != null ? demo.currentGridSolved.Count : 0) + "/"
                         + (demo.currentGridAllWords != null ? demo.currentGridAllWords.Count : 0) + " pour cette session.)"
-                        : "Essaie le mot cible actuel : « " + target + " » (même longueur que les lettres qu’on cherche ici).");
+                        : "Essaie plutôt : « " + target + " ».");
             }
 
             GameSfxHub.Instance?.PlayResult(ok);
@@ -2126,6 +2251,7 @@ namespace CongoGames.Presentation
             }
 
             bool ok = MiniGameDemoBanks.ImageGuessMatches(demo.CurrentImageGuessRound, t);
+            GameSfxHub.Instance?.StopBlindDemoMusic();
             if (demo.imageGuessFeedback != null)
             {
                 string key = demo.CurrentImageGuessRound.AnswerKey;
