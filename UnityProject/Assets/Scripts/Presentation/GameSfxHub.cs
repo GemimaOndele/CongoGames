@@ -35,6 +35,7 @@ namespace CongoGames.Presentation
         private AudioClip badClip;
         private AudioClip cheerClip;
         private AudioClip chronoTickClip;
+        public bool IsBlindMusicPlaying => blindLoop != null && blindLoop.isPlaying && blindLoop.clip != null;
 
         private void Awake()
         {
@@ -155,12 +156,16 @@ namespace CongoGames.Presentation
         private IEnumerator CoLoadAndPlayBlindMusic(int seed, string streamingFileBase, string remoteUrl)
         {
             AudioClip loaded = null;
+            string lastRejectedSource = "";
+            string lastRejectedReason = "";
             string url = (remoteUrl ?? "").Trim();
             if (url.Length > 10
                 && (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
                 && StreamingMediaUrlPolicy.IsNonStreamableContentPageUrl(url))
             {
                 StreamingMediaUrlPolicy.LogOnceRejected("Blind (audioUrl)", url, "Importez l’audio en .mp3 local (StreamingAssets) ou un lien direct vers un .mp3/.ogg si vous avez hébergé le fichier.");
+                lastRejectedSource = url;
+                lastRejectedReason = "URL non streamable (page web, pas un fichier audio direct)";
             }
             else if (url.Length > 10
                 && (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
@@ -172,21 +177,22 @@ namespace CongoGames.Presentation
                     yield return uwr.SendWebRequest();
                     if (uwr.result == UnityWebRequest.Result.Success)
                     {
-                        try
+                        if (TryExtractDownloadedClip(uwr, out AudioClip c, out string reason))
                         {
-                            if (uwr.downloadedBytes > 0)
-                            {
-                                loaded = DownloadHandlerAudioClip.GetContent(uwr);
-                                if (loaded != null && loaded.loadState == AudioDataLoadState.Failed)
-                                {
-                                    loaded = null;
-                                }
-                            }
+                            loaded = c;
                         }
-                        catch (Exception)
+                        else
                         {
-                            loaded = null;
+                            lastRejectedSource = url;
+                            lastRejectedReason = reason;
+                            Debug.LogWarning("[BlindTest] Audio URL rejeté: " + url + " | " + reason);
                         }
+                    }
+                    else
+                    {
+                        lastRejectedSource = url;
+                        lastRejectedReason = "Erreur réseau: " + uwr.error;
+                        Debug.LogWarning("[BlindTest] Erreur réseau audio URL: " + url + " | " + uwr.error);
                     }
                 }
             }
@@ -203,30 +209,25 @@ namespace CongoGames.Presentation
                         foreach (string ext in exts)
                         {
                             string u = StreamingAssetsUrl.UrlForRelativePath(r + "/" + baseClean + ext);
-                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
+                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.UNKNOWN : AudioType.WAV;
                             using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(u, at))
                             {
                                 yield return uwr.SendWebRequest();
                                 if (uwr.result == UnityWebRequest.Result.Success)
                                 {
-                                    try
+                                    if (TryExtractDownloadedClip(uwr, out AudioClip c, out string reason))
                                     {
-                                        if (uwr.downloadedBytes > 0)
-                                        {
-                                            loaded = DownloadHandlerAudioClip.GetContent(uwr);
-                                        }
-                                    }
-                                    catch (Exception)
-                                    {
-                                        loaded = null;
-                                    }
-
-                                    if (loaded != null && loaded.loadState != AudioDataLoadState.Failed)
-                                    {
+                                        loaded = c;
                                         break;
                                     }
-
-                                    loaded = null;
+                                    lastRejectedSource = u;
+                                    lastRejectedReason = reason;
+                                    Debug.LogWarning("[BlindTest] Fichier webgl rejeté: " + u + " | " + reason);
+                                }
+                                else
+                                {
+                                    lastRejectedSource = u;
+                                    lastRejectedReason = "Erreur réseau: " + uwr.error;
                                 }
                             }
                         }
@@ -255,31 +256,26 @@ namespace CongoGames.Presentation
                                 continue;
                             }
 
-                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
+                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.UNKNOWN : AudioType.WAV;
                             string uri = StreamingAssetsUrl.ToRequestUrl(full);
                             using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(uri, at))
                             {
                                 yield return uwr.SendWebRequest();
                                 if (uwr.result == UnityWebRequest.Result.Success)
                                 {
-                                    try
+                                    if (TryExtractDownloadedClip(uwr, out AudioClip c, out string reason))
                                     {
-                                        if (uwr.downloadedBytes > 0)
-                                        {
-                                            loaded = DownloadHandlerAudioClip.GetContent(uwr);
-                                        }
-                                    }
-                                    catch (Exception)
-                                    {
-                                        loaded = null;
-                                    }
-
-                                    if (loaded != null && loaded.loadState != AudioDataLoadState.Failed)
-                                    {
+                                        loaded = c;
                                         break;
                                     }
-
-                                    loaded = null;
+                                    lastRejectedSource = full;
+                                    lastRejectedReason = reason;
+                                    Debug.LogWarning("[BlindTest] Fichier local rejeté: " + full + " | " + reason);
+                                }
+                                else
+                                {
+                                    lastRejectedSource = full;
+                                    lastRejectedReason = "Erreur réseau locale: " + uwr.error;
                                 }
                             }
                         }
@@ -294,7 +290,16 @@ namespace CongoGames.Presentation
 
             if (loaded == null)
             {
+                if (!string.IsNullOrWhiteSpace(lastRejectedSource))
+                {
+                    Debug.LogWarning("[BlindTest] Fallback audio procédural utilisé. Dernière source rejetée: " + lastRejectedSource + " | " + lastRejectedReason);
+                }
                 loaded = ProceduralClips.BuildBlindMusicStub(seed);
+            }
+
+            if (loaded != null && string.IsNullOrWhiteSpace(loaded.name))
+            {
+                loaded.name = "blind_fallback_or_loaded";
             }
 
             blindLoopClip = loaded;
@@ -308,8 +313,51 @@ namespace CongoGames.Presentation
             string u = urlLower.ToLowerInvariant();
             if (u.Contains(".ogg")) return AudioType.OGGVORBIS;
             if (u.Contains(".wav")) return AudioType.WAV;
-            if (u.Contains(".mp3")) return AudioType.MPEG;
-            return AudioType.MPEG;
+            if (u.Contains(".mp3")) return AudioType.UNKNOWN;
+            return AudioType.UNKNOWN;
+        }
+
+        private static bool TryExtractDownloadedClip(UnityWebRequest uwr, out AudioClip clip, out string reason)
+        {
+            clip = null;
+            reason = "";
+            if (uwr == null || uwr.downloadHandler == null || uwr.downloadedBytes <= 0)
+            {
+                reason = "download vide ou null";
+                return false;
+            }
+
+            // Evite de tenter un décodage audio si le serveur renvoie une page HTML/JSON d'erreur.
+            string contentType = uwr.GetResponseHeader("Content-Type");
+            if (!string.IsNullOrWhiteSpace(contentType))
+            {
+                string ct = contentType.ToLowerInvariant();
+                if (ct.Contains("text/") || ct.Contains("application/json") || ct.Contains("application/xml") || ct.Contains("html"))
+                {
+                    reason = "content-type non audio: " + contentType;
+                    return false;
+                }
+            }
+
+            try
+            {
+                clip = DownloadHandlerAudioClip.GetContent(uwr);
+                if (clip == null || clip.loadState == AudioDataLoadState.Failed)
+                {
+                    reason = clip == null ? "clip null après décodage" : "loadState failed";
+                    clip = null;
+                    return false;
+                }
+
+                reason = "ok";
+                return true;
+            }
+            catch (Exception ex)
+            {
+                reason = "exception décodage: " + ex.Message;
+                clip = null;
+                return false;
+            }
         }
 
         /// <summary>Stop acclamations / rires (appelé avant la question suivante pour ne pas chevaucher le son).</summary>

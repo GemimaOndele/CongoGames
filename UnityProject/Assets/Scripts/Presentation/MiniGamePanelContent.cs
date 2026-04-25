@@ -116,8 +116,13 @@ namespace CongoGames.Presentation
 
         [Tooltip("Pendant l’écoute, les choix A–D sont désactivés ; après la coupure, tu réponds.")]
         [SerializeField] private float blindListenSeconds = 60f;
+        [SerializeField] private bool orchestrateHostForBlindAndImage = true;
+        [SerializeField] private bool aiHostNarratesAllModes = true;
+        [SerializeField] private float hostSafetyWaitSeconds = 16f;
+        [SerializeField] private float preMusicCountdownSeconds = 3f;
         private bool blindInQuestionPhase;
         private Coroutine blindListenCo;
+        private Coroutine imageOrchestrationCo;
         private float blindListenEndUnscaled;
         private float blindListenWindowSec;
         private Image imageGuessVeil;
@@ -411,6 +416,11 @@ namespace CongoGames.Presentation
                 StopCoroutine(imageRevealCo);
                 imageRevealCo = null;
             }
+            if (imageOrchestrationCo != null)
+            {
+                StopCoroutine(imageOrchestrationCo);
+                imageOrchestrationCo = null;
+            }
 
             if (blindEmojiPulseCo != null)
             {
@@ -491,6 +501,18 @@ namespace CongoGames.Presentation
 
         public void Populate(string modeId)
         {
+            if (!string.Equals(modeId, "blind-test", StringComparison.Ordinal) && blindListenCo != null)
+            {
+                StopCoroutine(blindListenCo);
+                blindListenCo = null;
+            }
+
+            if (!string.Equals(modeId, "image-guess", StringComparison.Ordinal) && imageOrchestrationCo != null)
+            {
+                StopCoroutine(imageOrchestrationCo);
+                imageOrchestrationCo = null;
+            }
+
             if (!string.Equals(modeId, "blind-test", StringComparison.Ordinal)
                 && !string.Equals(modeId, "image-guess", StringComparison.Ordinal))
             {
@@ -517,30 +539,123 @@ namespace CongoGames.Presentation
             switch (modeId)
             {
                 case "quiz":
+                    MaybeNarrateMode(modeId);
                     break;
                 case "semantic":
                     ApplySemanticDemo();
+                    MaybeNarrateMode(modeId);
                     break;
                 case "word-scramble":
                     ApplyWordScrambleDemo();
+                    MaybeNarrateMode(modeId);
                     break;
                 case "crossword-lite":
                     ApplyCrosswordDemo();
+                    MaybeNarrateMode(modeId);
                     break;
                 case "blind-test":
                     ApplyBlindDemo();
                     break;
                 case "mystery-word":
                     ApplyMysteryDemo();
+                    MaybeNarrateMode(modeId);
                     break;
                 case "memory":
                     ApplyMemoryDemo();
+                    MaybeNarrateMode(modeId);
                     break;
                 case "speed-chrono":
                     ApplyChronoDemo();
+                    MaybeNarrateMode(modeId);
                     break;
                 case "image-guess":
                     StartCoroutine(CoApplyImageDemo());
+                    break;
+            }
+        }
+
+        private void MaybeNarrateMode(string modeId)
+        {
+            if (!aiHostNarratesAllModes) return;
+            if (string.IsNullOrWhiteSpace(modeId)) return;
+            if (string.Equals(modeId, "blind-test", StringComparison.Ordinal) || string.Equals(modeId, "image-guess", StringComparison.Ordinal))
+            {
+                // Ces deux modes ont déjà une orchestration IA dédiée (intro + 3,2,1 + relance).
+                return;
+            }
+
+            AIHostManager host = AIHostManager.Instance;
+            if (host == null) return;
+            host.InterruptSpeech();
+            int jokePick = UnityEngine.Random.Range(0, 3);
+
+            switch (modeId)
+            {
+                case "quiz":
+                    host.Speak("Mesdames et messieurs, bienvenue sur le quiz CongoGames, concentration maximale et sourire obligatoire.");
+                    host.Speak("Je lance la question, tu choisis la meilleure réponse, et on valide avec style.");
+                    host.Speak(jokePick == 0
+                        ? "Attention, aujourd'hui même les mauvaises réponses ont confiance en elles."
+                        : (jokePick == 1
+                            ? "Si tu trouves du premier coup, je promets de ne pas faire ma danse de la victoire."
+                            : "Respire, réfléchis, et surtout ne clique pas au hasard comme un DJ pressé."));
+                    break;
+                case "semantic":
+                    host.Speak("Mode associations, version plateau télé : un thème, des lettres, et ton cerveau en mode turbo.");
+                    host.Speak("Observe la grille, trouve le mot qui relie le thème, puis valide.");
+                    host.Speak(jokePick == 0
+                        ? "Indice secret : si ton mot ressemble à une recette de cuisine, on n'est peut-être pas loin... ou complètement perdu."
+                        : (jokePick == 1
+                            ? "Pas de panique, même les champions commencent parfois par regarder les lettres de travers."
+                            : "Rappelle-toi : intuition + logique, c'est mieux que panique + hasard."));
+                    break;
+                case "word-scramble":
+                    host.Speak("Mode mots mélangés ! Les lettres ont fait la fête, à toi de remettre de l'ordre.");
+                    host.Speak("Recompose le mot correct, tape ta réponse, puis valide.");
+                    host.Speak(jokePick == 0
+                        ? "Si les lettres bougent dans ta tête, c'est normal, elles s'échauffent."
+                        : (jokePick == 1
+                            ? "Objectif du jour : battre le chaos alphabétique."
+                            : "Promis, aucune lettre n'a été blessée pendant le mélange."));
+                    break;
+                case "crossword-lite":
+                    host.Speak("Mode mots cachés, ambiance enquête : les mots se cachent, toi tu les débusques.");
+                    host.Speak("Repère les mots du thème, écris ta proposition, puis valide.");
+                    host.Speak(jokePick == 0
+                        ? "Active la loupe imaginaire, détective du vocabulaire."
+                        : (jokePick == 1
+                            ? "Si tu trouves un mot en diagonale, tu gagnes le respect du public."
+                            : "Règle d'or : on cherche des mots, pas la sortie de secours."));
+                    break;
+                case "mystery-word":
+                    host.Speak("Mot mystère ! Les indices sont là, mais le mot final se mérite.");
+                    host.Speak("Analyse les lettres cachées, trouve le mot complet, puis valide avant la fin.");
+                    host.Speak(jokePick == 0
+                        ? "Si ton premier essai est bizarre, appelle ça une stratégie d'intimidation."
+                        : (jokePick == 1
+                            ? "Le suspense est total, même moi je retiens ma respiration numérique."
+                            : "N'oublie pas : parfois le mot le plus simple est le bon."));
+                    break;
+                case "memory":
+                    host.Speak("Mode mémoire ! On retourne deux cartes, et on tente le coup de génie.");
+                    host.Speak("Retrouve les paires, garde les positions en tête, et enchaîne les points.");
+                    host.Speak(jokePick == 0
+                        ? "Petit conseil : si tu oublies tout, accuse poliment la pression du direct."
+                        : (jokePick == 1
+                            ? "Ta mémoire est une superstar, elle a juste besoin d'un échauffement."
+                            : "Ici, chaque carte retournée est un mini thriller."));
+                    break;
+                case "speed-chrono":
+                    host.Speak("Chrono vitesse ! Accroche-toi, ça part très fort.");
+                    host.Speak("Top départ, réflexes rapides, et vise le maximum de points.");
+                    host.Speak(jokePick == 0
+                        ? "Si ton coeur accélère, c'est normal, le chrono adore le drama."
+                        : (jokePick == 1
+                            ? "Ici on ne court pas, on téléporte ses réflexes."
+                            : "Concentre-toi : en mode turbo, même une seconde fait la différence."));
+                    break;
+                default:
+                    host.Speak("Nouvelle manche, nouveau défi, et toujours la même énergie de plateau.");
                     break;
             }
         }
@@ -1085,7 +1200,7 @@ namespace CongoGames.Presentation
             GameSfxHub.Instance?.PlayBlindDrumCue();
             int musicSeed = (r.Prompt ?? "blind").GetHashCode();
             float listen = blindListenSeconds < 0.5f ? 0f : blindListenSeconds;
-            blindListenCo = StartCoroutine(CoBlindListenThenQuestion(musicSeed, raw, listen));
+            blindListenCo = StartCoroutine(CoBlindHostThenListen(musicSeed, raw, listen));
         }
 
         private void SetBlindChoicesInteractable(bool on)
@@ -1097,10 +1212,36 @@ namespace CongoGames.Presentation
             }
         }
 
+        private IEnumerator CoBlindHostThenListen(int musicSeed, MiniGameDemoBanks.BlindRound raw, float listen)
+        {
+            int sec = Mathf.Clamp(Mathf.RoundToInt(listen), 15, 90);
+            if (orchestrateHostForBlindAndImage)
+            {
+                ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(1f);
+                AIHostManager host = AIHostManager.Instance;
+                host?.InterruptSpeech();
+                host?.Speak("Blind test. Je présente la règle, puis la musique démarre après trois, deux, un.");
+                host?.Speak("Tu écoutes l'extrait pendant " + sec + " secondes.");
+                host?.Speak("Ensuite je te dirai de choisir la bonne réponse parmi A, B, C ou D.");
+                yield return CoWaitHostSilence(hostSafetyWaitSeconds);
+            }
+
+            yield return CoPreMusicCountdown(preMusicCountdownSeconds);
+            yield return CoBlindListenThenQuestion(musicSeed, raw, listen);
+            blindListenCo = null;
+        }
+
         private IEnumerator CoBlindListenThenQuestion(int musicSeed, MiniGameDemoBanks.BlindRound raw, float listen)
         {
             ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(0f);
             GameSfxHub.Instance?.PlayBlindDemoMusic(musicSeed, raw.AudioFileBase, raw.AudioUrl);
+            yield return null;
+            if (GameSfxHub.Instance != null && !GameSfxHub.Instance.IsBlindMusicPlaying)
+            {
+                // Si la piste fournie n'est pas lisible, on force immédiatement un stub audible
+                // pour conserver le rythme "écoute -> chrono -> réponses".
+                GameSfxHub.Instance.PlayBlindDemoMusic(musicSeed, null, null);
+            }
             float wait = listen > 0.01f ? listen : 0.35f;
             blindListenWindowSec = wait;
             blindListenEndUnscaled = Time.unscaledTime + wait;
@@ -1117,6 +1258,10 @@ namespace CongoGames.Presentation
             }
 
             if (blindEmoji != null) blindEmoji.text = "?  Réponds  ?";
+            if (orchestrateHostForBlindAndImage)
+            {
+                AIHostManager.Instance?.Speak("L'écoute est terminée. Maintenant, réponds. Les propositions sont affichées ci-dessous.");
+            }
             blindListenCo = null;
         }
 
@@ -1660,6 +1805,11 @@ namespace CongoGames.Presentation
         {
             imageRevealEndUnscaled = 0f;
             GameSfxHub.Instance?.StopBlindDemoMusic();
+            if (imageOrchestrationCo != null)
+            {
+                StopCoroutine(imageOrchestrationCo);
+                imageOrchestrationCo = null;
+            }
             if (imageRevealCo != null)
             {
                 StopCoroutine(imageRevealCo);
@@ -1681,12 +1831,6 @@ namespace CongoGames.Presentation
 
             if (imageGuessFeedback != null) imageGuessFeedback.text = "";
             if (imageGuessSubmit != null) imageGuessSubmit.interactable = false;
-            if (!string.IsNullOrWhiteSpace(CurrentImageGuessRound.AudioFileBase)
-                || !string.IsNullOrWhiteSpace(CurrentImageGuessRound.AudioUrl))
-            {
-                int seed = (CurrentImageGuessRound.Hint ?? "image").GetHashCode();
-                GameSfxHub.Instance?.PlayBlindDemoMusic(seed, CurrentImageGuessRound.AudioFileBase, CurrentImageGuessRound.AudioUrl);
-            }
 
             if (imagePlaceholder != null)
             {
@@ -1714,8 +1858,125 @@ namespace CongoGames.Presentation
                 {
                     imageGuessVeil.color = new Color(0.02f, 0.02f, 0.05f, 0.92f);
                 }
+            }
 
-                imageRevealCo = StartCoroutine(CoImageRevealUnblur(imageGuessRevealSec));
+            imageOrchestrationCo = StartCoroutine(CoImageHostThenRevealAndMusic());
+        }
+
+        private IEnumerator CoImageHostThenRevealAndMusic()
+        {
+            string hint = CurrentImageGuessRound.Hint ?? "";
+            bool playLinkedAudio = ShouldPlayImageGuessAudio(CurrentImageGuessRound);
+            if (orchestrateHostForBlindAndImage)
+            {
+                ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(1f);
+                AIHostManager host = AIHostManager.Instance;
+                host?.InterruptSpeech();
+                host?.Speak("Image devinette. Je te présente la manche avant le lancement audio.");
+                host?.Speak(playLinkedAudio
+                    ? "Observe l'image et écoute bien l'extrait lié à cette image."
+                    : "Observe l'image. Cette manche se joue sans musique car l'image n'est pas liée à un extrait.");
+                if (!string.IsNullOrWhiteSpace(hint))
+                {
+                    host?.Speak("Indice: " + hint);
+                }
+                if (playLinkedAudio)
+                {
+                    host?.Speak("La musique démarre dans trois secondes. Concentre-toi.");
+                }
+                yield return CoWaitHostSilence(hostSafetyWaitSeconds);
+            }
+
+            if (playLinkedAudio)
+            {
+                yield return CoPreMusicCountdown(preMusicCountdownSeconds);
+                int seed = (CurrentImageGuessRound.Hint ?? "image").GetHashCode();
+                ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(0f);
+                GameSfxHub.Instance?.PlayBlindDemoMusic(seed, CurrentImageGuessRound.AudioFileBase, CurrentImageGuessRound.AudioUrl);
+            }
+            else
+            {
+                GameSfxHub.Instance?.StopBlindDemoMusic();
+                ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(1f);
+            }
+
+            imageRevealCo = StartCoroutine(CoImageRevealUnblur(imageGuessRevealSec));
+            yield return imageRevealCo;
+            if (playLinkedAudio)
+            {
+                ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(1f);
+            }
+            if (orchestrateHostForBlindAndImage)
+            {
+                AIHostManager.Instance?.Speak("Maintenant que tu as observé et écouté, réponds à la question avec la zone de réponse.");
+            }
+            imageOrchestrationCo = null;
+        }
+
+        private static bool ShouldPlayImageGuessAudio(MiniGameDemoBanks.ImageGuessRound round)
+        {
+            if (string.IsNullOrWhiteSpace(round.AudioFileBase) && string.IsNullOrWhiteSpace(round.AudioUrl))
+            {
+                return false;
+            }
+
+            string trivia = round.Trivia ?? "";
+            string triviaLower = trivia.ToLowerInvariant();
+            if (triviaLower.Contains("[category:"))
+            {
+                // Si une catégorie explicite existe, on applique la règle stricte.
+                return triviaLower.Contains("[category:music_related]");
+            }
+
+            string corpus = ((round.Hint ?? "") + " " + trivia + " " + (round.AnswerKey ?? "") + " " + (round.StreamingFileBase ?? ""))
+                .ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(corpus)) return false;
+
+            string[] positive =
+            {
+                "chanteur", "chanteuse", "artiste", "groupe", "musique", "chanson",
+                "titre", "album", "feat", "featuring", "compositeur", "producteur",
+                "interpr", "audio", "clip", "rumba", "ndombolo", "orchestre"
+            };
+            foreach (string k in positive)
+            {
+                if (corpus.Contains(k))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private IEnumerator CoPreMusicCountdown(float seconds)
+        {
+            int count = Mathf.Clamp(Mathf.RoundToInt(seconds), 1, 5);
+            for (int i = count; i >= 1; i--)
+            {
+                if (blindEmoji != null && blindEmoji.gameObject.activeInHierarchy)
+                {
+                    blindEmoji.text = i.ToString();
+                }
+
+                if (imageCaption != null && imageCaption.gameObject.activeInHierarchy)
+                {
+                    imageCaption.text = "Démarrage de la musique dans " + i + "…";
+                }
+
+                GameSfxHub.Instance?.PlayChronoTick(0.52f);
+                yield return new WaitForSecondsRealtime(1f);
+            }
+        }
+
+        private IEnumerator CoWaitHostSilence(float maxSec)
+        {
+            AIHostManager host = AIHostManager.Instance;
+            if (host == null) yield break;
+            float end = Time.unscaledTime + Mathf.Max(1f, maxSec);
+            while (host != null && host.IsSpeakingNow && Time.unscaledTime < end)
+            {
+                yield return null;
             }
         }
 
@@ -2114,29 +2375,29 @@ namespace CongoGames.Presentation
 
             GameObject img = PanelShell(modeRoot, "PanelImageGuess", "image-guess", new Color(0.08f, 0.09f, 0.11f, 0.96f), white, surf);
             demo.imageTitle = Title(img.transform, font, "ImgTitle", "Devine l’image", new Vector2(0f, -24f));
-            Transform imgHost = CreateGridHost(img.transform, "ImageBlockHost", 0.58f, new Vector2(0f, 112f), new Vector2(980f, 400f));
-            demo.imagePlaceholder = ImageBlockCentered(imgHost, white, new Vector2(870f, 380f));
-            GameObject imgCapBox = CreateRect(img.transform, "ImgCaptionBox", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -318f), new Vector2(956f, 88f));
+            Transform imgHost = CreateGridHost(img.transform, "ImageBlockHost", 0.59f, new Vector2(0f, 66f), new Vector2(980f, 390f));
+            demo.imagePlaceholder = ImageBlockCentered(imgHost, white, new Vector2(820f, 340f));
+            GameObject imgCapBox = CreateRect(img.transform, "ImgCaptionBox", new Vector2(0.08f, 0.30f), new Vector2(0.92f, 0.40f), Vector2.zero, Vector2.zero);
             Image imgCapBg = imgCapBox.AddComponent<Image>();
             imgCapBg.sprite = white;
             imgCapBg.color = new Color(0.02f, 0.03f, 0.07f, 0.74f);
             imgCapBg.raycastTarget = false;
-            demo.imageCaption = Sub(imgCapBox.transform, font, "ImgCap", new Vector2(0f, -44f));
+            demo.imageCaption = Sub(imgCapBox.transform, font, "ImgCap", new Vector2(0f, -18f));
             RectTransform capRt = demo.imageCaption.rectTransform;
-            capRt.sizeDelta = new Vector2(924f, 74f);
-            demo.imageCaption.fontSize = 24;
+            capRt.sizeDelta = new Vector2(900f, 58f);
+            demo.imageCaption.fontSize = 21;
             demo.imageCaption.color = new Color(0.98f, 0.95f, 0.76f, 0.98f);
 
-            GameObject imgFoot = CreateRect(img.transform, "ImageGuessFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 42f), new Vector2(980f, 158f));
+            GameObject imgFoot = CreateRect(img.transform, "ImageGuessFooter", new Vector2(0.06f, 0.03f), new Vector2(0.94f, 0.21f), Vector2.zero, Vector2.zero);
             Image imgFootBg = imgFoot.AddComponent<Image>();
             imgFootBg.sprite = white;
             imgFootBg.color = new Color(0.05f, 0.06f, 0.09f, 0.58f);
             imgFootBg.raycastTarget = false;
-            demo.imageGuessInput = BuildInputField(imgFoot.transform, font, "ImgAnswer", new Vector2(0f, -54f), 580f, "Écris ta réponse puis Valider…");
-            demo.imageGuessSubmit = BuildPrimaryButton(imgFoot.transform, font, "Valider", new Vector2(350f, -54f), () => OnImageGuessSubmit(demo));
-            demo.imageGuessFeedback = Sub(imgFoot.transform, font, "ImgFb", new Vector2(0f, -126f));
-            demo.imageGuessFeedback.rectTransform.sizeDelta = new Vector2(920f, 48f);
-            demo.imageGuessFeedback.fontSize = 22;
+            demo.imageGuessInput = BuildInputField(imgFoot.transform, font, "ImgAnswer", new Vector2(-120f, -42f), 520f, "Écris ta réponse puis Valider…");
+            demo.imageGuessSubmit = BuildPrimaryButton(imgFoot.transform, font, "Valider", new Vector2(280f, -42f), () => OnImageGuessSubmit(demo));
+            demo.imageGuessFeedback = Sub(imgFoot.transform, font, "ImgFb", new Vector2(0f, -90f));
+            demo.imageGuessFeedback.rectTransform.sizeDelta = new Vector2(880f, 42f);
+            demo.imageGuessFeedback.fontSize = 20;
         }
 
         private static void OnSemanticSubmit(MiniGamePanelContent demo)

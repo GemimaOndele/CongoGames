@@ -76,6 +76,7 @@ namespace CongoGames.AI
         }
 
         public string TtsHttpBase => ttsHttpBase;
+        public bool IsSpeakingNow => speaking || (audioSource != null && audioSource.isPlaying) || speechQueue.Count > 0;
 
         private IEnumerator BootstrapTts()
         {
