@@ -51,12 +51,16 @@ namespace CongoGames.UI
             sb.Append(today).Append(" · ");
             int n = ScoreManager.Instance != null ? ScoreManager.Instance.GetRegisteredPlayerCount() : players.Count;
             sb.Append(n).Append(" joueur(s)\n");
-            sb.Append(ScoreHistoryStore.BuildSummaryLine()).Append("\n—\n");
+            sb.Append("Session: ").Append(ScoreHistoryStore.BuildSummaryLine()).Append("\n");
+            sb.Append("────────────────\n");
             for (int i = 0; i < players.Count; i++)
             {
                 string u = players[i].Username;
-                if (u != null && u.Length > 20) u = u.Substring(0, 18) + "…";
-                sb.Append(i + 1).Append(". ").Append(u).Append(" ").Append(players[i].Score).Append('\n');
+                if (string.IsNullOrEmpty(u)) u = "Joueur";
+                if (u.Length > 15) u = u.Substring(0, 14) + "…";
+                string rank = (i + 1).ToString("00");
+                string score = players[i].Score.ToString(CultureInfo.InvariantCulture).PadLeft(4, ' ');
+                sb.Append('#').Append(rank).Append("  ").Append(u.PadRight(16, ' ')).Append(score).Append('\n');
             }
 
             leaderboardText.text = sb.ToString();

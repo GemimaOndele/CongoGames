@@ -1801,10 +1801,10 @@ namespace CongoGames.Presentation
             Sprite white = White();
 
             GameObject semantic = PanelShell(modeRoot, "PanelSemantic", "semantic", new Color(0.06f, 0.12f, 0.1f, 0.96f), white, surf);
-            demo.semanticTitle = Title(semantic.transform, font, "TitreSemantic", "Associations — grille", new Vector2(0f, -34f));
-            Transform semHost = CreateGridHost(semantic.transform, "SemanticGridHost", 0.57f, new Vector2(0f, 92f), new Vector2(920f, 360f));
+            demo.semanticTitle = Title(semantic.transform, font, "TitreSemantic", "Associations — grille", new Vector2(0f, -28f));
+            Transform semHost = CreateGridHost(semantic.transform, "SemanticGridHost", 0.56f, new Vector2(0f, 72f), new Vector2(920f, 352f));
             demo.semanticCells = LetterGrid(semHost, font, 3, 3, 86f, 16f, Vector2.zero);
-            GameObject semFoot = CreateRect(semantic.transform, "SemanticFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 112f), new Vector2(980f, 220f));
+            GameObject semFoot = CreateRect(semantic.transform, "SemanticFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 86f), new Vector2(980f, 210f));
             Image semFootBg = semFoot.AddComponent<Image>();
             semFootBg.sprite = white;
             semFootBg.color = new Color(0.04f, 0.06f, 0.08f, 0.65f);
@@ -1820,7 +1820,7 @@ namespace CongoGames.Presentation
             demo.semanticFeedback = Sub(semFoot.transform, font, "SemFb", new Vector2(0f, -156f));
 
             GameObject word = PanelShell(modeRoot, "PanelWordScramble", "word-scramble", new Color(0.08f, 0.08f, 0.14f, 0.96f), white, surf);
-            demo.wordScrambleTitle = Title(word.transform, font, "WTitle", "Mots mélangés", new Vector2(0f, -34f));
+            demo.wordScrambleTitle = Title(word.transform, font, "WTitle", "Mots mélangés", new Vector2(0f, -28f));
             demo.wordScrambleLetters = null;
             GameObject wordSide = CreateRect(word.transform, "WordFoundSide", new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-8f, 0f), new Vector2(220f, 480f));
             Image wsBg = wordSide.AddComponent<Image>();
@@ -1835,11 +1835,11 @@ namespace CongoGames.Presentation
             demo.gridFoundList.alignment = TextAnchor.UpperLeft;
             demo.gridFoundList.horizontalOverflow = HorizontalWrapMode.Wrap;
             demo.gridFoundList.text = "—";
-            Transform wordHost = CreateGridHost(word.transform, "WordGridHost", 0.53f, new Vector2(-100f, 124f), new Vector2(760f, 430f));
+            Transform wordHost = CreateGridHost(word.transform, "WordGridHost", 0.52f, new Vector2(-100f, 100f), new Vector2(760f, 420f));
             BuildScrambleLetterGrid(wordHost, font, 7, 7, ScrambleCellPx, ScrambleGapPx, Vector2.zero, demo);
             WireLetterGridDrag(wordHost, demo, false, demo.wordScrambleTiles);
 
-            GameObject wordFoot = CreateRect(word.transform, "WordFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 118f), new Vector2(980f, 220f));
+            GameObject wordFoot = CreateRect(word.transform, "WordFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 88f), new Vector2(980f, 210f));
             Image wfBg = wordFoot.AddComponent<Image>();
             wfBg.sprite = white;
             wfBg.color = new Color(0.04f, 0.05f, 0.08f, 0.62f);
@@ -1853,7 +1853,7 @@ namespace CongoGames.Presentation
             demo.wordFeedback = Sub(wordFoot.transform, font, "WordFb", new Vector2(0f, -162f));
 
             GameObject cross = PanelShell(modeRoot, "PanelCrossword", "crossword-lite", new Color(0.05f, 0.1f, 0.12f, 0.96f), white, surf);
-            demo.crosswordTitle = Title(cross.transform, font, "CTitle", "Mots cachés 10×10", new Vector2(0f, -34f));
+            demo.crosswordTitle = Title(cross.transform, font, "CTitle", "Mots cachés 10×10", new Vector2(0f, -28f));
             GameObject crossSide = CreateRect(cross.transform, "CrossFoundSide", new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-8f, 0f), new Vector2(220f, 480f));
             Image crBg = crossSide.AddComponent<Image>();
             crBg.sprite = white;
@@ -1867,11 +1867,11 @@ namespace CongoGames.Presentation
             demo.gridFoundListCross.alignment = TextAnchor.UpperLeft;
             demo.gridFoundListCross.horizontalOverflow = HorizontalWrapMode.Wrap;
             demo.gridFoundListCross.text = "—";
-            Transform crossHost = CreateGridHost(cross.transform, "CrossGridHost", 0.53f, new Vector2(-100f, 128f), new Vector2(760f, 430f));
+            Transform crossHost = CreateGridHost(cross.transform, "CrossGridHost", 0.52f, new Vector2(-100f, 106f), new Vector2(760f, 420f));
             demo.crosswordCells = CrosswordLetterGrid(crossHost, font, CrosswordCols, CrosswordCols, CrosswordCellPx, CrosswordGapPx, Vector2.zero, demo);
             WireLetterGridDrag(crossHost, demo, true, demo.crosswordCells);
 
-            GameObject crossFoot = CreateRect(cross.transform, "CrossFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 118f), new Vector2(980f, 166f));
+            GameObject crossFoot = CreateRect(cross.transform, "CrossFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 86f), new Vector2(980f, 156f));
             Image cfBg = crossFoot.AddComponent<Image>();
             cfBg.sprite = white;
             cfBg.color = new Color(0.04f, 0.05f, 0.08f, 0.62f);
@@ -1884,25 +1884,25 @@ namespace CongoGames.Presentation
             crossFbRt.sizeDelta = new Vector2(900f, 36f);
 
             GameObject blind = PanelShell(modeRoot, "PanelBlind", "blind-test", new Color(0.1f, 0.06f, 0.14f, 0.96f), white, surf);
-            demo.blindTitle = Title(blind.transform, font, "BTitle", "Blind test", new Vector2(0f, -36f));
-            demo.blindPrompt = Sub(blind.transform, font, "BlindQ", new Vector2(0f, -102f));
+            demo.blindTitle = Title(blind.transform, font, "BTitle", "Blind test", new Vector2(0f, -30f));
+            demo.blindPrompt = Sub(blind.transform, font, "BlindQ", new Vector2(0f, -94f));
             demo.blindPrompt.rectTransform.sizeDelta = new Vector2(940f, 178f);
             demo.blindPrompt.fontSize = 32;
-            demo.blindSub = Sub(blind.transform, font, "BlindSub", new Vector2(0f, -232f));
+            demo.blindSub = Sub(blind.transform, font, "BlindSub", new Vector2(0f, -214f));
             demo.blindSub.rectTransform.sizeDelta = new Vector2(920f, 140f);
             demo.blindSub.fontSize = 26;
             demo.blindSub.lineSpacing = 1.1f;
-            Transform blindHost = CreateGridHost(blind.transform, "BlindEmojiHost", 0.5f, new Vector2(0f, 84f), new Vector2(960f, 164f));
+            Transform blindHost = CreateGridHost(blind.transform, "BlindEmojiHost", 0.5f, new Vector2(0f, 68f), new Vector2(960f, 156f));
             demo.blindEmoji = BigLettersCentered(blindHost, font, "BEmoji", 64);
-            GameObject blindChoicesRoot = CreateRect(blind.transform, "BlindChoicesRoot", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 124f), new Vector2(980f, 300f));
+            GameObject blindChoicesRoot = CreateRect(blind.transform, "BlindChoicesRoot", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 92f), new Vector2(980f, 288f));
             BlindChoiceColumn(blindChoicesRoot.transform, font, new Vector2(0f, -12f), 54f, demo);
 
             GameObject myst = PanelShell(modeRoot, "PanelMystery", "mystery-word", new Color(0.07f, 0.09f, 0.13f, 0.96f), white, surf);
-            demo.mysteryTitle = Title(myst.transform, font, "MTitle", "Mot mystère", new Vector2(0f, -36f));
-            Transform mystHost = CreateGridHost(myst.transform, "MysteryMaskHost", 0.55f, new Vector2(0f, 140f), new Vector2(960f, 132f));
+            demo.mysteryTitle = Title(myst.transform, font, "MTitle", "Mot mystère", new Vector2(0f, -30f));
+            Transform mystHost = CreateGridHost(myst.transform, "MysteryMaskHost", 0.54f, new Vector2(0f, 114f), new Vector2(960f, 124f));
             demo.mysteryMask = BigLettersCentered(mystHost, font, "Mask", 46);
 
-            GameObject mystFoot = CreateRect(myst.transform, "MysteryFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 118f), new Vector2(980f, 220f));
+            GameObject mystFoot = CreateRect(myst.transform, "MysteryFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 88f), new Vector2(980f, 210f));
             Image mystFootBg = mystFoot.AddComponent<Image>();
             mystFootBg.sprite = white;
             mystFootBg.color = new Color(0.04f, 0.05f, 0.08f, 0.62f);
@@ -1916,16 +1916,16 @@ namespace CongoGames.Presentation
             demo.mysteryFeedback = Sub(mystFoot.transform, font, "MystFb", new Vector2(0f, -162f));
 
             GameObject mem = PanelShell(modeRoot, "PanelMemory", "memory", new Color(0.06f, 0.11f, 0.09f, 0.96f), white, surf);
-            demo.memoryTitle = Title(mem.transform, font, "MemTitle", "Mémoire", new Vector2(0f, -36f));
-            Transform memHost = CreateGridHost(mem.transform, "MemoryGridHost", 0.52f, new Vector2(0f, 40f), new Vector2(900f, 350f));
+            demo.memoryTitle = Title(mem.transform, font, "MemTitle", "Mémoire", new Vector2(0f, -32f));
+            Transform memHost = CreateGridHost(mem.transform, "MemoryGridHost", 0.50f, new Vector2(0f, 6f), new Vector2(900f, 330f));
             demo.memoryCards = MemoryGrid(memHost, font, white, 132f, 14f);
-            demo.memorySubtitle = Sub(mem.transform, font, "MemSub", new Vector2(0f, -214f));
-            demo.memorySubtitle.fontSize = 24;
+            demo.memorySubtitle = Sub(mem.transform, font, "MemSub", new Vector2(0f, -218f));
+            demo.memorySubtitle.fontSize = 26;
             demo.memorySubtitle.lineSpacing = 1.08f;
-            demo.memorySubtitle.rectTransform.sizeDelta = new Vector2(920f, 106f);
+            demo.memorySubtitle.rectTransform.sizeDelta = new Vector2(940f, 120f);
 
             GameObject chrono = PanelShell(modeRoot, "PanelChrono", "speed-chrono", new Color(0.12f, 0.07f, 0.06f, 0.96f), white, surf);
-            demo.chronoTitle = Title(chrono.transform, font, "ChTitle", "Chrono vitesse", new Vector2(0f, -36f));
+            demo.chronoTitle = Title(chrono.transform, font, "ChTitle", "Chrono vitesse", new Vector2(0f, -30f));
             GameObject chronoRule = CreateRect(chrono.transform, "ChronoRules", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             {
                 RectTransform crR = chronoRule.GetComponent<RectTransform>();
@@ -1983,15 +1983,15 @@ namespace CongoGames.Presentation
             }
 
             GameObject img = PanelShell(modeRoot, "PanelImageGuess", "image-guess", new Color(0.08f, 0.09f, 0.11f, 0.96f), white, surf);
-            demo.imageTitle = Title(img.transform, font, "ImgTitle", "Devine l’image", new Vector2(0f, -34f));
-            Transform imgHost = CreateGridHost(img.transform, "ImageBlockHost", 0.57f, new Vector2(0f, 84f), new Vector2(980f, 470f));
+            demo.imageTitle = Title(img.transform, font, "ImgTitle", "Devine l’image", new Vector2(0f, -28f));
+            Transform imgHost = CreateGridHost(img.transform, "ImageBlockHost", 0.56f, new Vector2(0f, 62f), new Vector2(980f, 458f));
             demo.imagePlaceholder = ImageBlockCentered(imgHost, white, new Vector2(860f, 420f));
-            demo.imageCaption = Sub(img.transform, font, "ImgCap", new Vector2(0f, -320f));
+            demo.imageCaption = Sub(img.transform, font, "ImgCap", new Vector2(0f, -298f));
             RectTransform capRt = demo.imageCaption.rectTransform;
             capRt.sizeDelta = new Vector2(940f, 92f);
             demo.imageCaption.fontSize = 30;
 
-            GameObject imgFoot = CreateRect(img.transform, "ImageGuessFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 94f), new Vector2(980f, 170f));
+            GameObject imgFoot = CreateRect(img.transform, "ImageGuessFooter", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 72f), new Vector2(980f, 162f));
             Image imgFootBg = imgFoot.AddComponent<Image>();
             imgFootBg.sprite = white;
             imgFootBg.color = new Color(0.05f, 0.06f, 0.09f, 0.58f);

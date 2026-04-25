@@ -136,6 +136,32 @@ namespace CongoGames.UI
             lockSingleModeDraft = GUILayout.Toggle(lockSingleModeDraft, "Verrouiller le jeu choisi (pas de rotation auto)");
 
             GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Mode précédent", GUILayout.Height(30f)))
+            {
+                modePickIndex = (modePickIndex - 1 + modeIds.Length) % modeIds.Length;
+                GameModeManager gmm = GameModeManager.Instance;
+                if (gmm != null)
+                {
+                    string modeId = modeIds[Mathf.Clamp(modePickIndex, 0, modeIds.Length - 1)];
+                    gmm.SetLocalDemoModeLock(lockSingleModeDraft, modeId);
+                    gmm.StartMode(modeId);
+                }
+            }
+
+            if (GUILayout.Button("Mode suivant", GUILayout.Height(30f)))
+            {
+                modePickIndex = (modePickIndex + 1) % modeIds.Length;
+                GameModeManager gmm = GameModeManager.Instance;
+                if (gmm != null)
+                {
+                    string modeId = modeIds[Mathf.Clamp(modePickIndex, 0, modeIds.Length - 1)];
+                    gmm.SetLocalDemoModeLock(lockSingleModeDraft, modeId);
+                    gmm.StartMode(modeId);
+                }
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
             if (GUILayout.Button("Appliquer durées", GUILayout.Height(30f)))
             {
                 GameModeManager gmm = GameModeManager.Instance;

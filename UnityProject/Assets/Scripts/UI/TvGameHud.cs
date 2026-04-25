@@ -12,6 +12,8 @@ namespace CongoGames.UI
         [SerializeField] private Text timerSeconds;
         [SerializeField] private Text brandLine;
         private int _hudChronoLastSec = int.MaxValue;
+        [SerializeField] [Range(0.2f, 1f)] private float musicDuckWhileChrono = 0.5f;
+        private bool _chronoDuckApplied;
 
         public void Wire(Image ring, Text mode, Text seconds, Text brand)
         {
@@ -52,6 +54,12 @@ namespace CongoGames.UI
                     GameSfxHub.Instance?.PlayChronoTick(0.58f);
                 }
 
+                if (!_chronoDuckApplied)
+                {
+                    ThemeMusicPlayer.Instance?.SetChronoDuckMultiplier(musicDuckWhileChrono);
+                    _chronoDuckApplied = true;
+                }
+
                 _hudChronoLastSec = auxSec;
                 if (brandLine != null && string.IsNullOrEmpty(brandLine.text))
                 {
@@ -62,6 +70,11 @@ namespace CongoGames.UI
             }
 
             _hudChronoLastSec = int.MaxValue;
+            if (_chronoDuckApplied)
+            {
+                ThemeMusicPlayer.Instance?.SetChronoDuckMultiplier(1f);
+                _chronoDuckApplied = false;
+            }
 
             bool chronoUi = string.Equals(gmm.ActiveModeId, "speed-chrono", System.StringComparison.Ordinal)
                             && (panel == null || panel.IsChronoRoundActive);
@@ -80,12 +93,28 @@ namespace CongoGames.UI
 
             if (timerSeconds != null)
             {
-                timerSeconds.text = Mathf.Ceil(t).ToString("0");
+                int sec = Mathf.CeilToInt(t);
+                timerSeconds.text = sec.ToString("0");
+                if (sec < _hudChronoLastSec && _hudChronoLastSec < 1000000)
+                {
+                    GameSfxHub.Instance?.PlayChronoTick(0.52f);
+                }
+
+                _hudChronoLastSec = sec;
             }
 
             if (brandLine != null && string.IsNullOrEmpty(brandLine.text))
             {
                 brandLine.text = "Congo · tricolore · FR · Lingala · Kituba";
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (_chronoDuckApplied)
+            {
+                ThemeMusicPlayer.Instance?.SetChronoDuckMultiplier(1f);
+                _chronoDuckApplied = false;
             }
         }
     }

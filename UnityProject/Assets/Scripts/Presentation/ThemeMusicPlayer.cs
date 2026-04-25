@@ -26,6 +26,7 @@ namespace CongoGames.Presentation
         [Tooltip("Optionnel : bus Audio Mixer (ex. Bus_Music) pour le mix broadcast.")]
         [SerializeField] private AudioMixerGroup musicOutputGroup;
         private float duckMultiplier = 1f;
+        private float chronoDuckMultiplier = 1f;
 
         private AudioSource music;
         private Coroutine playlistRoutine;
@@ -53,11 +54,19 @@ namespace CongoGames.Presentation
             RefreshMusicVolume();
         }
 
+        /// <summary>Atténuation temporaire pendant le compte à rebours visuel/sonore.</summary>
+        public void SetChronoDuckMultiplier(float linear01)
+        {
+            chronoDuckMultiplier = Mathf.Clamp01(linear01);
+            RefreshMusicVolume();
+        }
+
         private void RefreshMusicVolume()
         {
             if (music != null)
             {
                 music.volume = volume * duckMultiplier;
+                music.volume *= chronoDuckMultiplier;
             }
         }
 
@@ -195,9 +204,9 @@ namespace CongoGames.Presentation
                     }
                 }
 
-                if (trackPaths.Count < 2
-                    || string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase)
+                if ((string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(modeId, "image-guess", StringComparison.OrdinalIgnoreCase))
+                    && trackPaths.Count < 2)
                 {
                     TryAppendCongoleseRepoPlaylistFolder(trackPaths);
                 }
