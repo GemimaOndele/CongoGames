@@ -19,7 +19,7 @@
       "c": "Fanfare militaire russe",
       "d": "Bluegrass américain",
       "correctIndex": 0,
-      "subLine": "Indice : Kinshasa-Brazzaville : mêmes racines musicales échangées.",
+      "subLine": "Indice : de part et d’autre du fleuve, échanges musicaux historiques (Kinshasa, capitale RDC, et côté Congo).",
       "audioFileBase": "track02",
       "audioUrl": "",
       "categoryLabel": "Groupe / époque"
@@ -49,7 +49,7 @@
       "categoryLabel": "Rôle scénique"
     },
     {
-      "prompt": "La musique « congolaise » de Brazzaville partage souvent des racines avec celle de …",
+      "prompt": "La musique « congolaise » du Congo (pays) partage souvent des racines avec celle de …",
       "a": "Kinshasa (RDC), échanges historiques sur le fleuve",
       "b": "Oslo",
       "c": "Tokyo",

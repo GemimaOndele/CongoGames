@@ -1,44 +1,44 @@
 {
   "items": [
     {
-      "hint": "Habitants célèbres pour l’élégance des tenues, parfois photographiés près de Brazzaville — mot collectif souvent entendu ?",
+      "hint": "Habillés avec élégance, souvent photographiés en fête ou en rue : quel mot collectif désigne souvent ce style (Congo) ?",
       "answerKey": "SAPEUR",
       "styleSeed": 3101,
       "streamingFileBase": "sapeurs",
       "altAnswerKey": "SAPEURS",
-      "trivia": "Placer sapeurs.png (photo libre de droits / Commons) dans Theme/ImageGuess/ — pas de poids binaire imposé dans le dépôt public."
+      "trivia": "Image réelle requise : sapeurs.png (droits vérifiés). Pas d’image générée par le moteur."
     },
     {
-      "hint": "Département côtier, pétrole, cultures maritimes (un mot) ?",
+      "hint": "Carte : département côtier, pétrole, cultures maritimes — un nom (région du Congo) ?",
       "answerKey": "KOUILOU",
       "styleSeed": 3202,
-      "streamingFileBase": "",
+      "streamingFileBase": "kouilou",
       "altAnswerKey": "KOUILOU",
-      "trivia": "Carte admin. du Congo (Brazzaville) : sud-ouest."
+      "trivia": "Photo carte ou côte : kouilou.png (source autorisée)."
     },
     {
-      "hint": "Réserve naturelle, rhinocéros, savanes (Nord) — un mot du nom de parc connu ?",
-      "answerKey": "Odzala",
+      "hint": "Parc ou réserve du nord, forêts et grands mammifères : un mot du nom d’une aire connue (Congo) ?",
+      "answerKey": "ODZALA",
       "styleSeed": 3303,
       "streamingFileBase": "odzala",
       "altAnswerKey": "ODZALA",
-      "trivia": "Image : paysage forêt / savane — visuel local optionnel odzala.png."
+      "trivia": "Paysage réel : odzala.png (tourisme / presse, licence claire)."
     },
     {
-      "hint": "Cours d’eau secondaire, affluent du fleuve, nom du bâtiment législatif à Brazzaville (fait le lien) — abréviation 3 lettres d’un aéroport congolais ?",
+      "hint": "Aéroport international du pays (code IATA 3 lettres) ?",
       "answerKey": "BZV",
       "styleSeed": 3404,
-      "streamingFileBase": "",
+      "streamingFileBase": "aeroport",
       "altAnswerKey": "",
-      "trivia": "Cohérent avec bzv de la banque de base : variante question."
+      "trivia": "Image : tarmac, terminal ou signalisation — aeroport.png."
     },
     {
-      "hint": "Langue véhiculaire très entendue à Brazzaville et en chansons (un mot) ?",
+      "hint": "Très entendu en chansons et au quotidien, langue véhiculaire du pays (un mot) ?",
       "answerKey": "LINGALA",
       "styleSeed": 3505,
-      "streamingFileBase": "",
+      "streamingFileBase": "langues",
       "altAnswerKey": "KITUBA",
-      "trivia": "Indice : Kituba (munukutuba) est aussi répandu — une des deux formes de réponse selon l’intitulé côté banc."
+      "trivia": "Photo culturelle ou concert local autorisé — langues.png."
     }
   ]
 }

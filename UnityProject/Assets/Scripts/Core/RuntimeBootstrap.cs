@@ -100,9 +100,10 @@ namespace CongoGames.Core
 
             CreateFlagBadge(topBar.transform);
 
-            const float logoMaxH = 86f;
-            const float logoMaxW = 520f;
+            const float logoMaxH = 80f;
+            const float logoMaxW = 440f;
             float headerLogoH = 0f;
+            GameObject headerLogoInstance = null;
             Texture2D logoTex = Resources.Load<Texture2D>("Branding/CongoGameslogo");
             if (logoTex != null)
             {
@@ -117,12 +118,13 @@ namespace CongoGames.Core
 
                 headerLogoH = lh;
                 GameObject logoGo = new GameObject("CongoGamesLogo");
+                headerLogoInstance = logoGo;
                 logoGo.transform.SetParent(canvasGo.transform, false);
                 RectTransform lrt = logoGo.AddComponent<RectTransform>();
                 lrt.anchorMin = new Vector2(0.5f, 1f);
                 lrt.anchorMax = new Vector2(0.5f, 1f);
                 lrt.pivot = new Vector2(0.5f, 1f);
-                lrt.anchoredPosition = new Vector2(0f, -10f);
+                lrt.anchoredPosition = new Vector2(0f, -8f);
                 lrt.sizeDelta = new Vector2(lw, lh);
                 RawImage logoRaw = logoGo.AddComponent<RawImage>();
                 logoRaw.texture = logoTex;
@@ -152,7 +154,7 @@ namespace CongoGames.Core
             brand.color = new Color(0.92f, 0.92f, 0.92f, 0.9f);
             brand.text = "Congo · tricolore vert · jaune · rouge · FR · Lingala · Kituba";
 
-            Text modeLabel = CreateText(canvasGo.transform, "ModeLabel", font, 28, TextAnchor.MiddleLeft, new Vector2(0f, 1f), new Vector2(0.48f, 1f), new Vector2(20f, -modeY), new Vector2(0f, 40f));
+            Text modeLabel = CreateText(canvasGo.transform, "ModeLabel", font, 28, TextAnchor.MiddleLeft, new Vector2(0f, 1f), new Vector2(0.36f, 1f), new Vector2(16f, -modeY), new Vector2(0f, 40f));
             modeLabel.color = Color.white;
             modeLabel.horizontalOverflow = HorizontalWrapMode.Wrap;
             modeLabel.verticalOverflow = VerticalWrapMode.Overflow;
@@ -160,12 +162,12 @@ namespace CongoGames.Core
             modeLabel.resizeTextMinSize = 18;
             modeLabel.resizeTextMaxSize = 30;
 
-            // Bande haute 52–75 % (entre le libellé de mode et le Classement) : le minuteur n’est plus sous le panneau central ni le classement
-            GameObject timerBlock = CreateUiRect(canvasGo.transform, "TimerBlock", new Vector2(0.52f, 0.86f), new Vector2(0.75f, 0.99f), Vector2.zero, Vector2.zero);
+            // Minuteur : bande haute, à gauche du panneau Classement (aucun chevauchement : fin avant anchor ~0,72)
+            GameObject timerBlock = CreateUiRect(canvasGo.transform, "TimerBlock", new Vector2(0.57f, 0.84f), new Vector2(0.71f, 0.98f), Vector2.zero, Vector2.zero);
             RectTransform timerRt = timerBlock.GetComponent<RectTransform>();
             timerRt.pivot = new Vector2(0.5f, 0.5f);
-            timerRt.offsetMin = new Vector2(2f, 2f);
-            timerRt.offsetMax = new Vector2(-2f, -2f);
+            timerRt.offsetMin = new Vector2(3f, 3f);
+            timerRt.offsetMax = new Vector2(-3f, -3f);
             Image ringBg = timerBlock.AddComponent<Image>();
             ringBg.sprite = GetWhiteSprite();
             ringBg.color = new Color(0.15f, 0.15f, 0.18f, 0.9f);
@@ -180,44 +182,49 @@ namespace CongoGames.Core
             ring.fillAmount = 1f;
             ring.raycastTarget = false;
 
-            Text timerSec = CreateText(timerBlock.transform, "TimerSec", font, 40, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(120f, 64f));
+            Text timerSec = CreateText(timerBlock.transform, "TimerSec", font, 34, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(110f, 60f));
             timerSec.fontStyle = FontStyle.Bold;
             timerSec.color = Color.white;
+            if (headerLogoInstance != null)
+            {
+                headerLogoInstance.transform.SetSiblingIndex(timerBlock.transform.GetSiblingIndex() + 1);
+            }
 
-            GameObject lbPanel = CreateUiRect(canvasGo.transform, "LeaderboardPanel", new Vector2(0.76f, 0.1f), new Vector2(0.99f, 0.9f), Vector2.zero, Vector2.zero);
+            GameObject lbPanel = CreateUiRect(canvasGo.transform, "LeaderboardPanel", new Vector2(0.73f, 0.1f), new Vector2(0.99f, 0.9f), Vector2.zero, Vector2.zero);
             Image lbBg = lbPanel.AddComponent<Image>();
             lbBg.sprite = GetWhiteSprite();
             lbBg.color = new Color(0.08f, 0.1f, 0.14f, 0.92f);
             RectTransform lbPanelRt = lbPanel.GetComponent<RectTransform>();
-            lbPanelRt.offsetMin = new Vector2(8f, 8f);
-            lbPanelRt.offsetMax = new Vector2(-8f, -8f);
+            lbPanelRt.offsetMin = new Vector2(10f, 10f);
+            lbPanelRt.offsetMax = new Vector2(-10f, -10f);
 
-            Text lbTitle = CreateText(lbPanel.transform, "LbTitle", font, 30, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(12f, -10f), new Vector2(-24f, 44f));
+            Text lbTitle = CreateText(lbPanel.transform, "LbTitle", font, 28, TextAnchor.UpperLeft, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(10f, -8f), new Vector2(-20f, 46f));
             lbTitle.fontStyle = FontStyle.Bold;
             lbTitle.color = new Color(1f, 0.85f, 0.15f);
             lbTitle.text = "Classement";
 
-            Text lbBody = CreateText(lbPanel.transform, "LbBody", font, 20, TextAnchor.UpperLeft, new Vector2(0f, 0f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero);
+            Text lbBody = CreateText(lbPanel.transform, "LbBody", font, 22, TextAnchor.UpperLeft, new Vector2(0f, 0f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero);
             lbBody.color = new Color(0.95f, 0.95f, 0.95f);
             lbBody.alignment = TextAnchor.UpperLeft;
             lbBody.horizontalOverflow = HorizontalWrapMode.Wrap;
             lbBody.verticalOverflow = VerticalWrapMode.Overflow;
-            lbBody.lineSpacing = 1.12f;
+            lbBody.lineSpacing = 1.15f;
             RectTransform lbRt = lbBody.rectTransform;
             lbRt.anchorMin = new Vector2(0f, 0f);
             lbRt.anchorMax = new Vector2(1f, 1f);
             lbRt.pivot = new Vector2(0.5f, 0.5f);
             lbRt.anchoredPosition = Vector2.zero;
-            lbRt.offsetMin = new Vector2(10f, 12f);
-            lbRt.offsetMax = new Vector2(-10f, -52f);
+            lbRt.offsetMin = new Vector2(10f, 10f);
+            lbRt.offsetMax = new Vector2(-10f, -54f);
 
             LeaderboardUI lbUi = lbPanel.AddComponent<LeaderboardUI>();
             lbUi.BindRuntime(lbBody);
 
-            GameObject modeRoot = CreateUiRect(canvasGo.transform, "ModePanelsRoot", new Vector2(0.02f, 0.08f), new Vector2(0.75f, 0.92f), Vector2.zero, Vector2.zero);
+            // Ne pas monter sous ~22 % du haut : laisse le logo / en-tête visibles (évite de recouvrir le centre).
+            GameObject modeRoot = CreateUiRect(canvasGo.transform, "ModePanelsRoot", new Vector2(0.015f, 0.08f), new Vector2(0.70f, 0.78f), Vector2.zero, Vector2.zero);
             RectTransform modeRootRt = modeRoot.GetComponent<RectTransform>();
-            modeRootRt.offsetMin = new Vector2(4f, 4f);
-            modeRootRt.offsetMax = new Vector2(-6f, -4f);
+            modeRootRt.offsetMin = new Vector2(6f, 6f);
+            modeRootRt.offsetMax = new Vector2(-8f, -6f);
             modeRoot.AddComponent<ModeSurfaceController>();
             modeRoot.AddComponent<MiniGamePanelContent>();
             modeRoot.AddComponent<HudPanelAnimator>();
@@ -235,7 +242,7 @@ namespace CongoGames.Core
             Text questionText = CreateQuestionBody(board.transform, font);
             Text phaseBanner = CreatePhaseBanner(board.transform, font);
 
-            GameObject strip = CreateUiRect(board.transform, "AnswersStrip", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 10f), new Vector2(0f, 258f));
+            GameObject strip = CreateUiRect(board.transform, "AnswersStrip", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 8f), new Vector2(0f, 288f));
             RectTransform stripRt = strip.GetComponent<RectTransform>();
             stripRt.pivot = new Vector2(0.5f, 0f);
             Image stripBg = strip.AddComponent<Image>();
@@ -243,13 +250,16 @@ namespace CongoGames.Core
             stripBg.color = new Color(0.03f, 0.04f, 0.06f, 0.94f);
             stripBg.raycastTarget = false;
 
-            Text stripLabel = CreateText(strip.transform, "AnswersStripLabel", font, 17, TextAnchor.UpperCenter, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -2f), new Vector2(800f, 26f));
+            Text stripLabel = CreateText(strip.transform, "AnswersStripLabel", font, 21, TextAnchor.UpperCenter, new Vector2(0.04f, 1f), new Vector2(0.96f, 1f), new Vector2(0f, -3f), new Vector2(0f, 32f));
             stripLabel.color = new Color(1f, 0.88f, 0.25f, 0.9f);
             stripLabel.fontStyle = FontStyle.Bold;
             stripLabel.text = "Réponses — touche une lettre";
+            stripLabel.horizontalOverflow = HorizontalWrapMode.Wrap;
+            stripLabel.verticalOverflow = VerticalWrapMode.Overflow;
+            stripLabel.alignment = TextAnchor.UpperLeft;
 
-            const float rowH = 48f;
-            const float gap = 4f;
+            const float rowH = 52f;
+            const float gap = 5f;
             const float baseY = 10f;
             CreateChoiceStripButton(strip.transform, font, "A", baseY + 3f * (rowH + gap), out Button btnA, out Image bgA, out Text lblA);
             CreateChoiceStripButton(strip.transform, font, "B", baseY + 2f * (rowH + gap), out Button btnB, out Image bgB, out Text lblB);
@@ -387,7 +397,7 @@ namespace CongoGames.Core
 
         private static void PatchAllCanvasScalersForWebGl()
         {
-            CanvasScaler[] scalers = Object.FindObjectsByType<CanvasScaler>(FindObjectsSortMode.None);
+            CanvasScaler[] scalers = Object.FindObjectsByType<CanvasScaler>(FindObjectsInactive.Exclude);
             for (int i = 0; i < scalers.Length; i++)
             {
                 WebGlCanvasTuning.ApplyToScaler(scalers[i]);
@@ -451,23 +461,23 @@ namespace CongoGames.Core
             GameObject go = new GameObject("QuestionBody");
             go.transform.SetParent(parent, false);
             RectTransform rt = go.AddComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.04f, 0.34f);
-            rt.anchorMax = new Vector2(0.96f, 0.94f);
+            rt.anchorMin = new Vector2(0.04f, 0.40f);
+            rt.anchorMax = new Vector2(0.96f, 0.92f);
             rt.pivot = new Vector2(0.5f, 1f);
             rt.anchoredPosition = Vector2.zero;
-            rt.offsetMin = new Vector2(10f, 6f);
-            rt.offsetMax = new Vector2(-10f, -10f);
+            rt.offsetMin = new Vector2(12f, 8f);
+            rt.offsetMax = new Vector2(-12f, -12f);
             Text text = go.AddComponent<Text>();
             text.font = font;
-            text.fontSize = 32;
+            text.fontSize = 34;
             text.fontStyle = FontStyle.Bold;
             text.alignment = TextAnchor.UpperCenter;
             text.color = Color.white;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 20;
-            text.resizeTextMaxSize = 40;
+            text.resizeTextMinSize = 22;
+            text.resizeTextMaxSize = 44;
             text.raycastTarget = false;
             Outline ol = go.AddComponent<Outline>();
             ol.effectColor = new Color(0f, 0f, 0f, 0.55f);
@@ -480,12 +490,12 @@ namespace CongoGames.Core
             GameObject go = new GameObject("PhaseBanner");
             go.transform.SetParent(parent, false);
             RectTransform rt = go.AddComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.06f, 0.30f);
-            rt.anchorMax = new Vector2(0.94f, 0.34f);
+            rt.anchorMin = new Vector2(0.05f, 0.31f);
+            rt.anchorMax = new Vector2(0.95f, 0.39f);
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.anchoredPosition = Vector2.zero;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
+            rt.offsetMin = new Vector2(6f, 0f);
+            rt.offsetMax = new Vector2(-6f, 0f);
             Text text = go.AddComponent<Text>();
             text.font = font;
             text.fontSize = 24;
@@ -495,8 +505,8 @@ namespace CongoGames.Core
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 16;
-            text.resizeTextMaxSize = 28;
+            text.resizeTextMinSize = 18;
+            text.resizeTextMaxSize = 32;
             text.raycastTarget = false;
             return text;
         }
@@ -506,11 +516,11 @@ namespace CongoGames.Core
             GameObject go = new GameObject("Choice" + letter);
             go.transform.SetParent(strip, false);
             RectTransform rt = go.AddComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.5f, 0f);
-            rt.anchorMax = new Vector2(0.5f, 0f);
+            rt.anchorMin = new Vector2(0.03f, 0f);
+            rt.anchorMax = new Vector2(0.97f, 0f);
             rt.pivot = new Vector2(0.5f, 0f);
             rt.anchoredPosition = new Vector2(0f, yFromBottom);
-            rt.sizeDelta = new Vector2(1040f, 50f);
+            rt.sizeDelta = new Vector2(0f, 52f);
 
             background = go.AddComponent<Image>();
             background.sprite = GetWhiteSprite();
@@ -532,10 +542,12 @@ namespace CongoGames.Core
             trt.offsetMax = new Vector2(-18f, -6f);
             label = textGo.AddComponent<Text>();
             label.font = font;
-            label.fontSize = 24;
+            label.fontSize = 26;
             label.fontStyle = FontStyle.Bold;
             label.alignment = TextAnchor.MiddleLeft;
             label.color = Color.white;
+            label.horizontalOverflow = HorizontalWrapMode.Wrap;
+            label.verticalOverflow = VerticalWrapMode.Overflow;
             label.raycastTarget = false;
         }
 

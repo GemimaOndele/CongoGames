@@ -5,8 +5,9 @@ namespace CongoGames.Presentation
     /// <summary>Build WebGL seulement : rafraîchit l’échelle UI + pincement 2 doigts.</summary>
     public sealed class WebGlUiScaleRuntime : MonoBehaviour
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
         private float _lastPinchDist = -1f;
-
+#endif
         private void OnEnable()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR

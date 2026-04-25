@@ -72,7 +72,7 @@ namespace CongoGames.Presentation
         private Button[] blindChoiceButtons;
 
         [Tooltip("Pendant l’écoute, les choix A–D sont désactivés ; après la coupure, tu réponds.")]
-        [SerializeField] private float blindListenSeconds = 48f;
+        [SerializeField] private float blindListenSeconds = 60f;
         private bool blindInQuestionPhase;
         private Coroutine blindListenCo;
         private float blindListenEndUnscaled;
@@ -1885,15 +1885,15 @@ namespace CongoGames.Presentation
             crossFbRt.sizeDelta = new Vector2(900f, 36f);
 
             GameObject blind = PanelShell(modeRoot, "PanelBlind", "blind-test", new Color(0.1f, 0.06f, 0.14f, 0.96f), white, surf);
-            demo.blindTitle = Title(blind.transform, font, "BTitle", "Blind test", new Vector2(0f, -30f));
-            demo.blindPrompt = Sub(blind.transform, font, "BlindQ", new Vector2(0f, -80f));
-            demo.blindPrompt.rectTransform.sizeDelta = new Vector2(940f, 150f);
+            demo.blindTitle = Title(blind.transform, font, "BTitle", "Blind test", new Vector2(0f, -32f));
+            demo.blindPrompt = Sub(blind.transform, font, "BlindQ", new Vector2(0f, -86f));
+            demo.blindPrompt.rectTransform.sizeDelta = new Vector2(900f, 160f);
             demo.blindPrompt.fontSize = 30;
-            demo.blindSub = Sub(blind.transform, font, "BlindSub", new Vector2(0f, -200f));
-            demo.blindSub.rectTransform.sizeDelta = new Vector2(920f, 120f);
+            demo.blindSub = Sub(blind.transform, font, "BlindSub", new Vector2(0f, -210f));
+            demo.blindSub.rectTransform.sizeDelta = new Vector2(880f, 132f);
             demo.blindSub.fontSize = 24;
-            demo.blindSub.lineSpacing = 1.05f;
-            Transform blindHost = CreateGridHost(blind.transform, "BlindEmojiHost", 0.48f, new Vector2(0f, 72f), new Vector2(920f, 150f));
+            demo.blindSub.lineSpacing = 1.1f;
+            Transform blindHost = CreateGridHost(blind.transform, "BlindEmojiHost", 0.48f, new Vector2(0f, 78f), new Vector2(900f, 150f));
             demo.blindEmoji = BigLettersCentered(blindHost, font, "BEmoji", 64);
             GameObject blindChoicesRoot = CreateRect(blind.transform, "BlindChoicesRoot", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 108f), new Vector2(960f, 280f));
             BlindChoiceColumn(blindChoicesRoot.transform, font, new Vector2(0f, -12f), 54f, demo);
@@ -1917,12 +1917,13 @@ namespace CongoGames.Presentation
             demo.mysteryFeedback = Sub(mystFoot.transform, font, "MystFb", new Vector2(0f, -162f));
 
             GameObject mem = PanelShell(modeRoot, "PanelMemory", "memory", new Color(0.06f, 0.11f, 0.09f, 0.96f), white, surf);
-            demo.memoryTitle = Title(mem.transform, font, "MemTitle", "Mémoire", new Vector2(0f, -28f));
-            Transform memHost = CreateGridHost(mem.transform, "MemoryGridHost", 0.5f, new Vector2(0f, 16f), new Vector2(720f, 280f));
-            demo.memoryCards = MemoryGrid(memHost, font, white, 124f, 14f);
-            demo.memorySubtitle = Sub(mem.transform, font, "MemSub", new Vector2(0f, -178f));
-            demo.memorySubtitle.fontSize = 21;
-            demo.memorySubtitle.rectTransform.sizeDelta = new Vector2(900f, 76f);
+            demo.memoryTitle = Title(mem.transform, font, "MemTitle", "Mémoire", new Vector2(0f, -32f));
+            Transform memHost = CreateGridHost(mem.transform, "MemoryGridHost", 0.5f, new Vector2(0f, 22f), new Vector2(800f, 300f));
+            demo.memoryCards = MemoryGrid(memHost, font, white, 120f, 12f);
+            demo.memorySubtitle = Sub(mem.transform, font, "MemSub", new Vector2(0f, -200f));
+            demo.memorySubtitle.fontSize = 22;
+            demo.memorySubtitle.lineSpacing = 1.08f;
+            demo.memorySubtitle.rectTransform.sizeDelta = new Vector2(880f, 96f);
 
             GameObject chrono = PanelShell(modeRoot, "PanelChrono", "speed-chrono", new Color(0.12f, 0.07f, 0.06f, 0.96f), white, surf);
             demo.chronoTitle = Title(chrono.transform, font, "ChTitle", "Chrono vitesse", new Vector2(0f, -32f));

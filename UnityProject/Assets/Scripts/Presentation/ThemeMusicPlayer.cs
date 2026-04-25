@@ -203,7 +203,7 @@ namespace CongoGames.Presentation
                 }
 
                 trackPaths = trackPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-                trackPaths.Sort(StringComparer.OrdinalIgnoreCase);
+                ShuffleStringListInPlace(trackPaths);
 
                 if (trackPaths.Count == 0 && Directory.Exists(root))
                 {
@@ -219,7 +219,7 @@ namespace CongoGames.Presentation
                         }
                     }
 
-                    trackPaths.Sort(StringComparer.OrdinalIgnoreCase);
+                    ShuffleStringListInPlace(trackPaths);
                 }
             }
 
@@ -234,6 +234,8 @@ namespace CongoGames.Presentation
                         playlistClips.Add(clip);
                     }
                 }
+
+                ShuffleClipListInPlace(playlistClips);
 
                 if (playlistClips.Count >= 2)
                 {
@@ -438,8 +440,13 @@ namespace CongoGames.Presentation
 
         private IEnumerator DownloadClipUriCo(string uri, AudioType audioType, Action<AudioClip> assign)
         {
+            if (string.IsNullOrEmpty(uri))
+            {
+                yield break;
+            }
+
             using UnityWebRequest req = UnityWebRequestMultimedia.GetAudioClip(uri, audioType);
-            req.timeout = 60;
+            req.timeout = 90;
             yield return req.SendWebRequest();
 
             if (req.result != UnityWebRequest.Result.Success)
@@ -447,8 +454,93 @@ namespace CongoGames.Presentation
                 yield break;
             }
 
-            AudioClip clip = DownloadHandlerAudioClip.GetContent(req);
+            long code = req.responseCode;
+            if (code > 0L && (code < 200L || code > 299L))
+            {
+                yield break;
+            }
+
+            if (req.downloadedBytes < 32u)
+            {
+                yield break;
+            }
+
+            if (req.downloadHandler is not DownloadHandlerAudioClip dha)
+            {
+                yield break;
+            }
+
+            byte[] raw = dha.data;
+            if (raw == null || !LooksLikeAudioPayload(raw, audioType))
+            {
+                // Souvent page HTML/JSON d’erreur (HEAD ok, GET réinitialisé, mauvais type MIME…).
+                yield break;
+            }
+
+            AudioClip clip;
+            try
+            {
+                clip = DownloadHandlerAudioClip.GetContent(req);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning("ThemeMusicPlayer: GetContent a échoué (" + uri + "): " + ex.Message);
+                yield break;
+            }
+
+            if (clip == null || clip.length < 0.02f)
+            {
+                if (clip != null)
+                {
+                    Destroy(clip);
+                }
+
+                yield break;
+            }
+
             assign?.Invoke(clip);
+        }
+
+        private static bool LooksLikeAudioPayload(byte[] data, AudioType t)
+        {
+            if (data == null || data.Length < 4)
+            {
+                return false;
+            }
+
+            // Réponses HTML (reverse proxy, 404, etc.)
+            if (data[0] == (byte)'<' && data.Length > 4)
+            {
+                if (data[1] == (byte)'!' || (data[1] == (byte)'h' && data[2] == (byte)'t' && data[3] == (byte)'m'))
+                {
+                    return false;
+                }
+            }
+
+            switch (t)
+            {
+                case AudioType.MPEG:
+                    if (data[0] == 0x49 && data[1] == 0x44 && data[2] == 0x33)
+                    {
+                        return true; // ID3v2
+                    }
+
+                    for (int i = 0; i <= data.Length - 2 && i < 12; i++)
+                    {
+                        if (data[i] == 0xFF && (data[i + 1] & 0xE0) == 0xE0)
+                        {
+                            return true; // trame MP3
+                        }
+                    }
+
+                    return false;
+                case AudioType.OGGVORBIS:
+                    return data[0] == 0x4F && data[1] == 0x67 && data[2] == 0x67 && data[3] == 0x53;
+                case AudioType.WAV:
+                    return data[0] == 0x52 && data[1] == 0x49 && data[2] == 0x46 && data[3] == 0x46;
+                default:
+                    return data.Length > 32;
+            }
         }
 
         private static AudioType GuessAudioType(string pathOrUrl)
@@ -525,7 +617,7 @@ namespace CongoGames.Presentation
             var uq = new List<string>();
             uq.AddRange(trackPaths);
             uq = uq.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-            uq.Sort(StringComparer.OrdinalIgnoreCase);
+            ShuffleStringListInPlace(uq);
             trackPaths.Clear();
             trackPaths.AddRange(uq);
             if (trackPaths.Count > 0)
@@ -550,9 +642,37 @@ namespace CongoGames.Presentation
             }
 
             uq = trackPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-            uq.Sort(StringComparer.OrdinalIgnoreCase);
+            ShuffleStringListInPlace(uq);
             trackPaths.Clear();
             trackPaths.AddRange(uq);
+        }
+
+        private static void ShuffleStringListInPlace(List<string> list)
+        {
+            if (list == null || list.Count < 2)
+            {
+                return;
+            }
+
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = UnityEngine.Random.Range(0, i + 1);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
+        }
+
+        private static void ShuffleClipListInPlace(List<AudioClip> list)
+        {
+            if (list == null || list.Count < 2)
+            {
+                return;
+            }
+
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = UnityEngine.Random.Range(0, i + 1);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
         }
 
         /// <summary>

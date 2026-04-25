@@ -45,7 +45,7 @@ namespace CongoGames.Presentation
         public static void RefreshAll()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            CanvasScaler[] scalers = Object.FindObjectsByType<CanvasScaler>(FindObjectsSortMode.None);
+            CanvasScaler[] scalers = Object.FindObjectsByType<CanvasScaler>(FindObjectsInactive.Exclude);
             for (int i = 0; i < scalers.Length; i++)
             {
                 ApplyToScaler(scalers[i]);

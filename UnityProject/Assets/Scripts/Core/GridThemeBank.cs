@@ -28,7 +28,7 @@ namespace CongoGames.Core
         {
             new Theme("geo", "Géo & lieux (Congo)", new[]
             {
-                "BRAZZA", "POINTE", "CUVETTE", "LIKOUALA", "SANGHA", "POOL", "LEFINI", "NIARI", "LOANGO", "OUESSO", "BETOU", "IMPFON", "BANIO", "MAYOMB", "ESTUA", "BASSA", "MFOUA", "LOUBO", "KINKA", "NOIRE"
+                "KINTELE", "POINTE", "CUVETTE", "LIKOUALA", "SANGHA", "POOL", "LEFINI", "NIARI", "LOANGO", "OUESSO", "BETOU", "IMPFON", "BANIO", "MAYOMB", "ESTUA", "BASSA", "MFOUA", "LOUBO", "KINKA", "NOIRE"
             }),
             new Theme("nature", "Forêts, fleuve, faune", new[]
             {
@@ -36,19 +36,23 @@ namespace CongoGames.Core
             }),
             new Theme("culture", "Culture, fête, drapeau", new[]
             {
-                "BANTOU", "RUMBA", "NGOMA", "NDOMBO", "SEBEN", "DANSE", "CHANT", "BRAZZA", "MBOTE", "FETE", "AOUT", "CULTUR", "FOULE", "KERMES", "DANJAR", "FOYER", "GLOIRE", "HONOR", "SCENE", "HABIT"
+                "BANTOU", "RUMBA", "NGOMA", "NDOMBO", "SEBEN", "DANSE", "CHANT", "CONGO", "MBOTE", "FETE", "AOUT", "CULTUR", "FOULE", "KERMES", "DANJAR", "FOYER", "GLOIRE", "HONOR", "SCENE", "HABIT"
             }),
-            new Theme("lang", "Lingala & kituba (mots usités)", new[]
+            new Theme("lingala", "Lingala — vocabulaire (mots à retrouver)", new[]
             {
-                "MELESI", "MBOTE", "MALAMU", "MOTEMA", "MWANA", "MAIE", "KOKO", "BISO", "MANGI", "LIBOSO", "SIMBA", "MOSALA", "NDAKISA", "NZOTO", "MABOKO", "MPONDO", "BOKET", "LOKOLA", "PEKO", "ZALA", "SALUT"
+                "MELESI", "MBOTE", "MWANA", "MANGI", "TATA", "MAMA", "BISO", "KOKO", "MOTO", "MOKO", "PONA", "SUKA", "SIMBA", "BOKO", "BANDA", "KATI", "PEKO", "SUKI", "POTO", "MUNA", "MOKI", "BANA", "LISI", "NZOTO", "MOTI", "YAYA", "BUKA", "MELI", "MOSI", "LIBO"
+            }),
+            new Theme("kituba", "Kituba — vocabulaire (mots à retrouver)", new[]
+            {
+                "MALAMU", "SANTU", "MUNTU", "BANTU", "BOKO", "DIBU", "KUTA", "BUKA", "SUKA", "KUKU", "KISI", "MUKA", "TUKA", "DUKA", "ZONI", "TONI", "MUKO", "MBOA", "BUKI", "KONO", "TUKO", "BUKO", "KITA", "BUKU", "DUKO", "TATA", "MAMA", "MUNA", "SUKI", "MPASI"
             }),
             new Theme("sport", "Stade, foot, ferveur", new[]
             {
-                "BUTEUR", "STADE", "EQUIPE", "BALLON", "VICTO", "COUPE", "FOULE", "BRAZZA", "BANC", "TALENT", "ESSAI", "JOUER", "MATCH", "GAGNE", "BUTS", "BLESS", "TIR", "BUT", "CARTO", "MEDAL"
+                "BUTEUR", "STADE", "EQUIPE", "BALLON", "VICTO", "COUPE", "FOULE", "CONGO", "BANC", "TALENT", "ESSAI", "JOUER", "MATCH", "GAGNE", "BUTS", "BLESS", "TIR", "BUT", "CARTO", "MEDAL"
             }),
             new Theme("histoire", "Indépendance, symboles", new[]
             {
-                "AOUT", "ANNEE", "DROIT", "LIBRE", "PAIX", "UNION", "ORDRE", "TRAVAI", "PROGRE", "ECOLE", "VOTER", "LECONS", "TEMPO", "BRAZZA", "AVANT", "APRES", "EPOPEE", "PATRIO", "STATUE", "GLOIRE"
+                "AOUT", "ANNEE", "DROIT", "LIBRE", "PAIX", "UNION", "ORDRE", "TRAVAI", "PROGRE", "ECOLE", "VOTER", "LECONS", "TEMPO", "CONGO", "AVANT", "APRES", "EPOPEE", "PATRIO", "STATUE", "GLOIRE"
             }),
             new Theme("eco", "Commerce & vie quotidienne", new[]
             {
@@ -147,6 +151,23 @@ namespace CongoGames.Core
                 case "PEKO": return "un peu";
                 case "ZALA": return "être";
                 case "SALUT": return "salut";
+                case "NZOTO": return "corps";
+                case "SANTU": return "saint / sainte (souvent)";
+                case "MUNTU": return "personne / être humain (souvent)";
+                case "BANTU": return "pluriel de muntu (souvent)";
+                case "MPASI": return "souffrance / peine (souvent)";
+                case "MOTI": return "mort (souvent)";
+                case "BANDA": return "tribu / origine (souvent)";
+                case "PONA": return "pour / afin de (souvent)";
+                case "POTO": return "port (souvent)";
+                case "MOKI": return "regard / œil (souvent)";
+                case "BANA": return "enfants (souvent)";
+                case "LISI": return "yeux (souvent)";
+                case "LIBO": return "intestins (souvent)";
+                case "YAYA": return "oncle (souvent)";
+                case "MELI": return "poisson (souvent)";
+                case "MOSI": return "fumée (souvent)";
+                case "BUKA": return "ouvrir (souvent)";
                 default: return "";
             }
         }

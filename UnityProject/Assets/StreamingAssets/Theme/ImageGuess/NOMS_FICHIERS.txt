@@ -1,20 +1,25 @@
-Devine l’image — images optionnelles (PNG ou JPEG)
-==================================================
+Devine l’image — photos réelles du Congo (PNG ou JPEG)
+=====================================================
 
 Place les fichiers ici : UnityProject/Assets/StreamingAssets/Theme/ImageGuess/
 
-Noms attendus par la banque (sans extension, le code essaie .png puis .jpg puis .jpeg) :
+Noms attendus par la banque (sans extension ; le code essaie .png puis .jpg puis .jpeg) :
 
-  brazzaville
+  capitale          (vue de la capitale du pays sur le fleuve — photo libre de droits / source autorisée)
   pointe_noire
   fleuve_congo
   gorille
   drapeau
-  parc
-  kintele     (optionnel — stade / aire des jeux ; photo Commons sous licence si tu l’ajoutes)
+  parc              (ex. parc / forêt du nord)
+  ocean             (côte ou océan, optionnel)
+  departement_pool  (carte ou symbole, optionnel)
+  likouala
+  sangha
+  ndombolo          (scène de fête / danse, droits OK)
+  kintele           (stade / aire des jeux — ex. Wikimedia sous licence)
+  aeroport          (aéroport international, ou bzv.png)
 
-Si un fichier est absent pour une manche, une image de secours est générée automatiquement (ciel + drapeau déco, pas de photo identifiante : pour un vrai visuel Congo, mets toi un PNG/JPEG local avec licence claire, ex. Wikimedia Commons, et renomme le fichier attendu).
+Si un fichier manque : le jeu affiche un drapeau tricolore (vert-jaune-rouge) en attente — plus de paysage généré.
+Pour un vrai quiz visuel, ajoute des photos : sites touristiques, personnalités historiques, cartes, culture (licence et crédits respectés).
 
-Pendant chaque manche, l’image est d’abord assombrie / recadrée puis se dévoile sur ~15 s (réglage côté Unity sur MiniGamePanelContent).
-
-Après ajout ou modification des fichiers, relance le jeu (Play) pour recharger.
+Après ajout ou modification, relance le jeu (Play) pour recharger.

@@ -22,17 +22,17 @@ namespace CongoGames.Core
 
         private static readonly QTemplate[] Templates =
         {
-            T("Quelle est la capitale politique de la République du Congo (Brazzaville) ?", "Brazzaville", "Libreville", "Pointe-Noire", "Malabo", 0, "géographie"),
+            T("Quelle est la capitale politique de la République du Congo ?", "Brazzaville", "Libreville", "Pointe-Noire", "Malabo", 0, "géographie"),
             T("Couleurs du drapeau du Congo (bandes) ?", "Vert, jaune, rouge", "Bleu, blanc, rouge", "Noir, jaune, rouge", "Orange, blanc, vert", 0, "symboles"),
-            T("Quel fleuve majeur traverse le pays et baigne Brazzaville ?", "Le fleuve Congo", "Le Nil", "Le Niger", "Le Zambèze", 0, "géographie"),
+            T("Quel fleuve majeur traverse le pays et baigne sa capitale ?", "Le fleuve Congo", "Le Nil", "Le Niger", "Le Zambèze", 0, "géographie"),
             T("Dans l’usage courant, « le Congo » sans précision désigne ici le pays dont la capitale est …", "Brazzaville", "Kinshasa (RDC)", "Libreville", "Yaoundé", 0, "géographie"),
             T("La République démocratique du Congo (RDC) se distingue du Congo par le fait que sa capitale est …", "Kinshasa", "Brazzaville", "Lubumbashi (seulement)", "Pointe-Noire", 0, "géographie"),
             T("En lingala, « mbote » (selon contexte) sert surtout à …", "Saluer / dire bonjour", "Commander de l’eau", "Dire l’heure", "Dire « au revoir » seulement", 0, "langues"),
             T("En kituba, « santu » correspond souvent à …", "Saint / sainte (titre chrétiens)", "La pluie", "Le soleil seul", "Un fruit", 0, "langues"),
             T("En kituba, « malamu » (bien) s’emploie le plus souvent pour …", "Dire qu’on va bien / un accord simple, « c’est bon »", "Compter des kilomètres", "Dire l’heure en format 24h", "Nommer un mois lunaire chinois", 0, "langues"),
-            T("Langues très présentes au Congo-Brazzaville ?", "Français, Lingala, Kituba", "Anglais seul", "Arabe, swahili", "Portugais, espagnol", 0, "langues"),
-            T("Le pays dont la capitale est Brazzaville se situe sur quel continent ?", "Afrique", "Europe", "Asie", "Amérique du Sud", 0, "géographie"),
-            T("Brazzaville se trouve sur quelle rive du fleuve Congo ?", "Rive nord", "Rive sud", "Rive est uniquement", "Loin du fleuve", 0, "géographie"),
+            T("Langues très présentes au Congo ?", "Français, Lingala, Kituba", "Anglais seul", "Arabe, swahili", "Portugais, espagnol", 0, "langues"),
+            T("Le Congo (pays) se situe sur quel continent ?", "Afrique", "Europe", "Asie", "Amérique du Sud", 0, "géographie"),
+            T("La capitale du Congo se trouve sur quelle rive du fleuve Congo ?", "Rive nord", "Rive sud", "Rive est uniquement", "Loin du fleuve", 0, "géographie"),
             T("Océan à l’ouest du Congo ?", "Atlantique", "Indien", "Arctique", "Pacifique sud", 0, "géographie"),
             T("« Mbote » en lingala / kituba correspond souvent à …", "Salut / bonjour", "Merci", "Au revoir", "Eau", 0, "langues"),
             T("« Melesi » (variantes) exprime souvent …", "Merci", "Bonjour", "Excuse", "Feu", 0, "langues"),
@@ -56,7 +56,7 @@ namespace CongoGames.Core
             T("Monnaie utilisée en République du Congo ?", "Franc CFA (CEMAC)", "Euro seul", "Dollar US officiel", "Livre sterling", 0, "économie"),
             T("CongoGames met en avant surtout …", "Culture et fierté du Congo", "Cuisine italienne", "Sports US", "Cinéma japonais", 0, "jeu"),
             T("Le département de la Cuvette est surtout connu pour …", "Fleuve, marécages, bassins versants (centre–nord)", "Des pistes de ski alpin", "Désert de sable", "Côte océanique seulement", 0, "géographie"),
-            T("Un pays frontalier du Congo-Brazzaville ?", "Gabon", "Madagascar", "Sénégal", "Kenya", 0, "géographie"),
+            T("Un pays frontalier du Congo ?", "Gabon", "Madagascar", "Sénégal", "Kenya", 0, "géographie"),
             T("Capitale économique côtière importante ?", "Pointe-Noire", "Ouesso", "Impfondo", "Madingou", 0, "géographie"),
             T("Parc connu pour les gorilles (nord) ?", "Nouabalé-Ndoki", "Yellowstone", "Kruger", "Serengeti", 0, "nature"),
             T("« Sango » est surtout une langue du …", "Voisin (Centrafrique)", "Congo uniquement", "Maroc", "Brésil", 0, "langues"),
@@ -81,10 +81,10 @@ namespace CongoGames.Core
             T("« Kozwa » peut signifier …", "Recevoir / obtenir", "Donner", "Cacher", "Nager", 0, "langues"),
             T("En classe, on note souvent le cours dans un …", "Cahier", "Four", "Réfrigérateur", "Tapis", 0, "culture"),
             T("Sport collectif très populaire en Afrique et au Congo ?", "Football", "Curling", "Baseball", "Hockey sur glace", 0, "sport"),
-            T("Brazzaville est souvent qualifiée de … sur le grand fleuve ?", "Grande « capitale bord de fleuve » (rive nord)", "Métropole arctique", "Port méditerranéen", "Base spatiale", 0, "géographie"),
+            T("La capitale du Congo est souvent qualifiée de … sur le grand fleuve ?", "Grande « capitale bord de fleuve » (rive nord)", "Métropole arctique", "Port méditerranéen", "Base spatiale", 0, "géographie"),
             T("Le département de la Likouala est surtout connu pour …", "Ses forêts et cours d’eau du nord", "Ses pistes de ski", "Ses champs de lavande", "Ses volcans en activité", 0, "géographie"),
             T("Quel animal emblématique trouve-t-on dans les forêts du nord congolais ?", "Gorille / éléphant de forêt (selon zones)", "Pingouin empereur", "Kangourou", "Ours polaire", 0, "nature"),
-            T("Le Pool (département) entoure surtout …", "Brazzaville et sa périphérie", "L’île de Groenland", "Le désert du Sahara central", "La cordillère des Andes", 0, "géographie"),
+            T("Le Pool (département) entoure surtout …", "la capitale et sa périphérie", "L’île de Groenland", "Le désert du Sahara central", "La cordillère des Andes", 0, "géographie"),
             T("Quel pays partage une frontière terrestre avec le Congo au sud-ouest ?", "Angola (Cabinda, enclave)", "Islande", "Japon", "Norvège", 0, "géographie"),
             T("En République du Congo, l’administration utilise encore beaucoup …", "Le français (langue officielle)", "Le japonais", "Le swahili seul", "Le latin classique", 0, "culture"),
             T("« Liboso » peut signifier souvent …", "Devant / auparavant", "Derrière uniquement", "Jamais", "Lundi", 0, "langues"),
@@ -104,12 +104,12 @@ namespace CongoGames.Core
             T("Pour animer un live sur TikTok avec du Congo, on privilégie souvent …", "BPM souples, rythme dansant, titres mémorables", "Bruit blanc 20 min", "Opéra wagnérien intégral", "Conférence sur les impôts", 0, "musique"),
             T("Pointe-Noire surnommée en partie pour … ?", "Pétrole, port, océan", "Fêtes vénitiennes de la neige", "Forêt tropicale pure sans côte", "Volcan actif 4000 m", 0, "géographie"),
             T("Le département de la Cuvette est surtout plutôt …", "Forêts et zones humides intérieures", "Désert de glace", "Pôle industriel siderurgique alpin", "Archipel de 200 îles", 0, "géographie"),
-            T("« Pool » côté populaire : on parle souvent du …", "Bassin autour de Brazzaville", "Océan Indien seul", "Désert d’Atacama", "Canal de Suez", 0, "géographie"),
+            T("« Pool » côté populaire : on parle souvent du …", "Bassin autour de la capitale", "Océan Indien seul", "Désert d’Atacama", "Canal de Suez", 0, "géographie"),
             T("Un plat à base de feuille de manioc cuite : gombo / … ?", "Légumes locaux, sauce, accompagnement", "Sashimi de saumon norvégien", "Raclette végétalienne de ski", "Smoothie ananas uniquement", 0, "culture"),
-            T("Très gros stade de football (près de Brazzaville, grands jeux) : on le nomme le plus souvent … ?", "Stade de Kintélé", "Stade de France (Paris)", "Santiago Bernabéu (Madrid)", "Old Trafford (Manchester)", 0, "sport"),
-            T("Cathédrale de style néo-byzantin repérable à Brazzaville, dédiée à … (nom courant) ?", "Sainte-Anne (cathédrale de Brazzaville)", "Notre-Dame (Paris) copié", "Dôme d’Aix-la-Chapelle (titre court", "Cathédrale de Cologne (Allemagne)", 0, "culture"),
+            T("Très gros stade de football (près de la capitale, grands jeux) : on le nomme le plus souvent … ?", "Stade de Kintélé", "Stade de France (Paris)", "Santiago Bernabéu (Madrid)", "Old Trafford (Manchester)", 0, "sport"),
+            T("Cathédrale de style néo-byzantin au centre du pays, dédiée à … (nom courant) ?", "Sainte-Anne (cathédrale, Congo)", "Notre-Dame (Paris) copié", "Dôme d’Aix-la-Chapelle (titre court", "Cathédrale de Cologne (Allemagne)", 0, "culture"),
             T("Pour un live (TikTok), la priorité n°1 pour rester lisible, c’est d’abord : … ?", "Gros caractères, contraste, son clair, peu d’effets sur le texte", "Texte 6 pt sur bande claire seulement", "Caméra tournante rapide 360° seulement", "Silence 5 min d’ouverture", 0, "jeu"),
-            T("Quand on distingue le Congo (capitale Brazzaville) de la RDC (capitale Kinshasa)…", "Sont deux pays distincts, deux capitales sur le fleuve, deux législations", "C’est le même drapeau exact", "Une seule monnaie officielle", "Même drapeau et même hymne seuls", 0, "culture")
+            T("Quand on distingue le Congo (République du Congo) de la RDC (capitale Kinshasa)…", "Sont deux pays distincts, deux capitales sur le fleuve, deux législations", "C’est le même drapeau exact", "Une seule monnaie officielle", "Même drapeau et même hymne seuls", 0, "culture")
         };
 
         private static readonly Queue<int> DrawQueue = new Queue<int>();

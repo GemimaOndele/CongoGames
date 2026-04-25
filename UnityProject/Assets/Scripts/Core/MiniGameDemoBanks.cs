@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -78,10 +79,10 @@ namespace CongoGames.Core
                 "track01",
                 null),
             new BlindRound(
-                "Dans le pays « Congo » (Brazzaville), le ndombolo vient le plus souvent d’un mix …",
+                "Dans le pays « Congo », le ndombolo vient le plus souvent d’un mix …",
                 new[] { "Guitare, seben, rythme club / ndombolo", "Hipp-hop US pur", "Opéra wagnérien", "Jazz new-orléans" },
                 0,
-                "Indice : danse de hanches + section rythmique. Ne pas confondre Congo (Brazzaville) et RDC (ex-Zaïre).",
+                "Indice : danse de hanches + section rythmique. Ne pas confondre le Congo et la RDC (ex-Zaïre).",
                 "track02",
                 null),
             new BlindRound(
@@ -99,7 +100,7 @@ namespace CongoGames.Core
                 "track02",
                 null),
             new BlindRound(
-                "Brazzaville est connue pour son lien avec quel fleuve ?",
+                "La capitale du Congo est connue pour son lien avec quel fleuve ?",
                 new[] { "Le fleuve Congo", "Le Nil", "Le Danube", "Le Mississippi" },
                 0,
                 "Indice : capitale sur la rive nord.",
@@ -156,19 +157,19 @@ namespace CongoGames.Core
                 "Écoute l’intro : pense « titre thématique » plus que technique.",
                 "track01", null, "Titre / thème (démo)"),
             new BlindRound(
-                "Dans l’imaginaire d’une fête « Brazza », une « tête d’affiche » c’est plutôt … (démo) ?",
+                "Dans l’imaginaire d’une fête au Congo, une « tête d’affiche » c’est plutôt … (démo) ?",
                 new[] { "Chanteur star devant, chœurs, guitares et mambos en fond", "Un quatuor à cordes classique seul", "DJ techno Berlin sans chœurs", "Fanfare militaire sèche" },
                 0,
                 "Indice : cliché fête, pas le nom d’un morceau précis.",
                 "track02", null, "Artiste / icône"),
             new BlindRound(
-                "Quel groupe a marqué longtemps la scène des danses congolaises (Brazzaville) avec orchestre et danseurs (démo) ?",
+                "Quel groupe a marqué longtemps la scène des danses congolaises avec orchestre et danseurs (démo) ?",
                 new[] { "Extra Musica (réf. culture) / soukous, danses d’avant", "The Beatles (Liverpool)", "BTS (Séoul)", "Metallica (Bay Area)" },
                 0,
                 "Indice : orchestre et danses, pas rock métal.",
                 "track01", null, "Groupe / orchestre"),
             new BlindRound(
-                "Quel type de thème de morceau est le plus proche d’un air « ndombolo / club Brazza » (démo) ?",
+                "Quel type de thème de morceau est le plus proche d’un air « ndombolo / club » au Congo (démo) ?",
                 new[] { "Basse lourde + refrain chanté, club / ndombolo", "Messe grégorienne a cappella", "Symphonie classique 4 mouvements", "Jingle pub dentifrice" },
                 0,
                 "Pense rythme et ambiance live TikTok, pas l’orchestration symphonique.",
@@ -201,19 +202,22 @@ namespace CongoGames.Core
 
         private static readonly Queue<int> BlindOrder = new Queue<int>();
         private static int lastBlind = -1;
+        /// <summary>Indices contigus générés depuis blind_playlist_meta (paires titre/artiste par piste).</summary>
+        private static int s_blindMetaBlockStart = -1;
+        private static int s_blindMetaBlockLength;
         private static BlindRound[] blindRoundsRuntime;
 
         private static readonly string[] ScrambleWords =
         {
-            "CONGO", "RUMBA", "BRAZZA", "NGOMA", "MBOTE", "SANZA", "KONGO", "DANSE", "LIKOUALA", "POINTE", "FORET", "FLEUVE",
+            "CONGO", "RUMBA", "KINTELE", "NGOMA", "MBOTE", "SANZA", "KONGO", "DANSE", "LIKOUALA", "POINTE", "FORET", "FLEUVE",
             "POOL", "LION", "VENT", "CIRE", "OCEAN", "CHANT", "BRUME", "TAMTAM", "RYTHME", "CULTURE", "MUSIQUE", "FESTIVAL",
-            "NDOMBOLO", "EQUATEUR", "CUVETTE", "LINGALA", "BRAZZAVILLE", "MAKOUA", "OUESSO", "IMPOKO", "CONGOLAIS", "LIBREVILLE",
+            "NDOMBOLO", "EQUATEUR", "CUVETTE", "LINGALA", "KITUBA", "MAKOUA", "OUESSO", "IMPOKO", "CONGOLAIS", "LIBREVILLE",
             "POINTENOIRE", "INDEPENDANCE", "LOANGO", "BASCONGO", "LESTUAIRE", "SANGHA", "LEKOLO", "MAYOMBE", "NIARI", "LEFINI"
         };
         private static readonly Queue<int> ScrambleOrder = new Queue<int>();
         private static int lastScramble = -1;
 
-        private static readonly string[] MysteryWords = { "CONGO", "RUMBA", "BRAZZA", "NGOMA", "MBOTE", "SANZA", "LIKOUALA", "NDOMBOLO" };
+        private static readonly string[] MysteryWords = { "CONGO", "RUMBA", "KINTELE", "NGOMA", "MBOTE", "SANZA", "LIKOUALA", "NDOMBOLO" };
         private static readonly Queue<int> MysteryOrder = new Queue<int>();
         private static int lastMystery = -1;
 
@@ -246,30 +250,61 @@ namespace CongoGames.Core
         private static readonly ImageGuessRound[] ImageGuessRoundsDefault =
         {
             new ImageGuessRound(
-                "Capitale politique du pays (Congo) sur le fleuve — quelle ville ? (réponse courte)",
+                "Photo d’une capitale sur le fleuve : de quelle ville s’agit-il ? (réponse courte, capitale du Congo)",
                 "BRAZZAVILLE",
                 1101,
-                "brazzaville",
-                "BRAZZA",
-                "Fête nationale : 15 août (indépendance). Placer un fichier brazzaville.png dans Theme/ImageGuess/."),
+                "capitale",
+                "CAPIT",
+                "Fête nationale : 15 août. Image : placez un fichier réel capitale.png (ou .jpg) dans Theme/ImageGuess/ (photo libre de droits, ex. vue urbaine reconnue)."),
             new ImageGuessRound(
-                "Ville côtière, pétrole, grand port (nom) ?",
+                "Image d’une grande ville portuaire et pétrolière côté ouest : quel nom (ville côtière du Congo) ?",
                 "POINTE NOIRE",
                 1202,
                 "pointe_noire",
                 "POINTENOIRE",
-                "Ne pas confondre le Congo (capitale Brazzaville) et la RDC (ex-Zaïre, Kinshasa)."),
-            new ImageGuessRound("Grand fleuve (nom) qui baigne Brazzaville ?", "CONGO", 1303, "fleuve_congo", "FLEUVE", null),
-            new ImageGuessRound("Mammifère de forêt du nord (un mot) ? (gorille, éléphant…)", "GORILLE", 1404, "gorille", "ELEPHANT", null),
-            new ImageGuessRound("Bande centrale du drapeau (couleur) ?", "JAUNE", 1505, "drapeau", "JAUNE", null),
-            new ImageGuessRound("Parc du nord, gorilles, forêts (un mot du nom) ?", "NOUABALE", 1606, "parc", "NOUABALENDOKI", null),
-            new ImageGuessRound("Partie du globe à l’ouest de l’Afrique centrale (océan) ?", "ATLANTIQUE", 1707, null, null, null),
-            new ImageGuessRound("Département au sud autour de Brazzaville (un mot) ?", "POOL", 1808, null, "DEPARTEMENT", null),
-            new ImageGuessRound("Département du nord, marécages (un mot) ?", "LIKOUALA", 1909, null, "LIWILI", null),
-            new ImageGuessRound("Département nord, Sanga, forêts (un mot) ?", "SANGHA", 2010, null, "OUANZA", null),
-            new ImageGuessRound("Danse de hanches, nom court, très présente en fête (Congo) ?", "NDOMBOLO", 2212, null, "NDOMBO", null),
-            new ImageGuessRound("Grand ensemble sportif (aire des jeux africains) près de la capitale — toponyme souvent associé (un mot) ?", "KINTELE", 2313, "kintele", "STADE", "Place kintele.png (photo Commons sous licence) si besoin d’un visuel réel."),
-            new ImageGuessRound("Code IATA (3 lettres) de l’aéroport de Brazzaville-Maya-Maya ?", "BZV", 2414, null, "BRA", "Photo d’aéroport possible (Commons) renommée bzv.png en secours visuel local.")
+                "Ne pas confondre le Congo (pays) et la RDC (ex-Zaïre) : ce sont deux pays voisins du fleuve."),
+            new ImageGuessRound(
+                "Fleuve majeur visible sur la photo (baigne aussi la capitale) : quel est son nom ?",
+                "CONGO", 1303, "fleuve_congo", "FLEUVE",
+                "Image : fleuve_congo.png — documentaire / touristique, fleuve au Congo."),
+            new ImageGuessRound(
+                "Faune : primate ou mammifère de forêt tropicale du nord (photo) — lequel (un mot) ?",
+                "GORILLE", 1404, "gorille", "ELEPHANT",
+                "Image : gorille.png (parc ou zone protégée)."),
+            new ImageGuessRound(
+                "Drapeau du pays sur la photo : quelle est la couleur de la bande **centrale** (vertical) ?",
+                "JAUNE", 1505, "drapeau", "JAUNE",
+                "Trois bandes vert, jaune, rouge drapeau du Congo."),
+            new ImageGuessRound(
+                "Aire naturelle du nord, gorilles et forêts : un mot du nom de ce parc (réputé) ?",
+                "NOUABALE", 1606, "parc", "NOUABALENDOKI",
+                "Image : parc.png (Nouabalé-Ndoki ou scène forêt équatoriale congolaise, licence autorisée)."),
+            new ImageGuessRound(
+                "Océan visible à l’ouest du pays sur la carte côtière : lequel (un mot) ?",
+                "ATLANTIQUE", 1707, "ocean", null, null,
+                "Image optionnelle ocean.png (côte, barrière de corail, ou cartographie)."),
+            new ImageGuessRound(
+                "Carte / relief : département au sud autour de la région de la capitale (un mot) ?",
+                "POOL", 1808, "departement_pool", "DEPARTEMENT",
+                "Image carte ou symbole administratif, ou pool.png (carte)."),
+            new ImageGuessRound(
+                "Département du nord, marécages, réputé pour l’eau (un mot) ?",
+                "LIKOUALA", 1909, "likouala", "LIWILI", null),
+            new ImageGuessRound(
+                "Département nord, bassin de la Sanga, forêts (un mot) ?",
+                "SANGHA", 2010, "sangha", "OUANZA", null),
+            new ImageGuessRound(
+                "Scène de fête : danse de hanches très présente (nom court) ?",
+                "NDOMBOLO", 2212, "ndombolo", "NDOMBO",
+                "Image fête / danse, ou ndombolo.png (ambiance, droits d’auteur respectés)."),
+            new ImageGuessRound(
+                "Infrastructures : grand stade africain, jeux, près de la capitale (toponyme en un mot) ?",
+                "KINTELE", 2313, "kintele", "STADE",
+                "Image : kintele.png (stade, photo touristique / presse autorisée)."),
+            new ImageGuessRound(
+                "Transport : code IATA (3 lettres) de l’aéroport international Maya-Maya (Congo) ?",
+                "BZV", 2414, "aeroport", "BRA",
+                "Image aéroport : aeroport.png ou bzv.png (Wikimedia / licence compatible).")
         };
 
         private static readonly Queue<int> ImageGuessOrder = new Queue<int>();
@@ -318,6 +353,8 @@ namespace CongoGames.Core
 
         private static void BuildBlindRounds()
         {
+            s_blindMetaBlockStart = -1;
+            s_blindMetaBlockLength = 0;
             var list = new List<BlindRound>(BlindRoundsDefault.Length + 4);
             foreach (BlindRound r in BlindRoundsDefault)
             {
@@ -353,7 +390,103 @@ namespace CongoGames.Core
                 }
             }
 
+            int beforePlaylistMeta = list.Count;
+            AppendBlindRoundsFromPlaylistMeta(list);
+            if (list.Count > beforePlaylistMeta)
+            {
+                s_blindMetaBlockStart = beforePlaylistMeta;
+                s_blindMetaBlockLength = list.Count - beforePlaylistMeta;
+            }
+
             blindRoundsRuntime = list.ToArray();
+        }
+
+        [Serializable] private class BlindPlaylistMetaFile
+        {
+            public BlindMetaItem[] items;
+        }
+
+        [Serializable] private class BlindMetaItem
+        {
+            public string fileBase;
+            public string artist;
+            public string title;
+        }
+
+        private static void AppendBlindRoundsFromPlaylistMeta(List<BlindRound> list)
+        {
+            if (list == null) return;
+            TextAsset ta = Resources.Load<TextAsset>("Datasets/blind_playlist_meta");
+            if (ta == null) return;
+            try
+            {
+                BlindPlaylistMetaFile f = JsonUtility.FromJson<BlindPlaylistMetaFile>(ta.text);
+                if (f?.items == null || f.items.Length == 0) return;
+                var titles = f.items
+                    .Select(x => x != null && !string.IsNullOrEmpty(x.title) ? x.title.Trim() : null)
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Distinct()
+                    .ToList();
+                var artists = f.items
+                    .Select(x => x != null && !string.IsNullOrEmpty(x.artist) ? x.artist.Trim() : null)
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Distinct()
+                    .ToList();
+                if (titles.Count < 1 || artists.Count < 1) return;
+                foreach (BlindMetaItem it in f.items)
+                {
+                    if (it == null || string.IsNullOrEmpty(it.fileBase)) continue;
+                    string t = (it.title ?? "").Trim();
+                    string a = (it.artist ?? "").Trim();
+                    if (t.Length < 1 || a.Length < 1) continue;
+                    string[] tChoices = BuildFourUniques(t, titles);
+                    int ti = System.Array.IndexOf(tChoices, t);
+                    if (ti < 0) ti = 0;
+                    list.Add(new BlindRound(
+                        "Après l’extrait (~1 min), quel est le titre de ce morceau ?",
+                        tChoices,
+                        ti,
+                        "Indice : le nom de fichier ressemble souvent à « Artiste - Titre ».",
+                        it.fileBase.Trim(),
+                        null,
+                        "Titre (playlist)"));
+                    string[] aChoices = BuildFourUniques(a, artists);
+                    int ai = System.Array.IndexOf(aChoices, a);
+                    if (ai < 0) ai = 0;
+                    list.Add(new BlindRound(
+                        "Après l’extrait, qui interprète ce morceau (artiste ou groupe) ?",
+                        aChoices,
+                        ai,
+                        "Indice : l’artiste est souvent la première partie du nom de fichier.",
+                        it.fileBase.Trim(),
+                        null,
+                        "Artiste (playlist)"));
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("blind_playlist_meta : " + e.Message);
+            }
+        }
+
+        private static string[] BuildFourUniques(string correct, List<string> pool)
+        {
+            if (string.IsNullOrEmpty(correct)) correct = "?";
+            List<string> wrong = pool
+                .Where(s => s != null && s != correct)
+                .Distinct()
+                .ToList();
+            for (int i = wrong.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (wrong[i], wrong[j]) = (wrong[j], wrong[i]);
+            }
+
+            var pick = new List<string> { correct };
+            for (int i = 0; i < 3 && i < wrong.Count; i++) pick.Add(wrong[i]);
+            int pad = 0;
+            while (pick.Count < 4) pick.Add("— (autre morceau) " + (++pad));
+            return pick.Take(4).ToArray();
         }
 
         private static void AppendBlindExtrasFromJsonString(List<BlindRound> list, string json)
@@ -558,12 +691,45 @@ namespace CongoGames.Core
         {
             if (BlindOrder.Count > 0) return;
             int len = GetBlindRoundsMerged().Length;
-            List<int> idx = new List<int>(len);
-            for (int i = 0; i < len; i++) idx.Add(i);
-            for (int i = idx.Count - 1; i > 0; i--)
+            List<int> idx;
+            if (s_blindMetaBlockStart >= 0 && s_blindMetaBlockLength >= 2)
             {
-                int j = Random.Range(0, i + 1);
-                (idx[i], idx[j]) = (idx[j], idx[i]);
+                int m0 = s_blindMetaBlockStart;
+                int mlen = s_blindMetaBlockLength;
+                if (m0 + mlen <= len && mlen % 2 == 0)
+                {
+                    int pairCount = mlen / 2;
+                    int startPair = Random.Range(0, pairCount);
+                    idx = new List<int>(len);
+                    for (int k = 0; k < pairCount; k++)
+                    {
+                        int p = (startPair + k) % pairCount;
+                        idx.Add(m0 + p * 2);
+                        idx.Add(m0 + p * 2 + 1);
+                    }
+
+                    for (int i = 0; i < len; i++)
+                    {
+                        if (i < m0 || i >= m0 + mlen)
+                        {
+                            idx.Add(i);
+                        }
+                    }
+
+                    for (int a = mlen; a < idx.Count; a++)
+                    {
+                        int b = Random.Range(a, idx.Count);
+                        (idx[a], idx[b]) = (idx[b], idx[a]);
+                    }
+                }
+                else
+                {
+                    idx = BuildFullRandomOrder(len);
+                }
+            }
+            else
+            {
+                idx = BuildFullRandomOrder(len);
             }
 
             if (idx.Count > 1 && lastBlind >= 0 && idx[0] == lastBlind)
@@ -573,6 +739,19 @@ namespace CongoGames.Core
 
             BlindOrder.Clear();
             foreach (int v in idx) BlindOrder.Enqueue(v);
+        }
+
+        private static List<int> BuildFullRandomOrder(int len)
+        {
+            var idx = new List<int>(len);
+            for (int i = 0; i < len; i++) idx.Add(i);
+            for (int i = idx.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (idx[i], idx[j]) = (idx[j], idx[i]);
+            }
+
+            return idx;
         }
 
         private static string RandomPseudoWord(int len)

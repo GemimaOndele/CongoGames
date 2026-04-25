@@ -6,7 +6,7 @@ const fallbackQuestion = {
   question: "Quelle est la capitale du Congo ?",
   options: ["Pointe-Noire", "Brazzaville", "Dolisie", "Owando"],
   correctAnswer: "B",
-  explanation: "La capitale du Congo est Brazzaville."
+  explanation: "La capitale du Congo est une grande ville sur le fleuve Congo (rive nord)."
 };
 
 export class QuestionGenerator {
@@ -19,7 +19,7 @@ export class QuestionGenerator {
     if (!this.enabled) return fallbackQuestion;
 
     const systemPrompt =
-      "You are a quiz generator for Congo (Brazzaville). Say Congo, not 'Republic of the Congo' in question wording. Return strict JSON only.";
+      "You are a quiz generator for the Republic of the Congo (country name: Congo). Never use the label 'Congo-Brazzaville'. Return strict JSON only.";
     const userPrompt = `Generate one multiple-choice question in ${language} with this schema:
 {
   "category": "history|geography|music|science|culture|languages|people",
