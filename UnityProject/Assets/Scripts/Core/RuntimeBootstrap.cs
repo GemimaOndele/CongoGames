@@ -13,6 +13,7 @@ namespace CongoGames.Core
     public static class RuntimeBootstrap
     {
         private static Sprite whiteSprite;
+        private static Texture2D congoFlagTexture;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AfterSceneLoad()
@@ -191,7 +192,7 @@ namespace CongoGames.Core
                 headerLogoInstance.transform.SetSiblingIndex(timerBlock.transform.GetSiblingIndex() + 1);
             }
 
-            GameObject lbPanel = CreateUiRect(canvasGo.transform, "LeaderboardPanel", new Vector2(0.73f, 0.12f), new Vector2(0.99f, 0.9f), Vector2.zero, Vector2.zero);
+            GameObject lbPanel = CreateUiRect(canvasGo.transform, "LeaderboardPanel", new Vector2(0.77f, 0.12f), new Vector2(0.99f, 0.9f), Vector2.zero, Vector2.zero);
             Image lbBg = lbPanel.AddComponent<Image>();
             lbBg.sprite = GetWhiteSprite();
             lbBg.color = new Color(0.08f, 0.1f, 0.14f, 0.92f);
@@ -202,7 +203,7 @@ namespace CongoGames.Core
             lbPanelRt.offsetMin = new Vector2(10f, 10f);
             lbPanelRt.offsetMax = new Vector2(-10f, -10f);
 
-            Text lbTitle = CreateText(lbPanel.transform, "LbTitle", font, 24, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -8f), new Vector2(-12f, 38f));
+            Text lbTitle = CreateText(lbPanel.transform, "LbTitle", font, 22, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -8f), new Vector2(-12f, 38f));
             lbTitle.fontStyle = FontStyle.Bold;
             lbTitle.color = new Color(1f, 0.85f, 0.15f);
             lbTitle.text = "Classement";
@@ -210,7 +211,7 @@ namespace CongoGames.Core
             lbTitle.resizeTextMinSize = 18;
             lbTitle.resizeTextMaxSize = 24;
 
-            Text lbBody = CreateText(lbPanel.transform, "LbBody", font, 18, TextAnchor.UpperLeft, new Vector2(0f, 0f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero);
+            Text lbBody = CreateText(lbPanel.transform, "LbBody", font, 16, TextAnchor.UpperLeft, new Vector2(0f, 0f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero);
             lbBody.color = new Color(0.95f, 0.95f, 0.95f);
             lbBody.alignment = TextAnchor.UpperLeft;
             lbBody.horizontalOverflow = HorizontalWrapMode.Wrap;
@@ -227,8 +228,8 @@ namespace CongoGames.Core
             LeaderboardUI lbUi = lbPanel.AddComponent<LeaderboardUI>();
             lbUi.BindRuntime(lbBody);
 
-            // Zone de jeu : large et stable, sans chevauchement avec HUD.
-            GameObject modeRoot = CreateUiRect(canvasGo.transform, "ModePanelsRoot", new Vector2(0.015f, 0.10f), new Vector2(0.70f, 0.86f), Vector2.zero, Vector2.zero);
+            // Zone de jeu un peu plus large pour laisser respirer les textes.
+            GameObject modeRoot = CreateUiRect(canvasGo.transform, "ModePanelsRoot", new Vector2(0.015f, 0.10f), new Vector2(0.75f, 0.86f), Vector2.zero, Vector2.zero);
             RectTransform modeRootRt = modeRoot.GetComponent<RectTransform>();
             modeRootRt.offsetMin = new Vector2(6f, 6f);
             modeRootRt.offsetMax = new Vector2(-8f, -6f);
@@ -249,7 +250,7 @@ namespace CongoGames.Core
             Text questionText = CreateQuestionBody(board.transform, font);
             Text phaseBanner = CreatePhaseBanner(board.transform, font);
 
-            GameObject strip = CreateUiRect(board.transform, "AnswersStrip", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 8f), new Vector2(0f, 288f));
+            GameObject strip = CreateUiRect(board.transform, "AnswersStrip", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 8f), new Vector2(0f, 262f));
             RectTransform stripRt = strip.GetComponent<RectTransform>();
             stripRt.pivot = new Vector2(0.5f, 0f);
             Image stripBg = strip.AddComponent<Image>();
@@ -257,7 +258,7 @@ namespace CongoGames.Core
             stripBg.color = new Color(0.03f, 0.04f, 0.06f, 0.94f);
             stripBg.raycastTarget = false;
 
-            Text stripLabel = CreateText(strip.transform, "AnswersStripLabel", font, 21, TextAnchor.UpperCenter, new Vector2(0.04f, 1f), new Vector2(0.96f, 1f), new Vector2(0f, -3f), new Vector2(0f, 32f));
+            Text stripLabel = CreateText(strip.transform, "AnswersStripLabel", font, 19, TextAnchor.UpperCenter, new Vector2(0.04f, 1f), new Vector2(0.96f, 1f), new Vector2(0f, -3f), new Vector2(0f, 30f));
             stripLabel.color = new Color(1f, 0.88f, 0.25f, 0.9f);
             stripLabel.fontStyle = FontStyle.Bold;
             stripLabel.text = "Réponses — touche une lettre";
@@ -265,9 +266,9 @@ namespace CongoGames.Core
             stripLabel.verticalOverflow = VerticalWrapMode.Overflow;
             stripLabel.alignment = TextAnchor.UpperLeft;
 
-            const float rowH = 52f;
-            const float gap = 5f;
-            const float baseY = 10f;
+            const float rowH = 48f;
+            const float gap = 4f;
+            const float baseY = 8f;
             CreateChoiceStripButton(strip.transform, font, "A", baseY + 3f * (rowH + gap), out Button btnA, out Image bgA, out Text lblA);
             CreateChoiceStripButton(strip.transform, font, "B", baseY + 2f * (rowH + gap), out Button btnB, out Image bgB, out Text lblB);
             CreateChoiceStripButton(strip.transform, font, "C", baseY + 1f * (rowH + gap), out Button btnC, out Image bgC, out Text lblC);
@@ -497,23 +498,23 @@ namespace CongoGames.Core
             GameObject go = new GameObject("PhaseBanner");
             go.transform.SetParent(parent, false);
             RectTransform rt = go.AddComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.05f, 0.31f);
-            rt.anchorMax = new Vector2(0.95f, 0.39f);
+            rt.anchorMin = new Vector2(0.05f, 0.36f);
+            rt.anchorMax = new Vector2(0.95f, 0.45f);
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.anchoredPosition = Vector2.zero;
             rt.offsetMin = new Vector2(6f, 0f);
             rt.offsetMax = new Vector2(-6f, 0f);
             Text text = go.AddComponent<Text>();
             text.font = font;
-            text.fontSize = 24;
+            text.fontSize = 22;
             text.fontStyle = FontStyle.Bold;
             text.alignment = TextAnchor.MiddleCenter;
             text.color = new Color(1f, 0.85f, 0.2f, 1f);
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 18;
-            text.resizeTextMaxSize = 32;
+            text.resizeTextMinSize = 16;
+            text.resizeTextMaxSize = 30;
             text.raycastTarget = false;
             return text;
         }
@@ -562,24 +563,44 @@ namespace CongoGames.Core
         {
             GameObject holder = CreateUiRect(topBar, "FlagBadge", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(24f, 0f), new Vector2(112f, 66f));
             holder.transform.SetAsLastSibling();
+            RawImage flag = holder.AddComponent<RawImage>();
+            flag.texture = GetCongoFlagTexture();
+            flag.color = Color.white;
+            flag.raycastTarget = false;
+            Outline ol = holder.AddComponent<Outline>();
+            ol.effectColor = new Color(0f, 0f, 0f, 0.45f);
+            ol.effectDistance = new Vector2(1f, -1f);
+        }
 
-            Color green = new Color(0f, 0.55f, 0.24f, 1f);
-            Color yellow = new Color(0.98f, 0.87f, 0.29f, 1f);
-            Color red = new Color(0.86f, 0.14f, 0.12f, 1f);
-
-            for (int i = 0; i < 3; i++)
+        private static Texture2D GetCongoFlagTexture()
+        {
+            if (congoFlagTexture != null)
             {
-                GameObject stripe = new GameObject("Stripe" + i);
-                stripe.transform.SetParent(holder.transform, false);
-                RectTransform srt = stripe.AddComponent<RectTransform>();
-                srt.anchorMin = new Vector2(i / 3f, 0f);
-                srt.anchorMax = new Vector2((i + 1) / 3f, 1f);
-                srt.offsetMin = new Vector2(i > 0 ? 1f : 0f, 0f);
-                srt.offsetMax = new Vector2(i < 2 ? -1f : 0f, 0f);
-                Image img = stripe.AddComponent<Image>();
-                img.sprite = GetWhiteSprite();
-                img.color = i == 0 ? green : i == 1 ? yellow : red;
+                return congoFlagTexture;
             }
+
+            const int w = 256;
+            const int h = 160;
+            congoFlagTexture = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            Color green = new Color(0f, 0.58f, 0.26f, 1f);
+            Color yellow = new Color(0.95f, 0.84f, 0.29f, 1f);
+            Color red = new Color(0.86f, 0.14f, 0.12f, 1f);
+            const float band = 0.18f;
+
+            for (int y = 0; y < h; y++)
+            {
+                float v = y / (h - 1f);
+                for (int x = 0; x < w; x++)
+                {
+                    float u = x / (w - 1f);
+                    float d = v - u;
+                    Color c = Mathf.Abs(d) <= band ? yellow : (d > 0f ? green : red);
+                    congoFlagTexture.SetPixel(x, y, c);
+                }
+            }
+
+            congoFlagTexture.Apply(false, true);
+            return congoFlagTexture;
         }
 
         private static GameObject CreateUiRect(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, Vector2 sizeDelta)

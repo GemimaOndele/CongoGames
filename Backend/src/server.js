@@ -187,8 +187,8 @@ app.post("/tts", async (req, res) => {
     });
   }
   try {
-    const preferPcm = String(req.body?.prefer_pcm ?? "1") !== "0";
-    const audio = await synthesizeToAudioBase64(text, { preferPcm });
+    // Unity client: flux PCM uniquement (supprime les erreurs de décodage MP3 côté Windows).
+    const audio = await synthesizeToAudioBase64(text, { preferPcm: true });
     res.json({ ok: true, ...audio });
   } catch (err) {
     const status = Number(err?.status ?? err?.response?.status);

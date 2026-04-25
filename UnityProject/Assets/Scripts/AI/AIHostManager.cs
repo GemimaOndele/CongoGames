@@ -321,7 +321,10 @@ namespace CongoGames.AI
             bool networkReset = err.IndexOf("Connection was reset", StringComparison.OrdinalIgnoreCase) >= 0
                 || err.IndexOf("Recv failure", StringComparison.OrdinalIgnoreCase) >= 0
                 || err.IndexOf("Failed to receive data", StringComparison.OrdinalIgnoreCase) >= 0
-                || err.IndexOf("Curl error 56", StringComparison.OrdinalIgnoreCase) >= 0;
+                || err.IndexOf("Curl error 56", StringComparison.OrdinalIgnoreCase) >= 0
+                || err.IndexOf("Unable to read data", StringComparison.OrdinalIgnoreCase) >= 0
+                || err.IndexOf("Décodage MP3 impossible", StringComparison.OrdinalIgnoreCase) >= 0
+                || err.IndexOf("Lecture MP3:", StringComparison.OrdinalIgnoreCase) >= 0;
 
             if (quota)
             {

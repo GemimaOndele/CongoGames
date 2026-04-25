@@ -31,8 +31,8 @@ app.post("/", async (req, res) => {
     });
   }
   try {
-    const preferPcm = String(req.body?.prefer_pcm ?? "1") !== "0";
-    const audio = await synthesizeToAudioBase64(text, { preferPcm });
+    // Vercel/API: on force PCM-only pour Unity.
+    const audio = await synthesizeToAudioBase64(text, { preferPcm: true });
     res.json({ ok: true, ...audio });
   } catch (err) {
     const status = Number(err?.status ?? err?.response?.status);

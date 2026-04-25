@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -40,8 +39,6 @@ namespace CongoGames.AI
 
     public static class TtsClient
     {
-        private static string lastTempMp3Path;
-
         public static IEnumerator FetchClip(string httpBase, string text, Action<AudioClip> onSuccess, Action<string> onError)
         {
             string url = httpBase.TrimEnd('/') + "/tts";
@@ -103,7 +100,6 @@ namespace CongoGames.AI
                 yield break;
             }
 
-            string fmt = (dto.format ?? "pcm").Trim().ToLowerInvariant();
             byte[] pcm = PcmToAudioClip.FromBase64(dto.pcmBase64 ?? "");
             if (pcm.Length >= 2)
             {
@@ -119,13 +115,7 @@ namespace CongoGames.AI
                 yield break;
             }
 
-            if (!string.IsNullOrEmpty(dto.mp3Base64))
-            {
-                yield return LoadMp3FromBase64(dto.mp3Base64, onSuccess, onError);
-                yield break;
-            }
-
-            onError?.Invoke(string.IsNullOrEmpty(fmt) || fmt == "pcm" ? "PCM vide" : "Réponse TTS sans audio utilisable (format: " + fmt + ")");
+            onError?.Invoke("PCM vide ou invalide (TTS attendu en PCM uniquement).");
         }
 
         private static string ExtractJsonError(string json)
@@ -144,87 +134,6 @@ namespace CongoGames.AI
             {
                 return null;
             }
-        }
-
-        private static IEnumerator LoadMp3FromBase64(string b64, Action<AudioClip> onSuccess, Action<string> onError)
-        {
-            byte[] bytes;
-            try
-            {
-                bytes = Convert.FromBase64String(b64);
-            }
-            catch (Exception ex)
-            {
-                onError?.Invoke("MP3 base64: " + ex.Message);
-                yield break;
-            }
-
-            if (!string.IsNullOrEmpty(lastTempMp3Path))
-            {
-                try
-                {
-                    if (File.Exists(lastTempMp3Path))
-                    {
-                        File.Delete(lastTempMp3Path);
-                    }
-                }
-                catch
-                {
-                    // ignore
-                }
-            }
-
-            string path = Path.Combine(Application.temporaryCachePath, "cgtts_" + Guid.NewGuid().ToString("N") + ".mp3");
-            lastTempMp3Path = path;
-            try
-            {
-                File.WriteAllBytes(path, bytes);
-            }
-            catch (Exception ex)
-            {
-                onError?.Invoke("MP3 écriture disque: " + ex.Message);
-                yield break;
-            }
-
-            yield return null;
-            yield return null;
-
-            string fileUri = ToAudioFileUri(path);
-            UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(fileUri, AudioType.MPEG);
-            yield return uwr.SendWebRequest();
-
-            if (uwr.result != UnityWebRequest.Result.Success)
-            {
-                onError?.Invoke("Lecture MP3: " + (uwr.error ?? "échec réseau / fichier"));
-                uwr.Dispose();
-                yield break;
-            }
-
-            AudioClip clip = DownloadHandlerAudioClip.GetContent(uwr);
-            if (clip != null && clip.loadState == AudioDataLoadState.Unloaded)
-            {
-                clip.LoadAudioData();
-            }
-
-            float waitUntil = Time.realtimeSinceStartup + 12f;
-            while (clip != null && clip.loadState == AudioDataLoadState.Loading && Time.realtimeSinceStartup < waitUntil)
-            {
-                yield return null;
-            }
-
-            if (clip == null || clip.loadState == AudioDataLoadState.Failed || clip.samples < 1)
-            {
-                onError?.Invoke(
-                    "Décodage MP3 impossible (Unity, « Unable to read data »). Utilise OpenAI TTS (PCM 24 kHz) ou ElevenLabs en pcm_22050 dans Backend/.env.");
-                uwr.Dispose();
-                yield break;
-            }
-
-            onSuccess?.Invoke(clip);
-            uwr.Dispose();
-
-            // Ne pas supprimer le fichier tout de suite : sous Windows Unity peut encore lire le .mp3
-            // pendant le décodage — suppression trop tôt → « Unable to read data » et clip null.
         }
 
         public static IEnumerator ProbeEnabledEnum(string httpBase, Action<bool> onResult)
@@ -309,16 +218,5 @@ namespace CongoGames.AI
             onSuccess?.Invoke(clip);
         }
 
-        /// <summary>URI fichier fiable pour GetAudioClip sous Windows (évite « Unable to read data »).</summary>
-        private static string ToAudioFileUri(string fullPath)
-        {
-            fullPath = Path.GetFullPath(fullPath).Replace("\\", "/");
-            if (fullPath.Length >= 2 && fullPath[1] == ':')
-            {
-                return "file:///" + fullPath;
-            }
-
-            return new Uri(fullPath).AbsoluteUri;
-        }
     }
 }
