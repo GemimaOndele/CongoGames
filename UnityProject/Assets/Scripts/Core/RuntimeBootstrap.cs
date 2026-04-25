@@ -193,7 +193,7 @@ namespace CongoGames.Core
                 headerLogoInstance.transform.SetSiblingIndex(timerBlock.transform.GetSiblingIndex() + 1);
             }
 
-            GameObject lbPanel = CreateUiRect(canvasGo.transform, "LeaderboardPanel", new Vector2(0.82f, 0.16f), new Vector2(0.99f, 0.86f), Vector2.zero, Vector2.zero);
+            GameObject lbPanel = CreateUiRect(canvasGo.transform, "LeaderboardPanel", new Vector2(0.79f, 0.14f), new Vector2(0.99f, 0.88f), Vector2.zero, Vector2.zero);
             Image lbBg = lbPanel.AddComponent<Image>();
             lbBg.sprite = GetWhiteSprite();
             lbBg.color = new Color(0.08f, 0.1f, 0.14f, 0.92f);
@@ -204,15 +204,15 @@ namespace CongoGames.Core
             lbPanelRt.offsetMin = new Vector2(10f, 10f);
             lbPanelRt.offsetMax = new Vector2(-10f, -10f);
 
-            Text lbTitle = CreateText(lbPanel.transform, "LbTitle", font, 22, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -8f), new Vector2(-12f, 34f));
+            Text lbTitle = CreateText(lbPanel.transform, "LbTitle", font, 24, TextAnchor.MiddleCenter, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -10f), new Vector2(0f, 44f));
             lbTitle.fontStyle = FontStyle.Bold;
             lbTitle.color = new Color(1f, 0.85f, 0.15f);
             lbTitle.text = "Classement";
             lbTitle.resizeTextForBestFit = true;
-            lbTitle.resizeTextMinSize = 18;
-            lbTitle.resizeTextMaxSize = 24;
+            lbTitle.resizeTextMinSize = 20;
+            lbTitle.resizeTextMaxSize = 28;
 
-            Text lbBody = CreateText(lbPanel.transform, "LbBody", font, 17, TextAnchor.UpperLeft, new Vector2(0f, 0f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero);
+            Text lbBody = CreateText(lbPanel.transform, "LbBody", font, 19, TextAnchor.UpperLeft, new Vector2(0f, 0f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero);
             lbBody.color = new Color(0.95f, 0.95f, 0.95f);
             lbBody.alignment = TextAnchor.UpperLeft;
             lbBody.horizontalOverflow = HorizontalWrapMode.Wrap;
@@ -223,14 +223,14 @@ namespace CongoGames.Core
             lbRt.anchorMax = new Vector2(1f, 1f);
             lbRt.pivot = new Vector2(0.5f, 0.5f);
             lbRt.anchoredPosition = Vector2.zero;
-            lbRt.offsetMin = new Vector2(10f, 10f);
-            lbRt.offsetMax = new Vector2(-10f, -42f);
+            lbRt.offsetMin = new Vector2(12f, 12f);
+            lbRt.offsetMax = new Vector2(-12f, -54f);
 
             LeaderboardUI lbUi = lbPanel.AddComponent<LeaderboardUI>();
             lbUi.BindRuntime(lbBody);
 
             // Zone de jeu un peu plus compacte.
-            GameObject modeRoot = CreateUiRect(canvasGo.transform, "ModePanelsRoot", new Vector2(0.03f, 0.11f), new Vector2(0.78f, 0.80f), Vector2.zero, Vector2.zero);
+            GameObject modeRoot = CreateUiRect(canvasGo.transform, "ModePanelsRoot", new Vector2(0.03f, 0.11f), new Vector2(0.77f, 0.80f), Vector2.zero, Vector2.zero);
             RectTransform modeRootRt = modeRoot.GetComponent<RectTransform>();
             modeRootRt.offsetMin = new Vector2(6f, 6f);
             modeRootRt.offsetMax = new Vector2(-8f, -6f);
@@ -471,11 +471,11 @@ namespace CongoGames.Core
             GameObject go = new GameObject("QuestionBody");
             go.transform.SetParent(parent, false);
             RectTransform rt = go.AddComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.04f, 0.40f);
-            rt.anchorMax = new Vector2(0.96f, 0.92f);
+            rt.anchorMin = new Vector2(0.04f, 0.47f);
+            rt.anchorMax = new Vector2(0.96f, 0.93f);
             rt.pivot = new Vector2(0.5f, 1f);
             rt.anchoredPosition = Vector2.zero;
-            rt.offsetMin = new Vector2(12f, 8f);
+            rt.offsetMin = new Vector2(12f, 12f);
             rt.offsetMax = new Vector2(-12f, -12f);
             Text text = go.AddComponent<Text>();
             text.font = font;
@@ -500,12 +500,12 @@ namespace CongoGames.Core
             GameObject go = new GameObject("PhaseBanner");
             go.transform.SetParent(parent, false);
             RectTransform rt = go.AddComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.05f, 0.36f);
-            rt.anchorMax = new Vector2(0.95f, 0.45f);
+            rt.anchorMin = new Vector2(0.05f, 0.39f);
+            rt.anchorMax = new Vector2(0.95f, 0.49f);
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.anchoredPosition = Vector2.zero;
-            rt.offsetMin = new Vector2(6f, 0f);
-            rt.offsetMax = new Vector2(-6f, 0f);
+            rt.offsetMin = new Vector2(6f, 4f);
+            rt.offsetMax = new Vector2(-6f, -2f);
             Text text = go.AddComponent<Text>();
             text.font = font;
             text.fontSize = 22;

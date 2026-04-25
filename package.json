@@ -20,6 +20,8 @@
     "dataset:image-guess:editorial": "node scripts/editorialize-image-guess.mjs",
     "dataset:image-guess": "node scripts/import-image-guess-commons.mjs",
     "theme:import-youtube": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/fetch-youtube-theme.ps1",
+    "theme:import-pro-videos": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/import-pro-theme-videos.ps1",
+    "theme:validate": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/validate-theme-videos.ps1",
     "unity:copy-playlist": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/copy-playlist-to-streamingassets.ps1",
     "webgl:vercel": "npx --yes vercel@latest deploy --prod",
     "backend:vercel": "node scripts/vercel-backend.mjs",

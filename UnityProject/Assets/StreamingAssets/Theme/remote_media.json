@@ -4,61 +4,61 @@
       "modeId": "_global",
       "musicUrl": "",
       "bottomVideoUrl": "",
-      "backgroundVideoUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+      "backgroundVideoUrl": ""
     },
     {
       "modeId": "quiz",
       "musicUrl": "",
       "bottomVideoUrl": "",
-      "backgroundVideoUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+      "backgroundVideoUrl": ""
     },
     {
       "modeId": "semantic",
       "musicUrl": "",
       "bottomVideoUrl": "",
-      "backgroundVideoUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+      "backgroundVideoUrl": ""
     },
     {
       "modeId": "word-scramble",
       "musicUrl": "",
       "bottomVideoUrl": "",
-      "backgroundVideoUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+      "backgroundVideoUrl": ""
     },
     {
       "modeId": "crossword-lite",
       "musicUrl": "",
       "bottomVideoUrl": "",
-      "backgroundVideoUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+      "backgroundVideoUrl": ""
     },
     {
       "modeId": "blind-test",
       "musicUrl": "",
       "bottomVideoUrl": "",
-      "backgroundVideoUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+      "backgroundVideoUrl": ""
     },
     {
       "modeId": "mystery-word",
       "musicUrl": "",
       "bottomVideoUrl": "",
-      "backgroundVideoUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+      "backgroundVideoUrl": ""
     },
     {
       "modeId": "memory",
       "musicUrl": "",
       "bottomVideoUrl": "",
-      "backgroundVideoUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+      "backgroundVideoUrl": ""
     },
     {
       "modeId": "speed-chrono",
       "musicUrl": "",
       "bottomVideoUrl": "",
-      "backgroundVideoUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+      "backgroundVideoUrl": ""
     },
     {
       "modeId": "image-guess",
       "musicUrl": "",
       "bottomVideoUrl": "",
-      "backgroundVideoUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+      "backgroundVideoUrl": ""
     }
   ]
 }

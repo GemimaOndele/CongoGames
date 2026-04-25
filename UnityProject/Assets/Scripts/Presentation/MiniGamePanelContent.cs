@@ -495,6 +495,7 @@ namespace CongoGames.Presentation
                 && !string.Equals(modeId, "image-guess", StringComparison.Ordinal))
             {
                 GameSfxHub.Instance?.StopBlindDemoMusic();
+                ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(1f);
             }
 
             if (!string.Equals(modeId, "speed-chrono", StringComparison.OrdinalIgnoreCase))
@@ -1098,6 +1099,7 @@ namespace CongoGames.Presentation
 
         private IEnumerator CoBlindListenThenQuestion(int musicSeed, MiniGameDemoBanks.BlindRound raw, float listen)
         {
+            ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(0f);
             GameSfxHub.Instance?.PlayBlindDemoMusic(musicSeed, raw.AudioFileBase, raw.AudioUrl);
             float wait = listen > 0.01f ? listen : 0.35f;
             blindListenWindowSec = wait;
@@ -1105,6 +1107,7 @@ namespace CongoGames.Presentation
             yield return new WaitForSecondsRealtime(wait);
             blindListenEndUnscaled = 0f;
             GameSfxHub.Instance?.StopBlindDemoMusic();
+            ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(1f);
             blindInQuestionPhase = true;
             SetBlindChoicesInteractable(true);
             if (blindSub != null)
@@ -1158,6 +1161,7 @@ namespace CongoGames.Presentation
             }
 
             GameSfxHub.Instance?.StopBlindDemoMusic();
+            ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(1f);
             bool ok = choiceIndex == lastBlindCorrectDisplayIndex;
             blindInQuestionPhase = false;
             SetBlindChoicesInteractable(false);
@@ -1915,7 +1919,7 @@ namespace CongoGames.Presentation
             demo.semanticTitle = Title(semantic.transform, font, "TitreSemantic", "Associations — grille", new Vector2(0f, -28f));
             Transform semHost = CreateGridHost(semantic.transform, "SemanticGridHost", 0.56f, new Vector2(0f, 72f), new Vector2(920f, 352f));
             demo.semanticCells = LetterGrid(semHost, font, 3, 3, 86f, 16f, Vector2.zero);
-            GameObject semFoot = CreateRect(semantic.transform, "SemanticFooter", new Vector2(0.06f, 0.03f), new Vector2(0.94f, 0.26f), Vector2.zero, Vector2.zero);
+            GameObject semFoot = CreateRect(semantic.transform, "SemanticFooter", new Vector2(0.06f, 0.03f), new Vector2(0.94f, 0.30f), Vector2.zero, Vector2.zero);
             Image semFootBg = semFoot.AddComponent<Image>();
             semFootBg.sprite = white;
             semFootBg.color = new Color(0.04f, 0.06f, 0.08f, 0.65f);
@@ -1923,13 +1927,13 @@ namespace CongoGames.Presentation
             demo.semanticHint = Sub(semFoot.transform, font, "SemHint", new Vector2(0f, -18f));
             demo.semanticHint.rectTransform.sizeDelta = new Vector2(860f, 62f);
             demo.semanticHint.fontSize = 22;
-            demo.semanticAnswerInput = BuildInputField(semFoot.transform, font, "SemAnswer", new Vector2(15f, -72f), 360f, "Tape ta réponse…");
-            demo.semanticClearButton = BuildSecondaryButton(semFoot.transform, font, "Effacer", new Vector2(-280f, -72f), () =>
+            demo.semanticAnswerInput = BuildInputField(semFoot.transform, font, "SemAnswer", new Vector2(0f, -64f), 500f, "Tape ta réponse…");
+            demo.semanticClearButton = BuildSecondaryButton(semFoot.transform, font, "Effacer", new Vector2(-260f, -122f), () =>
             {
                 if (demo.semanticAnswerInput != null) demo.semanticAnswerInput.text = "";
             });
-            demo.semanticSubmitButton = BuildPrimaryButton(semFoot.transform, font, "Valider", new Vector2(250f, -72f), () => OnSemanticSubmit(demo));
-            demo.semanticFeedback = Sub(semFoot.transform, font, "SemFb", new Vector2(0f, -118f));
+            demo.semanticSubmitButton = BuildPrimaryButton(semFoot.transform, font, "Valider", new Vector2(260f, -122f), () => OnSemanticSubmit(demo));
+            demo.semanticFeedback = Sub(semFoot.transform, font, "SemFb", new Vector2(0f, -162f));
 
             GameObject word = PanelShell(modeRoot, "PanelWordScramble", "word-scramble", new Color(0.08f, 0.08f, 0.14f, 0.96f), white, surf);
             demo.wordScrambleTitle = Title(word.transform, font, "WTitle", "Mots mélangés", new Vector2(0f, -28f));
@@ -1953,11 +1957,11 @@ namespace CongoGames.Presentation
             wordListRt.anchorMax = new Vector2(1f, 1f);
             wordListRt.offsetMin = new Vector2(8f, 8f);
             wordListRt.offsetMax = new Vector2(-8f, -40f);
-            Transform wordHost = CreateGridHost(word.transform, "WordGridHost", 0.52f, new Vector2(-156f, 100f), new Vector2(620f, 420f));
+            Transform wordHost = CreateGridHost(word.transform, "WordGridHost", 0.50f, new Vector2(-156f, 88f), new Vector2(620f, 392f));
             BuildScrambleLetterGrid(wordHost, font, 7, 7, ScrambleCellPx, ScrambleGapPx, Vector2.zero, demo);
             WireLetterGridDrag(wordHost, demo, false, demo.wordScrambleTiles);
 
-            GameObject wordFoot = CreateRect(word.transform, "WordFooter", new Vector2(0.06f, 0.03f), new Vector2(0.76f, 0.26f), Vector2.zero, Vector2.zero);
+            GameObject wordFoot = CreateRect(word.transform, "WordFooter", new Vector2(0.06f, 0.03f), new Vector2(0.76f, 0.29f), Vector2.zero, Vector2.zero);
             Image wfBg = wordFoot.AddComponent<Image>();
             wfBg.sprite = white;
             wfBg.color = new Color(0.04f, 0.05f, 0.08f, 0.62f);
@@ -1966,11 +1970,11 @@ namespace CongoGames.Presentation
             demo.wordHint = Sub(wordFoot.transform, font, "Hint", new Vector2(0f, -18f));
             demo.wordHint.rectTransform.sizeDelta = new Vector2(620f, 44f);
             demo.wordHint.fontSize = 22;
-            demo.wordAnswerInput = BuildInputField(wordFoot.transform, font, "AnswerField", new Vector2(0f, -70f), 320f);
-            demo.wordClearButton = BuildSecondaryButton(wordFoot.transform, font, "Effacer", new Vector2(-190f, -70f), () => demo.ClearWordGuess());
-            demo.wordSubmitButton = BuildPrimaryButton(wordFoot.transform, font, "Valider", new Vector2(205f, -70f), () => OnWordSubmit(demo));
-            demo.wordFeedback = Sub(wordFoot.transform, font, "WordFb", new Vector2(0f, -118f));
-            demo.wordFeedback.rectTransform.sizeDelta = new Vector2(640f, 40f);
+            demo.wordAnswerInput = BuildInputField(wordFoot.transform, font, "AnswerField", new Vector2(0f, -64f), 500f);
+            demo.wordClearButton = BuildSecondaryButton(wordFoot.transform, font, "Effacer", new Vector2(-260f, -122f), () => demo.ClearWordGuess());
+            demo.wordSubmitButton = BuildPrimaryButton(wordFoot.transform, font, "Valider", new Vector2(260f, -122f), () => OnWordSubmit(demo));
+            demo.wordFeedback = Sub(wordFoot.transform, font, "WordFb", new Vector2(0f, -164f));
+            demo.wordFeedback.rectTransform.sizeDelta = new Vector2(680f, 44f);
 
             GameObject cross = PanelShell(modeRoot, "PanelCrossword", "crossword-lite", new Color(0.05f, 0.1f, 0.12f, 0.96f), white, surf);
             demo.crosswordTitle = Title(cross.transform, font, "CTitle", "Mots cachés 10×10", new Vector2(0f, -28f));
@@ -1993,21 +1997,21 @@ namespace CongoGames.Presentation
             crossListRt.anchorMax = new Vector2(1f, 1f);
             crossListRt.offsetMin = new Vector2(8f, 8f);
             crossListRt.offsetMax = new Vector2(-8f, -40f);
-            Transform crossHost = CreateGridHost(cross.transform, "CrossGridHost", 0.52f, new Vector2(-156f, 106f), new Vector2(620f, 420f));
+            Transform crossHost = CreateGridHost(cross.transform, "CrossGridHost", 0.50f, new Vector2(-156f, 94f), new Vector2(620f, 392f));
             demo.crosswordCells = CrosswordLetterGrid(crossHost, font, CrosswordCols, CrosswordCols, CrosswordCellPx, CrosswordGapPx, Vector2.zero, demo);
             WireLetterGridDrag(crossHost, demo, true, demo.crosswordCells);
 
-            GameObject crossFoot = CreateRect(cross.transform, "CrossFooter", new Vector2(0.06f, 0.03f), new Vector2(0.76f, 0.24f), Vector2.zero, Vector2.zero);
+            GameObject crossFoot = CreateRect(cross.transform, "CrossFooter", new Vector2(0.06f, 0.03f), new Vector2(0.76f, 0.28f), Vector2.zero, Vector2.zero);
             Image cfBg = crossFoot.AddComponent<Image>();
             cfBg.sprite = white;
             cfBg.color = new Color(0.04f, 0.05f, 0.08f, 0.62f);
             cfBg.raycastTarget = false;
-            demo.crosswordAnswerInput = BuildInputField(crossFoot.transform, font, "CrossDraft", new Vector2(0f, -40f), 320f, "Clic sur les lettres ou tape ici…");
-            demo.crosswordClearButton = BuildSecondaryButton(crossFoot.transform, font, "Effacer", new Vector2(-190f, -40f), () => demo.ClearCrosswordGuess());
-            demo.crosswordSubmitButton = BuildPrimaryButton(crossFoot.transform, font, "Valider", new Vector2(205f, -40f), () => OnCrosswordSubmit(demo));
-            demo.crosswordFeedback = Sub(crossFoot.transform, font, "CrossFb", new Vector2(0f, -90f));
+            demo.crosswordAnswerInput = BuildInputField(crossFoot.transform, font, "CrossDraft", new Vector2(0f, -52f), 500f, "Clic sur les lettres ou tape ici…");
+            demo.crosswordClearButton = BuildSecondaryButton(crossFoot.transform, font, "Effacer", new Vector2(-260f, -110f), () => demo.ClearCrosswordGuess());
+            demo.crosswordSubmitButton = BuildPrimaryButton(crossFoot.transform, font, "Valider", new Vector2(260f, -110f), () => OnCrosswordSubmit(demo));
+            demo.crosswordFeedback = Sub(crossFoot.transform, font, "CrossFb", new Vector2(0f, -160f));
             RectTransform crossFbRt = demo.crosswordFeedback.rectTransform;
-            crossFbRt.sizeDelta = new Vector2(640f, 34f);
+            crossFbRt.sizeDelta = new Vector2(680f, 40f);
 
             GameObject blind = PanelShell(modeRoot, "PanelBlind", "blind-test", new Color(0.1f, 0.06f, 0.14f, 0.96f), white, surf);
             demo.blindTitle = Title(blind.transform, font, "BTitle", "Blind test", new Vector2(0f, -30f));
@@ -2033,13 +2037,13 @@ namespace CongoGames.Presentation
             mystFootBg.sprite = white;
             mystFootBg.color = new Color(0.04f, 0.05f, 0.08f, 0.62f);
             mystFootBg.raycastTarget = false;
-            demo.mysteryAnswerInput = BuildInputField(mystFoot.transform, font, "MystAnswer", new Vector2(20f, -96f), 400f, "Tape le mot complet…");
-            demo.mysteryClearButton = BuildSecondaryButton(mystFoot.transform, font, "Effacer", new Vector2(-400f, -96f), () =>
+            demo.mysteryAnswerInput = BuildInputField(mystFoot.transform, font, "MystAnswer", new Vector2(0f, -84f), 540f, "Tape le mot complet…");
+            demo.mysteryClearButton = BuildSecondaryButton(mystFoot.transform, font, "Effacer", new Vector2(-300f, -144f), () =>
             {
                 if (demo.mysteryAnswerInput != null) demo.mysteryAnswerInput.text = "";
             });
-            demo.mysterySubmitButton = BuildPrimaryButton(mystFoot.transform, font, "Valider", new Vector2(300f, -96f), () => OnMysterySubmit(demo));
-            demo.mysteryFeedback = Sub(mystFoot.transform, font, "MystFb", new Vector2(0f, -162f));
+            demo.mysterySubmitButton = BuildPrimaryButton(mystFoot.transform, font, "Valider", new Vector2(300f, -144f), () => OnMysterySubmit(demo));
+            demo.mysteryFeedback = Sub(mystFoot.transform, font, "MystFb", new Vector2(0f, -186f));
 
             GameObject mem = PanelShell(modeRoot, "PanelMemory", "memory", new Color(0.06f, 0.11f, 0.09f, 0.96f), white, surf);
             demo.memoryTitle = Title(mem.transform, font, "MemTitle", "Mémoire", new Vector2(0f, -32f));
@@ -2555,7 +2559,7 @@ namespace CongoGames.Presentation
 
         private static Button BuildPrimaryButton(Transform parent, Font font, string label, Vector2 pos, Action onClick)
         {
-            GameObject go = CreateRect(parent, "BtnSubmit", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), pos, new Vector2(230f, 54f));
+            GameObject go = CreateRect(parent, "BtnSubmit", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), pos, new Vector2(260f, 56f));
             Image img = go.AddComponent<Image>();
             img.sprite = White();
             img.color = new Color(0.12f, 0.48f, 0.28f, 1f);
@@ -2563,7 +2567,7 @@ namespace CongoGames.Presentation
             GameObject txGo = CreateRect(go.transform, "Txt", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             Text tx = txGo.AddComponent<Text>();
             tx.font = font;
-            tx.fontSize = 24;
+            tx.fontSize = 23;
             tx.fontStyle = FontStyle.Bold;
             tx.alignment = TextAnchor.MiddleCenter;
             tx.color = Color.white;
@@ -2574,7 +2578,7 @@ namespace CongoGames.Presentation
 
         private static Button BuildSecondaryButton(Transform parent, Font font, string label, Vector2 pos, Action onClick)
         {
-            GameObject go = CreateRect(parent, "BtnSecondary", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), pos, new Vector2(180f, 50f));
+            GameObject go = CreateRect(parent, "BtnSecondary", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), pos, new Vector2(220f, 52f));
             Image img = go.AddComponent<Image>();
             img.sprite = White();
             img.color = new Color(0.22f, 0.25f, 0.32f, 1f);
@@ -2582,7 +2586,7 @@ namespace CongoGames.Presentation
             GameObject txGo = CreateRect(go.transform, "Txt", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             Text tx = txGo.AddComponent<Text>();
             tx.font = font;
-            tx.fontSize = 22;
+            tx.fontSize = 21;
             tx.fontStyle = FontStyle.Bold;
             tx.alignment = TextAnchor.MiddleCenter;
             tx.color = new Color(0.95f, 0.95f, 0.95f, 1f);

@@ -12,6 +12,7 @@ namespace CongoGames.UI
     public class PlayerPrefsGui : MonoBehaviour
     {
         private bool show;
+        private bool guiSized;
         private string nameDraft = "";
         private bool soloDraft = true;
         private bool useVirtual3dDraft = true;
@@ -59,34 +60,28 @@ namespace CongoGames.UI
         {
             if (GameInput.F9Down())
             {
-                LiveEventClient c = Object.FindAnyObjectByType<LiveEventClient>();
-                if (c != null && c.IsConnected) return;
                 show = !show;
             }
         }
 
         private void OnGUI()
         {
+            EnsureReadableGuiScale();
+            DrawQuickModeBar();
             if (!show)
             {
-                float btnW = 170f;
-                float btnH = 30f;
-                Rect quick = new Rect(Screen.width - btnW - 12f, Screen.height - btnH - 12f, btnW, btnH);
+                float btnW = 300f;
+                float btnH = 50f;
+                Rect quick = new Rect(Screen.width - btnW - 16f, Screen.height - btnH - 16f, btnW, btnH);
                 if (GUI.Button(quick, "Tests rapides (F9)"))
                 {
                     show = true;
                 }
                 return;
             }
-            LiveEventClient c = Object.FindAnyObjectByType<LiveEventClient>();
-            if (c != null && c.IsConnected)
-            {
-                GUILayout.Label("Live TikTok : les noms viennent du chat.");
-                return;
-            }
-
-            float w = 520f;
-            GUILayout.BeginArea(new Rect(16f, 120f, w, 560f), GUI.skin.box);
+            float w = Mathf.Min(Screen.width * 0.46f, 760f);
+            float h = Mathf.Min(Screen.height * 0.76f, 760f);
+            GUILayout.BeginArea(new Rect(16f, 110f, w, h), GUI.skin.box);
             GUILayout.Label("Profil démo (F9 pour masquer)");
             GUILayout.Space(6f);
             GUILayout.Label("Pseudo (scores locaux)");
@@ -203,6 +198,73 @@ namespace CongoGames.UI
 
             GUILayout.Label("Astuce : si verrouillage activé, le même jeu redémarre à chaque fin de timer.");
             GUILayout.EndArea();
+        }
+
+        private void DrawQuickModeBar()
+        {
+            GameModeManager gmm = GameModeManager.Instance;
+            if (gmm == null) return;
+
+            float barW = Mathf.Min(Screen.width * 0.94f, 1680f);
+            float barH = Mathf.Min(Screen.height * 0.24f, 210f);
+            float x = (Screen.width - barW) * 0.5f;
+            GUILayout.BeginArea(new Rect(x, 10f, barW, barH), GUI.skin.box);
+            GUILayout.Label("Test rapide — mode + durée (visible en permanence)");
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("◀", GUILayout.Width(110f), GUILayout.Height(62f)))
+            {
+                modePickIndex = (modePickIndex - 1 + modeIds.Length) % modeIds.Length;
+                string modeId = modeIds[Mathf.Clamp(modePickIndex, 0, modeIds.Length - 1)];
+                gmm.SetLocalDemoModeLock(lockSingleModeDraft, modeId);
+                gmm.StartMode(modeId);
+            }
+
+            GUILayout.Label(GameModeManager.GetModeDisplayName(modeIds[Mathf.Clamp(modePickIndex, 0, modeIds.Length - 1)]), GUILayout.Width(460f));
+
+            if (GUILayout.Button("▶", GUILayout.Width(110f), GUILayout.Height(62f)))
+            {
+                modePickIndex = (modePickIndex + 1) % modeIds.Length;
+                string modeId = modeIds[Mathf.Clamp(modePickIndex, 0, modeIds.Length - 1)];
+                gmm.SetLocalDemoModeLock(lockSingleModeDraft, modeId);
+                gmm.StartMode(modeId);
+            }
+
+            GUILayout.Label("Temps(s)", GUILayout.Width(140f));
+            roundSecondsDraft = GUILayout.TextField(roundSecondsDraft ?? "", GUILayout.Width(160f), GUILayout.Height(58f));
+            if (GUILayout.Button("Appliquer", GUILayout.Width(190f), GUILayout.Height(62f)))
+            {
+                if (TryParseSeconds(roundSecondsDraft, out float roundSec))
+                {
+                    gmm.SetDefaultRoundDuration(roundSec);
+                }
+            }
+
+            if (GUILayout.Button("Lancer", GUILayout.Width(170f), GUILayout.Height(62f)))
+            {
+                string modeId = modeIds[Mathf.Clamp(modePickIndex, 0, modeIds.Length - 1)];
+                gmm.SetLocalDemoModeLock(lockSingleModeDraft, modeId);
+                gmm.StartMode(modeId);
+            }
+
+            if (GUILayout.Button(show ? "Masquer F9" : "Ouvrir F9", GUILayout.Width(210f), GUILayout.Height(62f)))
+            {
+                show = !show;
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+
+        private void EnsureReadableGuiScale()
+        {
+            if (guiSized) return;
+            guiSized = true;
+            int fs = Screen.height >= 2000 ? 32 : (Screen.height >= 1400 ? 26 : 21);
+            GUI.skin.label.fontSize = fs;
+            GUI.skin.button.fontSize = fs;
+            GUI.skin.textField.fontSize = fs;
+            GUI.skin.toggle.fontSize = fs - 1;
+            GUI.skin.box.fontSize = fs;
         }
 
         private static bool TryParseSeconds(string raw, out float seconds)

@@ -27,6 +27,7 @@ namespace CongoGames.Presentation
         [SerializeField] private AudioMixerGroup musicOutputGroup;
         private float duckMultiplier = 1f;
         private float chronoDuckMultiplier = 1f;
+        private float blindDuckMultiplier = 1f;
 
         private AudioSource music;
         private Coroutine playlistRoutine;
@@ -61,12 +62,20 @@ namespace CongoGames.Presentation
             RefreshMusicVolume();
         }
 
+        /// <summary>Atténuation forte pendant l'écoute du blind test (0 = mute).</summary>
+        public void SetBlindDuckMultiplier(float linear01)
+        {
+            blindDuckMultiplier = Mathf.Clamp01(linear01);
+            RefreshMusicVolume();
+        }
+
         private void RefreshMusicVolume()
         {
             if (music != null)
             {
                 music.volume = volume * duckMultiplier;
                 music.volume *= chronoDuckMultiplier;
+                music.volume *= blindDuckMultiplier;
             }
         }
 
@@ -220,7 +229,9 @@ namespace CongoGames.Presentation
                 trackPaths = trackPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
                 ShuffleStringListInPlace(trackPaths);
 
-                if (trackPaths.Count == 0 && Directory.Exists(root))
+                if ((string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(modeId, "image-guess", StringComparison.OrdinalIgnoreCase))
+                    && trackPaths.Count == 0 && Directory.Exists(root))
                 {
                     foreach (string ext in new[] { "ogg", "wav", "mp3" })
                     {

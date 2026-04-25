@@ -172,7 +172,21 @@ namespace CongoGames.Presentation
                     yield return uwr.SendWebRequest();
                     if (uwr.result == UnityWebRequest.Result.Success)
                     {
-                        loaded = DownloadHandlerAudioClip.GetContent(uwr);
+                        try
+                        {
+                            if (uwr.downloadedBytes > 0)
+                            {
+                                loaded = DownloadHandlerAudioClip.GetContent(uwr);
+                                if (loaded != null && loaded.loadState == AudioDataLoadState.Failed)
+                                {
+                                    loaded = null;
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            loaded = null;
+                        }
                     }
                 }
             }
@@ -195,7 +209,18 @@ namespace CongoGames.Presentation
                                 yield return uwr.SendWebRequest();
                                 if (uwr.result == UnityWebRequest.Result.Success)
                                 {
-                                    loaded = DownloadHandlerAudioClip.GetContent(uwr);
+                                    try
+                                    {
+                                        if (uwr.downloadedBytes > 0)
+                                        {
+                                            loaded = DownloadHandlerAudioClip.GetContent(uwr);
+                                        }
+                                    }
+                                    catch (Exception)
+                                    {
+                                        loaded = null;
+                                    }
+
                                     if (loaded != null && loaded.loadState != AudioDataLoadState.Failed)
                                     {
                                         break;
@@ -237,7 +262,18 @@ namespace CongoGames.Presentation
                                 yield return uwr.SendWebRequest();
                                 if (uwr.result == UnityWebRequest.Result.Success)
                                 {
-                                    loaded = DownloadHandlerAudioClip.GetContent(uwr);
+                                    try
+                                    {
+                                        if (uwr.downloadedBytes > 0)
+                                        {
+                                            loaded = DownloadHandlerAudioClip.GetContent(uwr);
+                                        }
+                                    }
+                                    catch (Exception)
+                                    {
+                                        loaded = null;
+                                    }
+
                                     if (loaded != null && loaded.loadState != AudioDataLoadState.Failed)
                                     {
                                         break;

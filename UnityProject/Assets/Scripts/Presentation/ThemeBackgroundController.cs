@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -20,6 +21,8 @@ namespace CongoGames.Presentation
         [SerializeField] private int renderWidth = 1920;
         [SerializeField] private int renderHeight = 1080;
         [SerializeField] private float videoCycleSeconds = 24f;
+        [SerializeField] private bool cycleVirtualThemes = true;
+        [SerializeField] private float virtualThemeCycleSeconds = 22f;
 
         private RawImage raw;
         private VideoPlayer video;
@@ -30,7 +33,12 @@ namespace CongoGames.Presentation
         private VirtualShowStage3D virtual3D;
         private string activeModeId = "";
         private Coroutine videoCycleCo;
+        private Coroutine virtualCycleCo;
         private static readonly Dictionary<string, int> VideoCycleIndexByMode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        private static readonly string[] VirtualCycleModes =
+        {
+            "quiz", "semantic", "word-scramble", "crossword-lite", "blind-test", "mystery-word", "memory", "speed-chrono", "image-guess"
+        };
 
         private void Awake()
         {
@@ -72,6 +80,8 @@ namespace CongoGames.Presentation
             activeModeId = id;
             StopEverything();
 
+            var validCandidates = new List<string>();
+
             RemoteModeMediaEntry remote = RemoteThemeMediaConfig.Resolve(id);
             if (!string.IsNullOrWhiteSpace(remote.backgroundVideoUrl))
             {
@@ -82,13 +92,11 @@ namespace CongoGames.Presentation
                 }
                 else
                 {
-                    TryPlayVideoUrl(urlBg, muteVideoSound, true);
-                    yield break;
+                    validCandidates.Add(urlBg);
                 }
             }
 
             IReadOnlyList<string> candidates = ThemeModeCatalog.BuildLocalBackgroundCandidates(id);
-            var validCandidates = new List<string>();
             foreach (string path in candidates)
             {
                 if (StreamingAssetsUrl.IsWebGlData)
@@ -109,6 +117,10 @@ namespace CongoGames.Presentation
                     }
                 }
             }
+
+            validCandidates = validCandidates
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
 
             if (validCandidates.Count > 0)
             {
@@ -140,6 +152,10 @@ namespace CongoGames.Presentation
             {
                 synthetic?.Stop();
                 virtual3D.RebuildForMode(id, raw);
+                if (cycleVirtualThemes)
+                {
+                    virtualCycleCo = StartCoroutine(CoCycleVirtualThemes(id));
+                }
                 yield break;
             }
 
@@ -215,6 +231,12 @@ namespace CongoGames.Presentation
             {
                 StopCoroutine(videoCycleCo);
                 videoCycleCo = null;
+            }
+
+            if (virtualCycleCo != null)
+            {
+                StopCoroutine(virtualCycleCo);
+                virtualCycleCo = null;
             }
 
             foreach (Texture2D tex in slideTextures)
@@ -317,6 +339,31 @@ namespace CongoGames.Presentation
                     Destroy(rt);
                     rt = null;
                 }
+            }
+        }
+
+        private IEnumerator CoCycleVirtualThemes(string modeId)
+        {
+            int idx = 0;
+            for (int i = 0; i < VirtualCycleModes.Length; i++)
+            {
+                if (string.Equals(VirtualCycleModes[i], modeId, StringComparison.OrdinalIgnoreCase))
+                {
+                    idx = i;
+                    break;
+                }
+            }
+
+            while (!string.IsNullOrEmpty(activeModeId) && string.Equals(activeModeId, modeId, StringComparison.Ordinal))
+            {
+                yield return new WaitForSecondsRealtime(Mathf.Max(10f, virtualThemeCycleSeconds));
+                if (virtual3D == null || raw == null || !string.Equals(activeModeId, modeId, StringComparison.Ordinal))
+                {
+                    yield break;
+                }
+
+                idx = (idx + 1) % VirtualCycleModes.Length;
+                virtual3D.RebuildForMode(VirtualCycleModes[idx], raw);
             }
         }
 

@@ -11,6 +11,9 @@ namespace CongoGames.UI
         [SerializeField] private Text modeLabel;
         [SerializeField] private Text timerSeconds;
         [SerializeField] private Text brandLine;
+        [SerializeField] private Color timerSafe = new Color(0.24f, 0.92f, 0.32f, 0.95f);
+        [SerializeField] private Color timerWarn = new Color(1f, 0.72f, 0.2f, 0.97f);
+        [SerializeField] private Color timerDanger = new Color(1f, 0.22f, 0.2f, 0.98f);
         private int _hudChronoLastSec = int.MaxValue;
         [SerializeField] [Range(0.2f, 1f)] private float musicDuckWhileChrono = 0.5f;
         private bool _chronoDuckApplied;
@@ -48,6 +51,7 @@ namespace CongoGames.UI
                 if (timerRing != null && timerRing.transform.parent != null) timerRing.transform.parent.gameObject.SetActive(true);
                 if (timerSeconds != null) timerSeconds.enabled = true;
                 if (timerRing != null) timerRing.fillAmount = auxFill;
+                if (timerRing != null) timerRing.color = EvaluateTimerColor(auxFill);
                 if (timerSeconds != null) timerSeconds.text = auxSec > 0 ? auxSec.ToString() : "0";
                 if (auxSec < _hudChronoLastSec && _hudChronoLastSec < 1000000)
                 {
@@ -89,6 +93,7 @@ namespace CongoGames.UI
             if (timerRing != null)
             {
                 timerRing.fillAmount = t / d;
+                timerRing.color = EvaluateTimerColor(timerRing.fillAmount);
             }
 
             if (timerSeconds != null)
@@ -116,6 +121,19 @@ namespace CongoGames.UI
                 ThemeMusicPlayer.Instance?.SetChronoDuckMultiplier(1f);
                 _chronoDuckApplied = false;
             }
+        }
+
+        private Color EvaluateTimerColor(float fill01)
+        {
+            float f = Mathf.Clamp01(fill01);
+            if (f > 0.5f)
+            {
+                float k = Mathf.InverseLerp(0.5f, 1f, f);
+                return Color.Lerp(timerWarn, timerSafe, k);
+            }
+
+            float k2 = Mathf.InverseLerp(0f, 0.5f, f);
+            return Color.Lerp(timerDanger, timerWarn, k2);
         }
     }
 }
