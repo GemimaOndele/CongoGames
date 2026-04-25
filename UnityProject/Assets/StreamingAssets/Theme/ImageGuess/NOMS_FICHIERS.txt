@@ -1,7 +1,13 @@
 Devine l’image — photos réelles du Congo (PNG ou JPEG)
 =====================================================
 
-Place les fichiers ici : UnityProject/Assets/StreamingAssets/Theme/ImageGuess/
+Dossier : UnityProject/Assets/StreamingAssets/Theme/ImageGuess/
+
+Import en lot (Wikimedia Commons + crédits) :
+  npm run dataset:image-guess
+  → lit scripts/data/image_guess_commons.manifest.json, télécharge les fichiers, remplit ATTRIBUTION.json et ATTRIBUTION.md.
+
+Vous pouvez aussi placer des fichiers manuellement ici :
 
 Noms attendus par la banque (sans extension ; le code essaie .png puis .jpg puis .jpeg) :
 

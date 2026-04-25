@@ -1,0 +1,22 @@
+{
+  "comment": "Titres exacts 'File:…' sur https://commons.wikimedia.org — à réviser si un fichier est renommé ou supprimé.",
+  "items": [
+    { "id": "capitale", "fileTitle": "File:Brazzaville, Republic of the Congo.jpg" },
+    { "id": "pointe_noire", "fileTitle": "File:Pointe-Noire downtown.jpg" },
+    { "id": "fleuve_congo", "fileTitle": "File:Two man sailing on the Congo river with his canoe.jpg" },
+    { "id": "gorille", "fileTitle": "File:Western lowland gorilla (Gorilla gorilla gorilla) closeup eating.jpg" },
+    { "id": "drapeau", "fileTitle": "File:Flag of the Republic of the Congo.svg" },
+    { "id": "parc", "fileTitle": "File:Odzala-Kokoua NP banner.jpg" },
+    { "id": "odzala", "fileTitle": "File:Odzala-Kokoua NP banner.jpg" },
+    { "id": "ocean", "fileTitle": "File:Pointe-Noire Beach.jpg" },
+    { "id": "departement_pool", "fileTitle": "File:Pool (Republic of the Congo).svg" },
+    { "id": "likouala", "fileTitle": "File:Districts of Likouala.jpg" },
+    { "id": "sangha", "fileTitle": "File:Rivière Sangha.jpg" },
+    { "id": "ndombolo", "fileTitle": "File:Un groupe de rumba congolais à Léopoldville.jpg" },
+    { "id": "kintele", "fileTitle": "File:Stade de la concorde de Kintele.jpg" },
+    { "id": "aeroport", "fileTitle": "File:Aeroport maya-maya.jpg" },
+    { "id": "kouilou", "fileTitle": "File:Kouilou districts.png" },
+    { "id": "sapeurs", "fileTitle": "File:Jocelyn Armel (sapeur).jpg" },
+    { "id": "langues", "fileTitle": "File:French Language Official vs. Native Language.png" }
+  ]
+}
