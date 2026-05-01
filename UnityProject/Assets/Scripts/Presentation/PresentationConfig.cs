@@ -50,7 +50,8 @@ namespace CongoGames.Presentation
         {
             int v = PlayerPrefs.GetInt(PrefsPresentQuality, (int)PresentationQualityTier.Cinematic);
             Tier = (PresentationQualityTier)Mathf.Clamp(v, 0, 2);
-            UseVirtual3DShowStage = PlayerPrefs.GetInt(PrefsUseVirtual3D, 1) != 0;
+            // Défaut 0 : privilégier les .mp4 locaux (Theme/<mode>/background.mp4) ; F9 peut réactiver le plateau 3D.
+            UseVirtual3DShowStage = PlayerPrefs.GetInt(PrefsUseVirtual3D, 0) != 0;
         }
     }
 }

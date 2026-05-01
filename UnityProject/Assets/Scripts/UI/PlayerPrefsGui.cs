@@ -107,7 +107,7 @@ namespace CongoGames.UI
             oauthGoogleDraft = PlayerProfileStore.OAuthUrlGoogle;
             oauthFacebookDraft = PlayerProfileStore.OAuthUrlFacebook;
             demoProviderIndex = ProviderIndexFromValue(providerDraft);
-            useVirtual3dDraft = PlayerPrefs.GetInt(PresentationConfig.PrefsUseVirtual3D, 1) != 0;
+            useVirtual3dDraft = PlayerPrefs.GetInt(PresentationConfig.PrefsUseVirtual3D, 0) != 0;
             StartCoroutine(CoLoadAuthProviders());
             GameModeManager gmm = GameModeManager.Instance;
             if (gmm != null)
