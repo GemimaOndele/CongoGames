@@ -38,3 +38,5 @@ pnpm-debug.log*
 Thumbs.db
 .DS_Store
 .vercel
+playlist.zip
+UnityProject/Assets/StreamingAssets/Theme/playlist/*.mp3

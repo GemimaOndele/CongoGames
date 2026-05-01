@@ -27,6 +27,7 @@ namespace CongoGames.Presentation
 
         private AudioSource source;
         private AudioSource crowdSource;
+        private AudioSource popSource;
         private AudioSource blindLoop;
         private AudioClip blindLoopClip;
         private Coroutine blindMusicCo;
@@ -36,6 +37,7 @@ namespace CongoGames.Presentation
         private AudioClip cheerClip;
         private AudioClip chronoTickClip;
         public bool IsBlindMusicPlaying => blindLoop != null && blindLoop.isPlaying && blindLoop.clip != null;
+        public bool IsBlindMusicLoading => blindMusicCo != null;
 
         private void Awake()
         {
@@ -54,6 +56,15 @@ namespace CongoGames.Presentation
             if (sfxOutputGroup != null)
             {
                 crowdSource.outputAudioMixerGroup = sfxOutputGroup;
+            }
+
+            popSource = gameObject.AddComponent<AudioSource>();
+            popSource.playOnAwake = false;
+            popSource.spatialBlend = 0f;
+            popSource.priority = 128;
+            if (sfxOutputGroup != null)
+            {
+                popSource.outputAudioMixerGroup = sfxOutputGroup;
             }
 
             blindLoop = gameObject.AddComponent<AudioSource>();
@@ -100,6 +111,11 @@ namespace CongoGames.Presentation
                 crowdSource.volume = volume * duckMultiplier;
             }
 
+            if (popSource != null)
+            {
+                popSource.volume = volume * duckMultiplier;
+            }
+
             if (blindLoop != null)
             {
                 // Bus blind un peu plus présent (extrait 30–60 s à écouter).
@@ -113,6 +129,24 @@ namespace CongoGames.Presentation
             {
                 source.PlayOneShot(tapClip);
             }
+        }
+
+        /// <summary>Petit "pop" UI pour les overlays live (mot trouvé, bonus, etc.).</summary>
+        public void PlayUiPop(float linearVolume = 0.22f)
+        {
+            if (tapClip == null) return;
+            if (popSource != null)
+            {
+                popSource.pitch = UnityEngine.Random.Range(0.94f, 1.07f);
+                popSource.PlayOneShot(tapClip, Mathf.Clamp01(linearVolume));
+                return;
+            }
+
+            if (source == null) return;
+            float prev = source.pitch;
+            source.pitch = UnityEngine.Random.Range(0.94f, 1.07f);
+            source.PlayOneShot(tapClip, Mathf.Clamp01(linearVolume));
+            source.pitch = prev;
         }
 
         /// <summary>Cue blind test (tam-tam court, sans attendre la musique de fond).</summary>
@@ -155,6 +189,14 @@ namespace CongoGames.Presentation
 
         private IEnumerator CoLoadAndPlayBlindMusic(int seed, string streamingFileBase, string remoteUrl)
         {
+            // Garde-fou: la musique d'écoute blind (ou indice) ne démarre jamais pendant que l'host TTS parle.
+            // Le chargement démarre, mais on bloque le Play (et l'impression "débit superposé") jusqu'au silence host.
+            float blockUntil = Time.unscaledTime + 90f;
+            while (AIHostManager.Instance != null && AIHostManager.Instance.IsSpeakingNow && Time.unscaledTime < blockUntil)
+            {
+                yield return null;
+            }
+
             AudioClip loaded = null;
             string lastRejectedSource = "";
             string lastRejectedReason = "";
@@ -203,13 +245,13 @@ namespace CongoGames.Presentation
                 string[] exts = { ".ogg", ".mp3", ".wav" };
                 if (StreamingAssetsUrl.IsWebGlData)
                 {
-                    string[] relRoots = { "Theme/BlindTest", "Theme" };
+                    string[] relRoots = { "Theme/BlindTest", "Theme/playlist", "Theme" };
                     foreach (string r in relRoots)
                     {
                         foreach (string ext in exts)
                         {
                             string u = StreamingAssetsUrl.UrlForRelativePath(r + "/" + baseClean + ext);
-                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.UNKNOWN : AudioType.WAV;
+                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
                             using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(u, at))
                             {
                                 yield return uwr.SendWebRequest();
@@ -256,7 +298,7 @@ namespace CongoGames.Presentation
                                 continue;
                             }
 
-                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.UNKNOWN : AudioType.WAV;
+                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
                             string uri = StreamingAssetsUrl.ToRequestUrl(full);
                             using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(uri, at))
                             {
@@ -302,6 +344,12 @@ namespace CongoGames.Presentation
                 loaded.name = "blind_fallback_or_loaded";
             }
 
+            blockUntil = Time.unscaledTime + 90f;
+            while (AIHostManager.Instance != null && AIHostManager.Instance.IsSpeakingNow && Time.unscaledTime < blockUntil)
+            {
+                yield return null;
+            }
+
             blindLoopClip = loaded;
             blindLoop.clip = blindLoopClip;
             blindLoop.Play();
@@ -313,7 +361,7 @@ namespace CongoGames.Presentation
             string u = urlLower.ToLowerInvariant();
             if (u.Contains(".ogg")) return AudioType.OGGVORBIS;
             if (u.Contains(".wav")) return AudioType.WAV;
-            if (u.Contains(".mp3")) return AudioType.UNKNOWN;
+            if (u.Contains(".mp3")) return AudioType.MPEG;
             return AudioType.UNKNOWN;
         }
 
@@ -370,7 +418,6 @@ namespace CongoGames.Presentation
         public void PlayResult(bool correct, bool hostVoiceCommentary = true, bool neutralNoWrongTone = false)
         {
             if (source == null) return;
-            AIHostManager.Instance?.InterruptSpeech();
             StopFeedbackOneShots();
             if (hostVoiceCommentary)
             {

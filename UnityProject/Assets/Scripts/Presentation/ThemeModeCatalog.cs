@@ -39,7 +39,7 @@ namespace CongoGames.Presentation
         public static IReadOnlyList<string> BuildLocalBackgroundCandidates(string modeId)
         {
             string id = string.IsNullOrEmpty(modeId) ? "default" : modeId.Trim();
-            var list = new List<string>(24);
+            var list = new List<string>(96);
             if (StreamingAssetsUrl.IsWebGlData)
             {
                 foreach (string name in BackgroundVideoFileNames)
@@ -55,6 +55,11 @@ namespace CongoGames.Presentation
                 foreach (string name in BackgroundVideoFileNames)
                 {
                     list.Add(StreamingAssetsUrl.UrlForRelativePath("Theme/" + name));
+                }
+
+                foreach (string name in BackgroundVideoFileNames)
+                {
+                    list.Add(StreamingAssetsUrl.UrlForRelativePath("Theme/_global/" + name));
                 }
 
                 return list;
@@ -78,7 +83,47 @@ namespace CongoGames.Presentation
                 list.Add(Path.Combine(root, name));
             }
 
+            // Nouveau fallback explicite : Theme/_global/*
+            string globalFolder = Path.Combine(root, "_global");
+            foreach (string name in BackgroundVideoFileNames)
+            {
+                list.Add(Path.Combine(globalFolder, name));
+            }
+
+            // Fallback intelligent desktop: accepte aussi toute vidéo du dossier (pas seulement background/loop/show).
+            AddDynamicFolderVideos(list, Path.Combine(root, id));
+            AddDynamicFolderVideos(list, devImport);
+            AddDynamicFolderVideos(list, root);
+            AddDynamicFolderVideos(list, globalFolder);
+            AddDynamicFolderVideos(list, Path.Combine(root, "_dev_import", GlobalKey));
+
             return list;
+        }
+
+        private static void AddDynamicFolderVideos(List<string> list, string folder)
+        {
+            if (!Directory.Exists(folder))
+            {
+                return;
+            }
+
+            try
+            {
+                foreach (string file in Directory.GetFiles(folder))
+                {
+                    string ext = Path.GetExtension(file).ToLowerInvariant();
+                    if (ext != ".mp4" && ext != ".webm" && ext != ".mov" && ext != ".m4v")
+                    {
+                        continue;
+                    }
+
+                    list.Add(file);
+                }
+            }
+            catch (IOException)
+            {
+                // Ignoré: on garde les candidats "nommés" déjà collectés.
+            }
         }
     }
 }

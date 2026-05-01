@@ -18,6 +18,7 @@ namespace CongoGames.Presentation
     public class ThemeMusicPlayer : MonoBehaviour
     {
         public static ThemeMusicPlayer Instance { get; private set; }
+        private const string AmbiencePresetPrefKey = "cg_audio_ambience_preset"; // 0=soft, 1=aggressive
 
         /// <summary>Phase 0–1 sur la piste en cours (pour synchroniser légèrement l’UI avec le rythme).</summary>
         public static float NormalizedPhase01 { get; private set; }
@@ -32,6 +33,32 @@ namespace CongoGames.Presentation
         private AudioSource music;
         private Coroutine playlistRoutine;
         private readonly List<AudioClip> playlistClips = new List<AudioClip>();
+        private static readonly Dictionary<string, int> PlaylistStartIndexByMode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        private string debugModeId = "";
+        private string debugNowPlaying = "—";
+        private int debugPlaylistCount;
+        private int debugRotationIndex;
+        private string debugSource = "none";
+        private string debugObservedNowPlaying = "";
+        private float debugNowPlayingSinceUnscaled;
+
+        public string DebugModeId => debugModeId;
+        public string DebugNowPlaying => debugNowPlaying;
+        public int DebugPlaylistCount => debugPlaylistCount;
+        public int DebugRotationIndex => debugRotationIndex;
+        public string DebugSource => debugSource;
+        public float DebugNowPlayingStableSeconds => Mathf.Max(0f, Time.unscaledTime - debugNowPlayingSinceUnscaled);
+
+        public static void ResetRotationDebugState()
+        {
+            PlaylistStartIndexByMode.Clear();
+        }
+
+        private enum AmbiencePreset
+        {
+            Soft = 0,
+            Aggressive = 1
+        }
 
         private void Awake()
         {
@@ -90,6 +117,12 @@ namespace CongoGames.Presentation
 
         private void Update()
         {
+            if (!string.Equals(debugObservedNowPlaying, debugNowPlaying, StringComparison.Ordinal))
+            {
+                debugObservedNowPlaying = debugNowPlaying ?? "";
+                debugNowPlayingSinceUnscaled = Time.unscaledTime;
+            }
+
             if (music != null && music.isPlaying && music.clip != null && music.clip.length > 0.05f)
             {
                 NormalizedPhase01 = Mathf.Repeat(music.time / music.clip.length, 1f);
@@ -112,6 +145,11 @@ namespace CongoGames.Presentation
         public void ApplyGameMode(string modeId)
         {
             string id = string.IsNullOrEmpty(modeId) ? "default" : modeId.Trim().ToLowerInvariant();
+            debugModeId = id;
+            debugNowPlaying = "chargement…";
+            debugPlaylistCount = 0;
+            debugRotationIndex = 0;
+            debugSource = "mode-switch";
             playlistRoutine = null;
             StopAllCoroutines();
             ClearPlaylistClips();
@@ -123,6 +161,14 @@ namespace CongoGames.Presentation
             music.clip = null;
             music.loop = true;
             StartCoroutine(LoadMusicForMode(id));
+        }
+
+        public void SetAmbiencePreset(bool aggressive)
+        {
+            PlayerPrefs.SetInt(AmbiencePresetPrefKey, aggressive ? 1 : 0);
+            PlayerPrefs.Save();
+            string currentMode = GameModeManager.Instance != null ? GameModeManager.Instance.ActiveModeId : "quiz";
+            ApplyGameMode(currentMode);
         }
 
         private void ClearPlaylistClips()
@@ -143,15 +189,21 @@ namespace CongoGames.Presentation
             yield return WebGlStreamingPrewarm.CoRunOnce();
             yield return TikTokGiftModeRegistry.CoPrewarmIfWebGl();
             yield return WebAudioGestureGate.CoWaitForUnlock();
-            // Image Guess: la musique de manche est pilotée par MiniGamePanelContent
-            // uniquement quand l'image affichée possède un lien audio explicite.
-            if (string.Equals(modeId, "image-guess", StringComparison.OrdinalIgnoreCase))
+            // Blind Test / Image Guess: la musique de manche est pilotée
+            // par MiniGamePanelContent (indices audio contextualisés).
+            // On évite toute musique de fond concurrente dans ces modes.
+            if (string.Equals(modeId, "image-guess", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase))
             {
+                debugNowPlaying = "piloté par GameSfxHub";
+                debugSource = "mode-excluded";
                 yield break;
             }
             RemoteModeMediaEntry remote = RemoteThemeMediaConfig.Resolve(modeId);
             string bottomU = (remote.bottomVideoUrl ?? "").Trim();
-            bool bottomProvidesAudio = !string.IsNullOrEmpty(bottomU) && !StreamingMediaUrlPolicy.IsNonStreamableContentPageUrl(bottomU);
+            bool bottomProvidesAudio = false; // Vidéo sans audio pour stabilité; ambiance pilotée par ThemeMusicPlayer.
+            AmbiencePreset preset = GetAmbiencePresetFromPrefs();
+            string[] preferredPrefixes = GetPreferredAmbiencePrefixes(preset);
 
             if (!bottomProvidesAudio && !string.IsNullOrWhiteSpace(remote.musicUrl))
             {
@@ -166,6 +218,8 @@ namespace CongoGames.Presentation
                     yield return DownloadClipFromHttp(mUrl, c => httpClip = c);
                     if (httpClip != null)
                     {
+                        debugNowPlaying = httpClip.name;
+                        debugSource = "remote-music-url";
                         yield return CoPlayWithIntro(httpClip, true);
                         yield break;
                     }
@@ -182,10 +236,14 @@ namespace CongoGames.Presentation
             List<string> trackPaths = new List<string>();
             if (StreamingAssetsUrl.IsWebGlData)
             {
-                yield return CoProbeTracksForWebGl(modeId, trackPaths);
+                yield return CoProbeTracksForWebGl(modeId, trackPaths, preferredPrefixes);
             }
             else
             {
+                // Priorité 1: ambiances gameplay réelles dédiées (ambient_*, loop_*, bgm_*).
+                TryAppendLocalGameplayAmbience(folder, trackPaths, preferredPrefixes);
+                TryAppendLocalGameplayAmbience(Path.Combine(root, "Gameplay", modeId), trackPaths, preferredPrefixes);
+
                 if (Directory.Exists(folder))
                 {
                     foreach (string ext in new[] { "ogg", "wav", "mp3" })
@@ -226,8 +284,11 @@ namespace CongoGames.Presentation
                     TryAppendCongoleseRepoPlaylistFolder(trackPaths);
                 }
 
-                trackPaths = trackPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-                ShuffleStringListInPlace(trackPaths);
+                trackPaths = trackPaths
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                RotateStringListForMode(modeId, trackPaths);
 
                 if ((string.Equals(modeId, "blind-test", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(modeId, "image-guess", StringComparison.OrdinalIgnoreCase))
@@ -245,7 +306,11 @@ namespace CongoGames.Presentation
                         }
                     }
 
-                    ShuffleStringListInPlace(trackPaths);
+                    trackPaths = trackPaths
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+                    RotateStringListForMode(modeId, trackPaths);
                 }
             }
 
@@ -261,10 +326,12 @@ namespace CongoGames.Presentation
                     }
                 }
 
-                ShuffleClipListInPlace(playlistClips);
+                RotateClipListForMode(modeId, playlistClips);
 
                 if (playlistClips.Count >= 2)
                 {
+                    debugPlaylistCount = playlistClips.Count;
+                    debugSource = "playlist";
                     playlistRoutine = StartCoroutine(PlayPlaylistLoop());
                     yield break;
                 }
@@ -276,6 +343,9 @@ namespace CongoGames.Presentation
                 yield return DownloadClip(trackPaths[0], Path.GetFileName(trackPaths[0]), c => one = c);
                 if (one != null)
                 {
+                    debugNowPlaying = one.name;
+                    debugPlaylistCount = 1;
+                    debugSource = "single-track";
                     yield return CoPlayWithIntro(one, true);
                     yield break;
                 }
@@ -300,6 +370,9 @@ namespace CongoGames.Presentation
                     yield return DownloadClip(u, file, c => subClip = c);
                     if (subClip != null)
                     {
+                        debugNowPlaying = subClip.name;
+                        debugPlaylistCount = 1;
+                        debugSource = "mode-music-file";
                         yield return CoPlayWithIntro(subClip, true);
                         yield break;
                     }
@@ -315,6 +388,9 @@ namespace CongoGames.Presentation
                     yield return DownloadClip(sub, file, c => subClip = c);
                     if (subClip != null)
                     {
+                        debugNowPlaying = subClip.name;
+                        debugPlaylistCount = 1;
+                        debugSource = "mode-music-file";
                         yield return CoPlayWithIntro(subClip, true);
                         yield break;
                     }
@@ -325,6 +401,9 @@ namespace CongoGames.Presentation
             AudioClip res = Resources.Load<AudioClip>(resPath);
             if (res != null)
             {
+                debugNowPlaying = res.name;
+                debugPlaylistCount = 1;
+                debugSource = "resources-mode";
                 yield return CoPlayWithIntro(res, true);
                 yield break;
             }
@@ -348,6 +427,9 @@ namespace CongoGames.Presentation
                         yield return DownloadClip(u, file, c => gClip = c);
                         if (gClip != null)
                         {
+                            debugNowPlaying = gClip.name;
+                            debugPlaylistCount = 1;
+                            debugSource = "global-theme-file";
                             yield return CoPlayWithIntro(gClip, true);
                             yield break;
                         }
@@ -363,6 +445,9 @@ namespace CongoGames.Presentation
                         yield return DownloadClip(globalPath, file, c => gClip = c);
                         if (gClip != null)
                         {
+                            debugNowPlaying = gClip.name;
+                            debugPlaylistCount = 1;
+                            debugSource = "global-theme-file";
                             yield return CoPlayWithIntro(gClip, true);
                             yield break;
                         }
@@ -372,12 +457,146 @@ namespace CongoGames.Presentation
                 res = Resources.Load<AudioClip>("Audio/theme");
                 if (res != null)
                 {
+                    debugNowPlaying = res.name;
+                    debugPlaylistCount = 1;
+                    debugSource = "resources-global";
                     yield return CoPlayWithIntro(res, true);
                     yield break;
                 }
             }
 
+            debugSource = "procedural";
             yield return CoProceduralModeLoop(modeId);
+        }
+
+        private static AmbiencePreset GetAmbiencePresetFromPrefs()
+        {
+            int v = PlayerPrefs.GetInt(AmbiencePresetPrefKey, 0);
+            return v == 1 ? AmbiencePreset.Aggressive : AmbiencePreset.Soft;
+        }
+
+        private static string[] GetPreferredAmbiencePrefixes(AmbiencePreset preset)
+        {
+            if (preset == AmbiencePreset.Aggressive)
+            {
+                return new[]
+                {
+                    "ambient_live_aggressive_01",
+                    "ambient_gameplay_02",
+                    "ambient_gameplay_01",
+                    "ambient_01",
+                    "loop_01",
+                    "bgm_01",
+                    "music",
+                    "theme"
+                };
+            }
+
+            return new[]
+            {
+                "ambient_live_soft_01",
+                "ambient_gameplay_01",
+                "ambient_gameplay_02",
+                "ambient_01",
+                "loop_01",
+                "bgm_01",
+                "music",
+                "theme"
+            };
+        }
+
+        private static void TryAppendLocalGameplayAmbience(string folder, List<string> trackPaths, string[] preferredPrefixes)
+        {
+            if (trackPaths == null || string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
+            {
+                return;
+            }
+
+            string[] patterns = preferredPrefixes != null && preferredPrefixes.Length > 0
+                ? preferredPrefixes
+                : new[] { "ambient_01", "loop_01", "bgm_01", "music", "theme" };
+            foreach (string ext in new[] { "ogg", "wav", "mp3" })
+            {
+                foreach (string p in patterns)
+                {
+                    try
+                    {
+                        string exact = Path.Combine(folder, p + "." + ext);
+                        if (File.Exists(exact))
+                        {
+                            trackPaths.Add(exact);
+                        }
+                    }
+                    catch (IOException)
+                    {
+                        // ignoré
+                    }
+                }
+            }
+
+            // Fallback large: toute ambiance gameplay du dossier (évite "toujours le même son").
+            foreach (string ext in new[] { ".ogg", ".wav", ".mp3" })
+            {
+                try
+                {
+                    foreach (string f in Directory.GetFiles(folder, "*" + ext, SearchOption.TopDirectoryOnly))
+                    {
+                        string n = Path.GetFileNameWithoutExtension(f).ToLowerInvariant();
+                        if (n.Contains("ambient") || n.Contains("loop") || n.Contains("bgm") || n.Contains("music") || n.Contains("theme"))
+                        {
+                            trackPaths.Add(f);
+                        }
+                    }
+                }
+                catch (IOException)
+                {
+                    // ignoré
+                }
+            }
+        }
+
+        private static void RotateStringListForMode(string modeId, List<string> list)
+        {
+            if (list == null || list.Count < 2) return;
+            int idx = 0;
+            if (PlaylistStartIndexByMode.TryGetValue(modeId ?? "", out int known))
+            {
+                idx = Mathf.Abs(known) % list.Count;
+            }
+
+            if (idx > 0)
+            {
+                var copy = new List<string>(list);
+                list.Clear();
+                for (int i = 0; i < copy.Count; i++)
+                {
+                    list.Add(copy[(idx + i) % copy.Count]);
+                }
+            }
+
+            PlaylistStartIndexByMode[modeId ?? "default"] = (idx + 1) % list.Count;
+        }
+
+        private static void RotateClipListForMode(string modeId, List<AudioClip> list)
+        {
+            if (list == null || list.Count < 2) return;
+            int idx = 0;
+            if (PlaylistStartIndexByMode.TryGetValue(modeId ?? "", out int known))
+            {
+                idx = Mathf.Abs(known) % list.Count;
+            }
+
+            if (idx > 0)
+            {
+                var copy = new List<AudioClip>(list);
+                list.Clear();
+                for (int i = 0; i < copy.Count; i++)
+                {
+                    list.Add(copy[(idx + i) % copy.Count]);
+                }
+            }
+
+            PlaylistStartIndexByMode[modeId ?? "default"] = (idx + 1) % list.Count;
         }
 
         private IEnumerator CoPlayWithIntro(AudioClip main, bool loop)
@@ -393,6 +612,7 @@ namespace CongoGames.Presentation
             music.clip = main;
             music.loop = loop;
             music.Play();
+            debugNowPlaying = main.name;
         }
 
         private IEnumerator CoProceduralModeLoop(string modeId)
@@ -411,6 +631,8 @@ namespace CongoGames.Presentation
                 music.clip = pad;
                 music.loop = true;
                 music.Play();
+                debugNowPlaying = "procedural:" + (modeId ?? "default") + "#" + phase;
+                debugRotationIndex = phase;
                 float len = pad != null && pad.length > 0.2f ? pad.length : 6f;
                 len = Mathf.Clamp(len, 5f, 12f);
                 yield return new WaitForSeconds(len * 0.96f);
@@ -430,6 +652,9 @@ namespace CongoGames.Presentation
             while (enabled && playlistClips.Count > 0)
             {
                 AudioClip c = playlistClips[i % playlistClips.Count];
+                debugPlaylistCount = playlistClips.Count;
+                debugRotationIndex = i % playlistClips.Count;
+                debugNowPlaying = c != null ? c.name : "—";
                 if (needIntro)
                 {
                     needIntro = false;
@@ -585,9 +810,29 @@ namespace CongoGames.Presentation
             return AudioType.WAV;
         }
 
-        private IEnumerator CoProbeTracksForWebGl(string modeId, List<string> trackPaths)
+        private IEnumerator CoProbeTracksForWebGl(string modeId, List<string> trackPaths, string[] preferredPrefixes)
         {
             string m = (modeId ?? "default").Trim();
+            string[] gameplayPrefixes = preferredPrefixes != null && preferredPrefixes.Length > 0
+                ? preferredPrefixes
+                : new[] { "ambient_gameplay_01", "ambient_gameplay_02", "ambient_01", "loop_01", "bgm_01", "music", "theme" };
+            foreach (string ext in new[] { "mp3", "ogg", "wav" })
+            {
+                for (int i = 0; i < gameplayPrefixes.Length; i++)
+                {
+                    string relA = "Theme/" + m + "/" + gameplayPrefixes[i] + "." + ext;
+                    string relB = "Theme/Gameplay/" + m + "/" + gameplayPrefixes[i] + "." + ext;
+                    string ua = StreamingAssetsUrl.UrlForRelativePath(relA);
+                    string ub = StreamingAssetsUrl.UrlForRelativePath(relB);
+                    bool oka = false;
+                    bool okb = false;
+                    yield return WebGlStreamingPrewarm.CoHttpHeadOk(ua, b => oka = b);
+                    if (oka) trackPaths.Add(ua);
+                    yield return WebGlStreamingPrewarm.CoHttpHeadOk(ub, b => okb = b);
+                    if (okb) trackPaths.Add(ub);
+                }
+            }
+
             for (int n = 1; n <= 36; n++)
             {
                 string prefix = "track" + n.ToString("D2");

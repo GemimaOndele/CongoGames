@@ -10,7 +10,7 @@ namespace CongoGames.Presentation
     [DefaultExecutionOrder(-80)]
     public class BroadcastAudioMixCoordinator : MonoBehaviour
     {
-        [SerializeField] [Range(0.05f, 1f)] private float musicLevelWhileSpeaking = 0.42f;
+        [SerializeField] [Range(0f, 1f)] private float musicLevelWhileSpeaking = 0f;
         [SerializeField] [Range(0.05f, 1f)] private float sfxLevelWhileSpeaking = 0.72f;
 
         private void OnEnable()
@@ -25,6 +25,7 @@ namespace CongoGames.Presentation
 
         private void OnHostSpeaking(bool speaking)
         {
+            // Exigence gameplay: pendant la voix IA, la musique de fond doit être totalement muette.
             float m = speaking ? musicLevelWhileSpeaking : 1f;
             float s = speaking ? sfxLevelWhileSpeaking : 1f;
             ThemeMusicPlayer.Instance?.SetBroadcastDuckMultiplier(m);

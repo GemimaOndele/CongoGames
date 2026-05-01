@@ -23,6 +23,7 @@ namespace CongoGames.Presentation
         /// <summary>Scène 3D « plateau TV » (Render Texture → fond) au lieu du seul fond 2D / vidéo.</summary>
         public static bool UseVirtual3DShowStage { get; set; } = true;
 
+
         public static int VirtualStageWidth => Tier switch
         {
             PresentationQualityTier.Compact => 960,

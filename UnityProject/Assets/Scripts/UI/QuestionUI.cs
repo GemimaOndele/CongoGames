@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using CongoGames.Core;
 using CongoGames.Presentation;
@@ -30,6 +31,7 @@ namespace CongoGames.UI
         private readonly List<Image> optionBgs = new List<Image>(4);
         private readonly List<Button> optionButtons = new List<Button>(4);
         private readonly Color idleColor = new Color(0.14f, 0.16f, 0.22f, 1f);
+        private readonly Color hoverChoiceColor = new Color(0.22f, 0.38f, 0.62f, 1f);
         private readonly Color correctColor = new Color(0.02f, 0.82f, 0.32f, 1f);
         private readonly Color accentColor = new Color(0.95f, 0.78f, 0.1f, 1f);
 
@@ -38,6 +40,7 @@ namespace CongoGames.UI
         private Coroutine animCo;
         private Coroutine resultPulseCo;
         private readonly string[] bufferedChoiceLines = new string[4];
+        public string CurrentPromptText => questionText != null ? questionText.text : "";
 
         public event Action<string> AnswerChosen;
 
@@ -83,6 +86,46 @@ namespace CongoGames.UI
             WireClick("B", buttonB);
             WireClick("C", buttonC);
             WireClick("D", buttonD);
+            WireChoiceHover(buttonA, backgroundA);
+            WireChoiceHover(buttonB, backgroundB);
+            WireChoiceHover(buttonC, backgroundC);
+            WireChoiceHover(buttonD, backgroundD);
+        }
+
+        private void WireChoiceHover(Button btn, Image bg)
+        {
+            if (btn == null || bg == null)
+            {
+                return;
+            }
+
+            EventTrigger trigger = btn.gameObject.GetComponent<EventTrigger>();
+            if (trigger == null)
+            {
+                trigger = btn.gameObject.AddComponent<EventTrigger>();
+            }
+
+            trigger.triggers ??= new List<EventTrigger.Entry>();
+            trigger.triggers.Clear();
+
+            var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enter.callback.AddListener(_ =>
+            {
+                if (choicesClickable && btn.interactable)
+                {
+                    bg.color = hoverChoiceColor;
+                }
+            });
+            var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+            exit.callback.AddListener(_ =>
+            {
+                if (choicesClickable && btn.interactable)
+                {
+                    bg.color = idleColor;
+                }
+            });
+            trigger.triggers.Add(enter);
+            trigger.triggers.Add(exit);
         }
 
         private void WireClick(string letter, Button btn)

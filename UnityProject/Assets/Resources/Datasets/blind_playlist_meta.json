@@ -1,154 +1,661 @@
 {
   "items": [
     {
-      "fileBase": "track01",
+      "fileBase": "Afara Tsena - Afro Mbokalisation (Audio)",
+      "fileName": "Afara Tsena - Afro Mbokalisation (Audio).mp3",
+      "artist": "Afara Tsena",
+      "title": "Afro Mbokalisation (Audio)",
+      "tags": [
+        "Audio"
+      ]
+    },
+    {
+      "fileBase": "Afara Tsena - Jalousie",
+      "fileName": "Afara Tsena - Jalousie.mp3",
+      "artist": "Afara Tsena",
+      "title": "Jalousie",
+      "tags": []
+    },
+    {
+      "fileBase": "Afara Tsena- Mbokalisation 3.0",
+      "fileName": "Afara Tsena- Mbokalisation 3.0.mp3",
+      "artist": "Afara Tsena",
+      "title": "Mbokalisation 3.0",
+      "tags": []
+    },
+    {
+      "fileBase": "Aurlus Mabele - Tour de contrôle",
+      "fileName": "Aurlus Mabele - Tour de contrôle.mp3",
+      "artist": "Aurlus Mabele",
+      "title": "Tour de contrôle",
+      "tags": []
+    },
+    {
+      "fileBase": "Aurlus Mabélé feat Le groupe_Loketo - Embargo",
+      "fileName": "Aurlus Mabélé feat Le groupe_Loketo - Embargo.mp3",
+      "artist": "Aurlus Mabélé feat Le groupe_Loketo",
+      "title": "Embargo",
+      "tags": []
+    },
+    {
+      "fileBase": "Blemix feat Kb le roi - Délinquant",
+      "fileName": "Blemix feat Kb le roi - Délinquant.mp3",
+      "artist": "Blemix feat Kb le roi",
+      "title": "Délinquant",
+      "tags": []
+    },
+    {
+      "fileBase": "CARINE FLEUR EDOUARE - KILOMBO CONGO",
+      "fileName": "CARINE FLEUR EDOUARE - KILOMBO CONGO.mp3",
       "artist": "CARINE FLEUR EDOUARE",
-      "title": "KILOMBO CONGO"
+      "title": "KILOMBO CONGO",
+      "tags": []
     },
     {
-      "fileBase": "track02",
+      "fileBase": "Casimir Zao - Ancien Combattant",
+      "fileName": "Casimir Zao - Ancien Combattant.mp3",
       "artist": "Casimir Zao",
-      "title": "Ancien Combattant"
+      "title": "Ancien Combattant",
+      "tags": []
     },
     {
-      "fileBase": "track03",
+      "fileBase": "Casimir Zao - Corbillard",
+      "fileName": "Casimir Zao - Corbillard.mp3",
       "artist": "Casimir Zao",
-      "title": "Corbillard"
+      "title": "Corbillard",
+      "tags": []
     },
     {
-      "fileBase": "track04",
+      "fileBase": "Casimir Zao - Soulard",
+      "fileName": "Casimir Zao - Soulard.mp3",
       "artist": "Casimir Zao",
-      "title": "Soulard"
+      "title": "Soulard",
+      "tags": []
     },
     {
-      "fileBase": "track05",
+      "fileBase": "Casimir Zao - Wele",
+      "fileName": "Casimir Zao - Wele.mp3",
       "artist": "Casimir Zao",
-      "title": "Wele"
+      "title": "Wele",
+      "tags": []
     },
     {
-      "fileBase": "track06",
+      "fileBase": "Cino Black feat Zaparo de guerre - Anti rouille ",
+      "fileName": "Cino Black feat Zaparo de guerre - Anti rouille .mp3",
+      "artist": "Cino Black feat Zaparo de guerre",
+      "title": "Anti rouille",
+      "tags": []
+    },
+    {
+      "fileBase": "Cino black feat Zaparo de guerre - Polémique",
+      "fileName": "Cino black feat Zaparo de guerre - Polémique.mp3",
       "artist": "Cino black feat Zaparo de guerre",
-      "title": "Polémique"
+      "title": "Polémique",
+      "tags": []
     },
     {
-      "fileBase": "track07",
+      "fileBase": "Coq Manu le Coq feat Trésor B - Dans mes délires",
+      "fileName": "Coq Manu le Coq feat Trésor B - Dans mes délires.mp3",
+      "artist": "Coq Manu le Coq feat Trésor B",
+      "title": "Dans mes délires",
+      "tags": []
+    },
+    {
+      "fileBase": "Davy Kassa feat Elveronne Ndinga - Cheri Beetho (Kingoli Universel)",
+      "fileName": "Davy Kassa feat Elveronne Ndinga - Cheri Beetho (Kingoli Universel).mp3",
       "artist": "Davy Kassa feat Elveronne Ndinga",
-      "title": "Cheri Beetho Kingoli Universel"
+      "title": "Cheri Beetho (Kingoli Universel)",
+      "tags": [
+        "Kingoli Universel"
+      ]
     },
     {
-      "fileBase": "track08",
+      "fileBase": "Diesel Gucci - Bolaye",
+      "fileName": "Diesel Gucci - Bolaye.mp3",
+      "artist": "Diesel Gucci",
+      "title": "Bolaye",
+      "tags": []
+    },
+    {
+      "fileBase": "Diesel Gucci - Djoyiyo",
+      "fileName": "Diesel Gucci - Djoyiyo.mp3",
+      "artist": "Diesel Gucci",
+      "title": "Djoyiyo",
+      "tags": []
+    },
+    {
+      "fileBase": "Dj Boogie Black - éyinda",
+      "fileName": "Dj Boogie Black - éyinda.mp3",
+      "artist": "Dj Boogie Black",
+      "title": "éyinda",
+      "tags": []
+    },
+    {
+      "fileBase": "Dj Boogie Black - Tika zoubida (OFFICIAL VIDEO CLIP by BIG KLOZ director)",
+      "fileName": "Dj Boogie Black - Tika zoubida (OFFICIAL VIDEO CLIP by BIG KLOZ director).mp3",
+      "artist": "Dj Boogie Black",
+      "title": "Tika zoubida (OFFICIAL VIDEO CLIP by BIG KLOZ director)",
+      "tags": [
+        "OFFICIAL VIDEO CLIP by BIG KLOZ director"
+      ]
+    },
+    {
+      "fileBase": "Dj Bookson feat Marvy - Mvila Tala mbasse",
+      "fileName": "Dj Bookson feat Marvy - Mvila Tala mbasse.mp3",
+      "artist": "Dj Bookson feat Marvy Mvila",
+      "title": "Tala Mbasse",
+      "tags": []
+    },
+    {
+      "fileBase": "Extra Musica - Etat Major",
+      "fileName": "Extra Musica - Etat Major.mp3",
+      "artist": "Extra Musica",
+      "title": "Etat Major",
+      "tags": []
+    },
+    {
+      "fileBase": "Fernand Mabala - Yatama",
+      "fileName": "Fernand Mabala - Yatama.mp3",
+      "artist": "Fernand Mabala",
+      "title": "Yatama",
+      "tags": []
+    },
+    {
+      "fileBase": "Franklin Boukaka - Le bûcheron",
+      "fileName": "Franklin Boukaka - Le bûcheron.mp3",
       "artist": "Franklin Boukaka",
-      "title": "Le bûcheron"
+      "title": "Le bûcheron",
+      "tags": []
     },
     {
-      "fileBase": "track09",
-      "artist": "Groupe AVB",
-      "title": "Mentalité"
+      "fileBase": "Jacques Loubelo - Congo(Hymne à la paix)",
+      "fileName": "Jacques Loubelo - Congo(Hymne à la paix).mp3",
+      "artist": "Jacques Loubelo",
+      "title": "Congo(Hymne à la paix)",
+      "tags": [
+        "Hymne à la paix"
+      ]
     },
     {
-      "fileBase": "track10",
-      "artist": "Kedjevara feat Extra Musica Nouvel Horizon",
-      "title": "TIA LOKOLO"
+      "fileBase": "Jacques Loubelo - Kongo Akoloba",
+      "fileName": "Jacques Loubelo - Kongo Akoloba.mp3",
+      "artist": "Jacques Loubelo",
+      "title": "Kongo Akoloba",
+      "tags": []
     },
     {
-      "fileBase": "track11",
+      "fileBase": "Jean Baron feat le groupe_Loketo - Malou",
+      "fileName": "Jean Baron feat le groupe_Loketo - Malou.mp3",
+      "artist": "Jean Baron feat le groupe_Loketo",
+      "title": "Malou",
+      "tags": []
+    },
+    {
+      "fileBase": "Jean Serge Essous - Bongo",
+      "fileName": "Jean Serge Essous - Bongo.mp3",
+      "artist": "Jean Serge Essous",
+      "title": "Bongo",
+      "tags": []
+    },
+    {
+      "fileBase": "Jean Serge Essous - Philosophie",
+      "fileName": "Jean Serge Essous - Philosophie.mp3",
+      "artist": "Jean Serge Essous",
+      "title": "Philosophie",
+      "tags": []
+    },
+    {
+      "fileBase": "Kedjevara feat Le groupe_Extra Musica Nouvel Horizon -  Tia lokolo",
+      "fileName": "Kedjevara feat Le groupe_Extra Musica Nouvel Horizon -  Tia lokolo.mp3",
+      "artist": "Kedjevara feat Le groupe_Extra Musica Nouvel Horizon",
+      "title": "Tia lokolo",
+      "tags": []
+    },
+    {
+      "fileBase": "Key kolos - Avertissement buzoba",
+      "fileName": "Key kolos - Avertissement buzoba.mp3",
+      "artist": "Key kolos",
+      "title": "Avertissement buzoba",
+      "tags": []
+    },
+    {
+      "fileBase": "Key Kolos - Iza mama africa",
+      "fileName": "Key Kolos - Iza mama africa.mp3",
+      "artist": "Key Kolos",
+      "title": "Iza mama africa",
+      "tags": []
+    },
+    {
+      "fileBase": "Key kolos - My Lova",
+      "fileName": "Key kolos - My Lova.mp3",
+      "artist": "Key kolos",
+      "title": "My Lova",
+      "tags": []
+    },
+    {
+      "fileBase": "Key Kolos feat Nestelia Forest - Love Story",
+      "fileName": "Key Kolos feat Nestelia Forest - Love Story.mp3",
+      "artist": "Key Kolos feat Nestelia Forest",
+      "title": "Love Story",
+      "tags": []
+    },
+    {
+      "fileBase": "Le groupe_AVB - Mentalité (Vocal Bantou)",
+      "fileName": "Le groupe_AVB - Mentalité (Vocal Bantou).mp3",
+      "artist": "AVB",
+      "title": "Mentalité (Vocal Bantou)",
+      "tags": [
+        "Vocal Bantou"
+      ]
+    },
+    {
+      "fileBase": "Le groupe_Embeudah Musik - Louboutin",
+      "fileName": "Le groupe_Embeudah Musik - Louboutin.mp3",
+      "artist": "Embeudah Musik",
+      "title": "Louboutin",
+      "tags": []
+    },
+    {
+      "fileBase": "Le groupe_Les Bantous de la Capitale - Makambo mibalé",
+      "fileName": "Le groupe_Les Bantous de la Capitale - Makambo mibalé.mp3",
       "artist": "Les Bantous de la Capitale",
-      "title": "Makambo mibalé"
+      "title": "Makambo mibalé",
+      "tags": []
     },
     {
-      "fileBase": "track12",
+      "fileBase": "Le groupe_Patrouille des Stars - Congo Uni",
+      "fileName": "Le groupe_Patrouille des Stars - Congo Uni.mp3",
+      "artist": "Patrouille des Stars",
+      "title": "Congo Uni",
+      "tags": []
+    },
+    {
+      "fileBase": "Le groupe_Patrouille des stars - tonton partout partout",
+      "fileName": "Le groupe_Patrouille des stars - tonton partout partout.mp3",
+      "artist": "Patrouille des stars",
+      "title": "tonton partout partout",
+      "tags": []
+    },
+    {
+      "fileBase": "Le groupe_Très faché Mouyirika -Zolana",
+      "fileName": "Le groupe_Très faché Mouyirika -Zolana.mp3",
+      "artist": "Très faché Mouyirika",
+      "title": "Zolana",
+      "tags": []
+    },
+    {
+      "fileBase": "Louz Baby - Maman",
+      "fileName": "Louz Baby - Maman.mp3",
+      "artist": "Louz Baby",
+      "title": "Maman",
+      "tags": []
+    },
+    {
+      "fileBase": "Louz Baby - Mère ya palais",
+      "fileName": "Louz Baby - Mère ya palais.mp3",
+      "artist": "Louz Baby",
+      "title": "Mère ya palais",
+      "tags": []
+    },
+    {
+      "fileBase": "Louz Baby - Papa",
+      "fileName": "Louz Baby - Papa.mp3",
+      "artist": "Louz Baby",
+      "title": "Papa",
+      "tags": []
+    },
+    {
+      "fileBase": "Louz Baby x Paterne Maestro - Mbongo",
+      "fileName": "Louz Baby x Paterne Maestro - Mbongo.mp3",
       "artist": "Louz Baby x Paterne Maestro",
-      "title": "MBONGO"
+      "title": "Mbongo",
+      "tags": []
     },
     {
-      "fileBase": "track13",
+      "fileBase": "Mac Itoua Caleb - Lombo l'adjémbé",
+      "fileName": "Mac Itoua Caleb - Lombo l'adjémbé.mp3",
+      "artist": "Mac Itoua Caleb",
+      "title": "Lombo l'adjémbé",
+      "tags": []
+    },
+    {
+      "fileBase": "Makhalba Malecheck - Na tolo",
+      "fileName": "Makhalba Malecheck - Na tolo.mp3",
+      "artist": "Makhalba Malecheck",
+      "title": "Na tolo",
+      "tags": []
+    },
+    {
+      "fileBase": "Mamie claudia - Mwana ya mama",
+      "fileName": "Mamie claudia - Mwana ya mama.mp3",
+      "artist": "Mamie claudia",
+      "title": "Mwana ya mama",
+      "tags": []
+    },
+    {
+      "fileBase": "Mamie claudia - Ntonga nga",
+      "fileName": "Mamie claudia - Ntonga nga.mp3",
+      "artist": "Mamie claudia",
+      "title": "Ntonga nga",
+      "tags": []
+    },
+    {
+      "fileBase": "Mav Cacharel - N'Kembo",
+      "fileName": "Mav Cacharel - N'Kembo.mp3",
+      "artist": "Mav Cacharel",
+      "title": "N'Kembo",
+      "tags": []
+    },
+    {
+      "fileBase": "Michelle Moutouari - Heritage",
+      "fileName": "Michelle Moutouari - Heritage.mp3",
       "artist": "Michelle Moutouari",
-      "title": "Heritage"
+      "title": "Heritage",
+      "tags": []
     },
     {
-      "fileBase": "track14",
+      "fileBase": "Mlg Mochristo - Tule kule",
+      "fileName": "Mlg Mochristo - Tule kule.mp3",
+      "artist": "Mlg Mochristo",
+      "title": "Tule kule",
+      "tags": []
+    },
+    {
+      "fileBase": "Nestelia Forest - Minguinita",
+      "fileName": "Nestelia Forest - Minguinita.mp3",
+      "artist": "Nestelia Forest",
+      "title": "Minguinita",
+      "tags": []
+    },
+    {
+      "fileBase": "Nestelia Forest feat Wayé - Ntimani",
+      "fileName": "Nestelia Forest feat Wayé - Ntimani.mp3",
+      "artist": "Nestelia Forest feat Wayé",
+      "title": "Ntimani",
+      "tags": []
+    },
+    {
+      "fileBase": "Niska - B.O.C #KeDuSal 1",
+      "fileName": "Niska - B.O.C #KeDuSal 1.mp3",
+      "artist": "Niska",
+      "title": "B.O.C #KeDuSal 1",
+      "tags": []
+    },
+    {
+      "fileBase": "Niska - Réseaux",
+      "fileName": "Niska - Réseaux.mp3",
+      "artist": "Niska",
+      "title": "Réseaux",
+      "tags": []
+    },
+    {
+      "fileBase": "Norbat de Paris - Ngoma ya la sape",
+      "fileName": "Norbat de Paris - Ngoma ya la sape.mp3",
       "artist": "Norbat de Paris",
-      "title": "Ngoma ya la sape"
+      "title": "Ngoma ya la sape",
+      "tags": []
     },
     {
-      "fileBase": "track15",
+      "fileBase": "Nzongo soul - Hey walla (afro funk)",
+      "fileName": "Nzongo soul - Hey walla (afro funk).mp3",
+      "artist": "Nzongo soul",
+      "title": "Hey walla (afro funk)",
+      "tags": [
+        "afro funk"
+      ]
+    },
+    {
+      "fileBase": "Nzongo Soul - Mvaneno nlele",
+      "fileName": "Nzongo Soul - Mvaneno nlele.mp3",
+      "artist": "Nzongo Soul",
+      "title": "Mvaneno nlele",
+      "tags": []
+    },
+    {
+      "fileBase": "Pamelo Mounka - Amour de Nombakélé",
+      "fileName": "Pamelo Mounka - Amour de Nombakélé.mp3",
       "artist": "Pamelo Mounka",
-      "title": "Amour de Nombakélé"
+      "title": "Amour de Nombakélé",
+      "tags": []
     },
     {
-      "fileBase": "track16",
+      "fileBase": "Pamelo Mounka - Buala yayi mambu",
+      "fileName": "Pamelo Mounka - Buala yayi mambu.mp3",
       "artist": "Pamelo Mounka",
-      "title": "Buala yayi mambu"
+      "title": "Buala yayi mambu",
+      "tags": []
     },
     {
-      "fileBase": "track17",
+      "fileBase": "Pamelo Mounka - L'argent appelle l'argent",
+      "fileName": "Pamelo Mounka - L'argent appelle l'argent.mp3",
       "artist": "Pamelo Mounka",
-      "title": "L'argent appelle l'argent"
+      "title": "L'argent appelle l'argent",
+      "tags": []
     },
     {
-      "fileBase": "track18",
+      "fileBase": "Pembey Sheiro - Ominga",
+      "fileName": "Pembey Sheiro - Ominga.mp3",
+      "artist": "Pembey Sheiro",
+      "title": "Ominga",
+      "tags": []
+    },
+    {
+      "fileBase": "Pembey Sheiro - Yo mama leki",
+      "fileName": "Pembey Sheiro - Yo mama leki.mp3",
+      "artist": "Pembey Sheiro",
+      "title": "Yo mama leki",
+      "tags": []
+    },
+    {
+      "fileBase": "Pembey Sheiro Feat Anaïs Kissangou - La Paix Au Congo",
+      "fileName": "Pembey Sheiro Feat Anaïs Kissangou - La Paix Au Congo.mp3",
+      "artist": "Pembey Sheiro Feat Anaïs Kissangou",
+      "title": "La Paix Au Congo",
+      "tags": []
+    },
+    {
+      "fileBase": "Pierre Moutouari - Missengue",
+      "fileName": "Pierre Moutouari - Missengue.mp3",
       "artist": "Pierre Moutouari",
-      "title": "Missengue"
+      "title": "Missengue",
+      "tags": []
     },
     {
-      "fileBase": "track19",
+      "fileBase": "Pierrette Adams - Caterpillars",
+      "fileName": "Pierrette Adams - Caterpillars.mp3",
       "artist": "Pierrette Adams",
-      "title": "Caterpillars"
+      "title": "Caterpillars",
+      "tags": []
     },
     {
-      "fileBase": "track20",
+      "fileBase": "Pierrette Adams - Journal intime",
+      "fileName": "Pierrette Adams - Journal intime.mp3",
       "artist": "Pierrette Adams",
-      "title": "Journal intime"
+      "title": "Journal intime",
+      "tags": []
     },
     {
-      "fileBase": "track21",
-      "artist": "POZO CHARABIA Feat MJ NADER (Freestyle part 1 Papa SASSOU & ADOU DANGA)",
-      "title": "—"
+      "fileBase": "Pozo charabia feat Mj Nader -  papa sassou & adou danga [Freestyle part 1]",
+      "fileName": "Pozo charabia feat Mj Nader -  papa sassou & adou danga [Freestyle part 1].mp3",
+      "artist": "Pozo charabia feat Mj Nader",
+      "title": "papa sassou & adou danga [Freestyle part 1]",
+      "tags": [
+        "Freestyle part 1"
+      ]
     },
     {
-      "fileBase": "track22",
+      "fileBase": "Rapha Bounzeki -Départ pour l'école",
+      "fileName": "Rapha Bounzeki -Départ pour l'école.mp3",
+      "artist": "Rapha Bounzeki",
+      "title": "Départ pour l'école",
+      "tags": []
+    },
+    {
+      "fileBase": "Roga Roga - Nzoungou",
+      "fileName": "Roga Roga - Nzoungou.mp3",
       "artist": "Roga Roga",
-      "title": "Nzoungou"
+      "title": "Nzoungou",
+      "tags": []
     },
     {
-      "fileBase": "track23",
-      "artist": "Roga Roga Extra Musica",
-      "title": "BOKOKO"
+      "fileBase": "Roga roga - Tolérance zéro rupture",
+      "fileName": "Roga roga - Tolérance zéro rupture.mp3",
+      "artist": "Roga roga",
+      "title": "Tolérance zéro rupture",
+      "tags": []
     },
     {
-      "fileBase": "track24",
-      "artist": "ROGA ROGA EXTRA MUSICA",
-      "title": "Contentieux"
+      "fileBase": "Roga Roga x Le groupe_Extra Musica - Bokoko",
+      "fileName": "Roga Roga x Le groupe_Extra Musica - Bokoko.mp3",
+      "artist": "Roga Roga x Le groupe_Extra Musica",
+      "title": "Bokoko",
+      "tags": []
     },
     {
-      "fileBase": "track25",
+      "fileBase": "Roga roga x Le groupe_Extra Musica - Contentieux",
+      "fileName": "Roga roga x Le groupe_Extra Musica - Contentieux.mp3",
+      "artist": "Roga roga x Le groupe_Extra Musica",
+      "title": "Contentieux",
+      "tags": []
+    },
+    {
+      "fileBase": "Sam SamouraÏ - HRB (Hommage à Rapha BOUNZEKI)",
+      "fileName": "Sam SamouraÏ - HRB (Hommage à Rapha BOUNZEKI).mp3",
+      "artist": "Sam SamouraÏ",
+      "title": "HRB (Hommage à Rapha BOUNZEKI)",
+      "tags": [
+        "Hommage à Rapha BOUNZEKI"
+      ]
+    },
+    {
+      "fileBase": "Sebas Enemen - Hymne à Brazzaville",
+      "fileName": "Sebas Enemen - Hymne à Brazzaville.mp3",
+      "artist": "Sebas Enemen",
+      "title": "Hymne à Brazzaville",
+      "tags": []
+    },
+    {
+      "fileBase": "Sebas Enemen- Historiette de Brazzaville",
+      "fileName": "Sebas Enemen- Historiette de Brazzaville.mp3",
+      "artist": "Sebas Enemen",
+      "title": "Historiette de Brazzaville",
+      "tags": []
+    },
+    {
+      "fileBase": "Siboy feat. Benash Damso - Mobali",
+      "fileName": "Siboy feat. Benash Damso - Mobali.mp3",
+      "artist": "Siboy feat. Benash Damso",
+      "title": "Mobali",
+      "tags": []
+    },
+    {
+      "fileBase": "Sosey - Deux à deux",
+      "fileName": "Sosey - Deux à deux.mp3",
+      "artist": "Sosey",
+      "title": "Deux à deux",
+      "tags": []
+    },
+    {
+      "fileBase": "Sosey - Na kati",
+      "fileName": "Sosey - Na kati.mp3",
+      "artist": "Sosey",
+      "title": "Na kati",
+      "tags": []
+    },
+    {
+      "fileBase": "Sylvain Akouala - Dialogue avec un incrédule",
+      "fileName": "Sylvain Akouala - Dialogue avec un incrédule.mp3",
+      "artist": "Sylvain Akouala",
+      "title": "Dialogue avec un incrédule",
+      "tags": []
+    },
+    {
+      "fileBase": "Teddy Benzo Mixton feat Spinho - Moselebende",
+      "fileName": "Teddy Benzo Mixton feat Spinho - Moselebende.mp3",
       "artist": "Teddy Benzo Mixton feat Spinho",
-      "title": "Moselebende"
+      "title": "Moselebende",
+      "tags": []
     },
     {
-      "fileBase": "track26",
+      "fileBase": "Théo Blaise Kounkou - Éden",
+      "fileName": "Théo Blaise Kounkou - Éden.mp3",
+      "artist": "Théo Blaise Kounkou",
+      "title": "Éden",
+      "tags": []
+    },
+    {
+      "fileBase": "Tidiane Mario - Give Me Freedom",
+      "fileName": "Tidiane Mario - Give Me Freedom.mp3",
+      "artist": "Tidiane Mario",
+      "title": "Give Me Freedom",
+      "tags": []
+    },
+    {
+      "fileBase": "Tidiane Mario x Tété Ketch x Vinny Baltazard - Ya Nga Bébé",
+      "fileName": "Tidiane Mario x Tété Ketch x Vinny Baltazard - Ya Nga Bébé.mp3",
       "artist": "Tidiane Mario x Tété Ketch x Vinny Baltazard",
-      "title": "Ya Nga Bébé"
+      "title": "Ya Nga Bébé",
+      "tags": []
     },
     {
-      "fileBase": "track27",
-      "artist": "Wayé feat casimir Zao",
-      "title": "Soûlard remix"
+      "fileBase": "Tikulu - Nkwikila",
+      "fileName": "Tikulu - Nkwikila.mp3",
+      "artist": "Tikulu",
+      "title": "Nkwikila",
+      "tags": []
     },
     {
-      "fileBase": "track28",
-      "artist": "YOULOU MABIALA",
-      "title": "LOUFOULAKARI"
+      "fileBase": "Trésor Mvoula - Vieux Thomas",
+      "fileName": "Trésor Mvoula - Vieux Thomas.mp3",
+      "artist": "Trésor Mvoula",
+      "title": "Vieux Thomas",
+      "tags": []
     },
     {
-      "fileBase": "track29",
-      "artist": "youlou mabiala",
-      "title": "mamou"
+      "fileBase": "Wayé feat Casimir Zao - Soûlard [remix]",
+      "fileName": "Wayé feat Casimir Zao - Soûlard [remix].mp3",
+      "artist": "Wayé feat Casimir Zao",
+      "title": "Soûlard [remix]",
+      "tags": [
+        "remix"
+      ]
     },
     {
-      "fileBase": "track30",
+      "fileBase": "Ya Tatchi - Ndjindji",
+      "fileName": "Ya Tatchi - Ndjindji.mp3",
+      "artist": "Ya Tatchi",
+      "title": "Ndjindji",
+      "tags": []
+    },
+    {
+      "fileBase": "Youlou Mabiala - Loufoulakari",
+      "fileName": "Youlou Mabiala - Loufoulakari.mp3",
+      "artist": "Youlou Mabiala",
+      "title": "Loufoulakari",
+      "tags": []
+    },
+    {
+      "fileBase": "Youlou mabiala - Mamou",
+      "fileName": "Youlou mabiala - Mamou.mp3",
+      "artist": "Youlou mabiala",
+      "title": "Mamou",
+      "tags": []
+    },
+    {
+      "fileBase": "Zitany Neil - Marcory Gasoil",
+      "fileName": "Zitany Neil - Marcory Gasoil.mp3",
       "artist": "Zitany Neil",
-      "title": "Marcory Gasoil"
+      "title": "Marcory Gasoil",
+      "tags": []
+    },
+    {
+      "fileBase": "Zuko Yadeblè feat. Lema & Hardy S, Djam Kiss, Paterne Maestro & MC Baba, Wayé, Kosar X Flatt Boy, Authentik,Vitch prodz, Freud Vinces,Refle Kazama,Blacky Armani,Makhalba Malecheck - Ni béto [remix]",
+      "fileName": "Zuko Yadeblè feat. Lema & Hardy S, Djam Kiss, Paterne Maestro & MC Baba, Wayé, Kosar X Flatt Boy, Authentik,Vitch prodz, Freud Vinces,Refle Kazama,Blacky Armani,Makhalba Malecheck - Ni béto [remix].mp3",
+      "artist": "Zuko Yadeblè feat. Lema & Hardy S, Djam Kiss, Paterne Maestro & MC Baba, Wayé, Kosar X Flatt Boy, Authentik,Vitch prodz, Freud Vinces,Refle Kazama,Blacky Armani,Makhalba Malecheck",
+      "title": "Ni béto [remix]",
+      "tags": [
+        "remix"
+      ]
     }
   ]
 }

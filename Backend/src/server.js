@@ -3,6 +3,7 @@ import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import http from "node:http";
+import crypto from "node:crypto";
 import express from "express";
 import { WebSocketServer } from "ws";
 import { GiftEngine } from "./services/giftEngine.js";
@@ -54,6 +55,83 @@ const tiktokBridge = new TikTokLiveBridge(tiktokUsernames);
 const TIKTOK_RETRY_MS = Number(process.env.TIKTOK_RETRY_MS || 15000);
 const recentEvents = [];
 const RECENT_MAX = 200;
+const oauthProfiles = new Map();
+const latestOAuthTokenByProvider = new Map();
+const OAUTH_PROFILE_TTL_MS = Number(process.env.OAUTH_PROFILE_TTL_MS || 1000 * 60 * 60 * 12); // 12h
+
+const oauthProviderUrls = {
+  tiktok: (process.env.OAUTH_TIKTOK_URL || "").trim(),
+  google: (process.env.OAUTH_GOOGLE_URL || "").trim(),
+  facebook: (process.env.OAUTH_FACEBOOK_URL || "").trim()
+};
+
+function nowMs() {
+  return Date.now();
+}
+
+function sanitizeProvider(raw) {
+  const p = String(raw || "").trim().toLowerCase();
+  if (p === "tiktok" || p === "google" || p === "facebook") return p;
+  return "";
+}
+
+function parseBooleanFlag(raw) {
+  if (raw === true || raw === 1) return true;
+  const s = String(raw || "").trim().toLowerCase();
+  return s === "1" || s === "true" || s === "yes" || s === "on";
+}
+
+function buildProfileFromRequest(req, providerHint = "") {
+  const body = req.body || {};
+  const query = req.query || {};
+  const provider = sanitizeProvider(body.provider || query.provider || providerHint) || "invité";
+  const displayName = String(body.displayName || query.displayName || body.user || query.user || "Joueur")
+    .trim()
+    .slice(0, 60) || "Joueur";
+  const avatarUrl = String(body.avatarUrl || query.avatarUrl || body.profilePictureUrl || query.profilePictureUrl || "")
+    .trim()
+    .slice(0, 500);
+  const isAdmin = parseBooleanFlag(body.isAdmin ?? query.isAdmin);
+  return { provider, displayName, avatarUrl, isAdmin };
+}
+
+function saveOAuthProfile(profile) {
+  const token = crypto.randomUUID();
+  const provider = sanitizeProvider(profile?.provider) || "invité";
+  oauthProfiles.set(token, {
+    ...profile,
+    provider,
+    authToken: token,
+    createdAt: nowMs(),
+    expiresAt: nowMs() + OAUTH_PROFILE_TTL_MS
+  });
+  latestOAuthTokenByProvider.set(provider, token);
+  return token;
+}
+
+function getOAuthProfile(token) {
+  const key = String(token || "").trim();
+  if (!key) return null;
+  const p = oauthProfiles.get(key);
+  if (!p) return null;
+  if (p.expiresAt < nowMs()) {
+    oauthProfiles.delete(key);
+    return null;
+  }
+  return p;
+}
+
+function purgeExpiredOAuthProfiles() {
+  const t = nowMs();
+  for (const [token, p] of oauthProfiles.entries()) {
+    if (!p || p.expiresAt < t) {
+      oauthProfiles.delete(token);
+      if (p?.provider && latestOAuthTokenByProvider.get(p.provider) === token) {
+        latestOAuthTokenByProvider.delete(p.provider);
+      }
+    }
+  }
+}
 
 function pushEvent(type, payload) {
   recentEvents.push({ type, payload, ts: Date.now() });
@@ -155,13 +233,111 @@ code{background:#f0f0f0;padding:2px 6px;border-radius:4px}a{color:#0a6}</style><
 });
 
 app.get("/health", (_req, res) => {
+  purgeExpiredOAuthProfiles();
   res.json({
     ok: true,
     service: "congogames-backend",
     httpPort: boundHttpPort,
     wsPort: activeWsPort,
-    ttsEnabled: isTtsConfigured()
+    ttsEnabled: isTtsConfigured(),
+    oauthProviders: {
+      tiktok: Boolean(oauthProviderUrls.tiktok),
+      google: Boolean(oauthProviderUrls.google),
+      facebook: Boolean(oauthProviderUrls.facebook)
+    },
+    oauthProfilesActive: oauthProfiles.size
   });
+});
+
+app.get("/auth/providers", (_req, res) => {
+  res.json({
+    ok: true,
+    providers: {
+      tiktok: oauthProviderUrls.tiktok,
+      google: oauthProviderUrls.google,
+      facebook: oauthProviderUrls.facebook
+    }
+  });
+});
+
+app.get("/auth/:provider/start", (req, res) => {
+  const provider = sanitizeProvider(req.params.provider);
+  if (!provider) return res.status(400).json({ ok: false, error: "provider invalide" });
+  const base = oauthProviderUrls[provider];
+  if (!base) return res.status(501).json({ ok: false, error: `OAUTH_${provider.toUpperCase()}_URL manquant` });
+
+  // On propage un state simple (optionnel) ; le callback d'identity provider doit revenir sur /auth/:provider/callback.
+  const state = String(req.query.state || crypto.randomUUID());
+  const join = base.includes("?") ? "&" : "?";
+  const redirect = `${base}${join}state=${encodeURIComponent(state)}`;
+  res.redirect(302, redirect);
+});
+
+app.get("/auth/:provider/callback", (req, res) => {
+  const provider = sanitizeProvider(req.params.provider);
+  if (!provider) return res.status(400).json({ ok: false, error: "provider invalide" });
+  const profile = buildProfileFromRequest(req, provider);
+  const authToken = saveOAuthProfile(profile);
+  purgeExpiredOAuthProfiles();
+  const payload = { ok: true, authToken, profile };
+
+  // Mode navigateur: affiche un message simple prêt à copier/coller.
+  if (String(req.query.format || "").toLowerCase() === "json") {
+    return res.json(payload);
+  }
+  res.type("html").send(`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"/><title>Connexion ${provider}</title>
+<style>body{font-family:system-ui,sans-serif;max-width:44rem;margin:2rem auto;padding:0 1rem;line-height:1.5}code{background:#f0f0f0;padding:2px 6px;border-radius:4px}</style>
+</head><body><h2>Connexion ${provider} réussie</h2>
+<p>Copie ce token dans Unity si nécessaire :</p>
+<p><code>${authToken}</code></p>
+<pre>${JSON.stringify(payload, null, 2)}</pre>
+</body></html>`);
+});
+
+app.get("/auth/:provider/latest", (req, res) => {
+  const provider = sanitizeProvider(req.params.provider);
+  if (!provider) return res.status(400).json({ ok: false, error: "provider invalide" });
+  purgeExpiredOAuthProfiles();
+  const token = latestOAuthTokenByProvider.get(provider);
+  if (!token) return res.status(404).json({ ok: false, error: "aucun profil récent" });
+  const p = getOAuthProfile(token);
+  if (!p) return res.status(404).json({ ok: false, error: "profil expiré" });
+  return res.json({
+    ok: true,
+    authToken: p.authToken,
+    profile: {
+      provider: p.provider,
+      displayName: p.displayName,
+      avatarUrl: p.avatarUrl,
+      isAdmin: Boolean(p.isAdmin)
+    },
+    expiresAt: p.expiresAt
+  });
+});
+
+app.post("/profile/sync", (req, res) => {
+  const authToken = String(req.body?.authToken || req.query?.authToken || "").trim();
+  if (authToken) {
+    const p = getOAuthProfile(authToken);
+    if (!p) return res.status(404).json({ ok: false, error: "authToken inconnu ou expiré" });
+    return res.json({
+      ok: true,
+      authToken: p.authToken,
+      profile: {
+        provider: p.provider,
+        displayName: p.displayName,
+        avatarUrl: p.avatarUrl,
+        isAdmin: Boolean(p.isAdmin)
+      },
+      expiresAt: p.expiresAt
+    });
+  }
+
+  // Fallback: accepte aussi un push direct profil.
+  const profile = buildProfileFromRequest(req);
+  const token = saveOAuthProfile(profile);
+  purgeExpiredOAuthProfiles();
+  return res.json({ ok: true, authToken: token, profile });
 });
 
 app.get("/tts/status", (_req, res) => {

@@ -20,9 +20,9 @@ namespace CongoGames.Presentation
         [SerializeField] private bool muteVideoSound = false;
         [SerializeField] private int renderWidth = 1920;
         [SerializeField] private int renderHeight = 1080;
-        [SerializeField] private float videoCycleSeconds = 24f;
+        [SerializeField] private float videoCycleSeconds = 14f;
         [SerializeField] private bool cycleVirtualThemes = true;
-        [SerializeField] private float virtualThemeCycleSeconds = 22f;
+        [SerializeField] private float virtualThemeCycleSeconds = 14f;
 
         private RawImage raw;
         private VideoPlayer video;
@@ -34,10 +34,36 @@ namespace CongoGames.Presentation
         private string activeModeId = "";
         private Coroutine videoCycleCo;
         private Coroutine virtualCycleCo;
+        private Coroutine alternateMixCo;
+        [SerializeField] private float minVideoSwitchSeconds = 6f;
+        [SerializeField] private float minVirtualSwitchSeconds = 10f;
         private static readonly Dictionary<string, int> VideoCycleIndexByMode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        private string debugVideoUrl = "—";
+        private int debugVideoIndex;
+        private int debugCandidateCount;
+        private string debugPhase = "idle";
+
+        public string DebugActiveModeId => activeModeId;
+        public string DebugVideoUrl => debugVideoUrl;
+        public int DebugVideoIndex => debugVideoIndex;
+        public int DebugCandidateCount => debugCandidateCount;
+        public string DebugPhase => debugPhase;
+
+        public static void ResetRotationDebugState()
+        {
+            VideoCycleIndexByMode.Clear();
+        }
         private static readonly string[] VirtualCycleModes =
         {
-            "quiz", "semantic", "word-scramble", "crossword-lite", "blind-test", "mystery-word", "memory", "speed-chrono", "image-guess"
+            "quiz", "quiz_alt",
+            "semantic", "semantic_alt",
+            "word-scramble", "word-scramble_alt",
+            "crossword-lite", "crossword-lite_alt",
+            "blind-test", "blind-test_alt",
+            "mystery-word", "mystery-word_alt",
+            "memory", "memory_alt",
+            "speed-chrono", "speed-chrono_alt",
+            "image-guess", "image-guess_alt"
         };
 
         private void Awake()
@@ -81,7 +107,60 @@ namespace CongoGames.Presentation
             StopEverything();
 
             var validCandidates = new List<string>();
+            yield return CoGatherVideoCandidates(id, validCandidates);
+            validCandidates = validCandidates
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            debugCandidateCount = validCandidates.Count;
 
+            bool hasVideo = validCandidates.Count > 0;
+            bool use3D = PresentationConfig.UseVirtual3DShowStage && virtual3D != null;
+
+            // Comportement prod forcé : si fond 3D activé et vidéos présentes, on alterne automatiquement.
+            if (use3D && hasVideo)
+            {
+                debugPhase = "mix-3d-video";
+                alternateMixCo = StartCoroutine(CoAlternateVideoAndVirtual3D(id, validCandidates));
+                yield break;
+            }
+
+            if (use3D)
+            {
+                debugPhase = "3d-only";
+                yield return CoStartSyntheticOrSlides(id);
+                yield break;
+            }
+
+            if (hasVideo)
+            {
+                int idx = 0;
+                if (VideoCycleIndexByMode.TryGetValue(id, out int prev))
+                {
+                    idx = prev % validCandidates.Count;
+                }
+
+                VideoCycleIndexByMode[id] = (idx + 1) % validCandidates.Count;
+                debugVideoIndex = idx;
+                if (validCandidates.Count == 1)
+                {
+                    debugPhase = "video-loop";
+                    TryPlayVideoUrl(validCandidates[0], muteVideoSound, true);
+                }
+                else
+                {
+                    debugPhase = "video-cycle";
+                    videoCycleCo = StartCoroutine(CoCycleVideos(id, validCandidates));
+                }
+
+                yield break;
+            }
+
+            yield return CoStartSyntheticOrSlides(id);
+        }
+
+        private IEnumerator CoGatherVideoCandidates(string id, List<string> validCandidates)
+        {
+            validCandidates.Clear();
             RemoteModeMediaEntry remote = RemoteThemeMediaConfig.Resolve(id);
             if (!string.IsNullOrWhiteSpace(remote.backgroundVideoUrl))
             {
@@ -117,32 +196,77 @@ namespace CongoGames.Presentation
                     }
                 }
             }
+        }
 
-            validCandidates = validCandidates
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            if (validCandidates.Count > 0)
+        /// <summary>Plateau 3D pendant <see cref="virtualThemeCycleSeconds"/>, puis vidéo pendant <see cref="videoCycleSeconds"/>, en boucle.</summary>
+        private IEnumerator CoAlternateVideoAndVirtual3D(string modeId, List<string> urls)
+        {
+            if (urls == null || urls.Count == 0 || virtual3D == null || raw == null)
             {
-                int idx = 0;
-                if (VideoCycleIndexByMode.TryGetValue(id, out int prev))
-                {
-                    idx = prev % validCandidates.Count;
-                }
-
-                VideoCycleIndexByMode[id] = idx;
-                if (validCandidates.Count == 1)
-                {
-                    TryPlayVideoUrl(validCandidates[0], muteVideoSound, true);
-                }
-                else
-                {
-                    videoCycleCo = StartCoroutine(CoCycleVideos(id, validCandidates));
-                }
                 yield break;
             }
 
-            yield return CoStartSyntheticOrSlides(id);
+            bool phase3D = true;
+            while (!string.IsNullOrEmpty(activeModeId) && string.Equals(activeModeId, modeId, StringComparison.Ordinal))
+            {
+                if (phase3D)
+                {
+                    debugPhase = "mix:3d";
+                    ReleaseVideoPlayerAndRenderTexture();
+                    synthetic?.Stop();
+                    virtual3D.RebuildForMode(modeId, raw);
+                    float wait3d = Mathf.Max(minVirtualSwitchSeconds, virtualThemeCycleSeconds);
+                    yield return new WaitForSecondsRealtime(wait3d);
+                    if (!string.Equals(activeModeId, modeId, StringComparison.Ordinal))
+                    {
+                        yield break;
+                    }
+
+                    virtual3D.Teardown();
+                    phase3D = false;
+                }
+                else
+                {
+                    int idx = 0;
+                    if (VideoCycleIndexByMode.TryGetValue(modeId, out int known))
+                    {
+                        idx = Mathf.Abs(known) % urls.Count;
+                    }
+
+                    TryPlayVideoUrl(urls[idx], muteVideoSound, true);
+                    VideoCycleIndexByMode[modeId] = (idx + 1) % urls.Count;
+                    debugVideoIndex = idx;
+                    debugPhase = "mix:video";
+                    float waitV = Mathf.Max(minVideoSwitchSeconds, videoCycleSeconds);
+                    yield return new WaitForSecondsRealtime(waitV);
+                    if (!string.Equals(activeModeId, modeId, StringComparison.Ordinal))
+                    {
+                        yield break;
+                    }
+
+                    ReleaseVideoPlayerAndRenderTexture();
+                    phase3D = true;
+                }
+            }
+        }
+
+        private void ReleaseVideoPlayerAndRenderTexture()
+        {
+            if (video != null)
+            {
+                video.prepareCompleted -= OnVideoPrepared;
+                video.errorReceived -= OnVideoError;
+                Destroy(video);
+                video = null;
+            }
+
+            if (rt != null)
+            {
+                rt.Release();
+                Destroy(rt);
+                rt = null;
+            }
+            debugVideoUrl = "—";
         }
 
         /// <summary>Sans fichier vidéo : plateau 3D (option) ; sinon slides ; sinon « clip » 2D procédural.</summary>
@@ -150,6 +274,7 @@ namespace CongoGames.Presentation
         {
             if (PresentationConfig.UseVirtual3DShowStage && virtual3D != null)
             {
+                debugPhase = "3d-cycle";
                 synthetic?.Stop();
                 virtual3D.RebuildForMode(id, raw);
                 if (cycleVirtualThemes)
@@ -212,10 +337,17 @@ namespace CongoGames.Presentation
             }
 
             synthetic?.Play(id, raw, renderWidth, renderHeight);
+            debugPhase = "synthetic";
         }
 
         private void StopEverything()
         {
+            if (alternateMixCo != null)
+            {
+                StopCoroutine(alternateMixCo);
+                alternateMixCo = null;
+            }
+
             if (virtual3D != null)
             {
                 virtual3D.Teardown();
@@ -251,20 +383,7 @@ namespace CongoGames.Presentation
 
             synthetic?.Stop();
 
-            if (video != null)
-            {
-                video.prepareCompleted -= OnVideoPrepared;
-                video.errorReceived -= OnVideoError;
-                Destroy(video);
-                video = null;
-            }
-
-            if (rt != null)
-            {
-                rt.Release();
-                Destroy(rt);
-                rt = null;
-            }
+            ReleaseVideoPlayerAndRenderTexture();
         }
 
         private void OnDestroy()
@@ -279,6 +398,7 @@ namespace CongoGames.Presentation
 
         private void TryPlayVideoUrl(string url, bool mute, bool loop)
         {
+            debugVideoUrl = string.IsNullOrEmpty(url) ? "—" : Path.GetFileName(url);
             rt = new RenderTexture(renderWidth, renderHeight, 0, RenderTextureFormat.ARGB32);
             rt.Create();
             raw.texture = rt;
@@ -291,10 +411,9 @@ namespace CongoGames.Presentation
             video.renderMode = VideoRenderMode.RenderTexture;
             video.targetTexture = rt;
             video.url = url;
-            if (mute)
-            {
-                video.audioOutputMode = VideoAudioOutputMode.None;
-            }
+            // Stabilise le runtime (évite AudioSampleProvider buffer overflow en continu).
+            // L'audio de fond est géré par ThemeMusicPlayer/GameSfxHub.
+            video.audioOutputMode = VideoAudioOutputMode.None;
 
             video.prepareCompleted += OnVideoPrepared;
             video.errorReceived += OnVideoError;
@@ -318,7 +437,9 @@ namespace CongoGames.Presentation
 
                 TryPlayVideoUrl(urls[idx], muteVideoSound, false);
                 VideoCycleIndexByMode[modeId] = (idx + 1) % urls.Count;
-                float wait = Mathf.Max(8f, videoCycleSeconds);
+                debugVideoIndex = idx;
+                debugPhase = "video-cycle";
+                float wait = Mathf.Max(minVideoSwitchSeconds, videoCycleSeconds);
                 yield return new WaitForSecondsRealtime(wait);
                 if (!string.Equals(activeModeId, modeId, StringComparison.Ordinal))
                 {

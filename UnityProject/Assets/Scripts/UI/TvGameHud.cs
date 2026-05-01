@@ -40,7 +40,12 @@ namespace CongoGames.UI
 
             if (modeLabel != null)
             {
-                modeLabel.text = "Mode : " + gmm.ActiveModeDisplayName;
+                bool locked = gmm.IsLocalDemoModeLocked
+                    && !string.IsNullOrWhiteSpace(gmm.LockedModeId)
+                    && string.Equals(gmm.LockedModeId, gmm.ActiveModeId, System.StringComparison.OrdinalIgnoreCase);
+                modeLabel.text = locked
+                    ? ("Mode verrouillé: " + gmm.ActiveModeDisplayName + "  [LOCK]")
+                    : ("Mode : " + gmm.ActiveModeDisplayName);
             }
 
             MiniGamePanelContent panel = MiniGamePanelContent.Instance;
@@ -67,7 +72,7 @@ namespace CongoGames.UI
                 _hudChronoLastSec = auxSec;
                 if (brandLine != null && string.IsNullOrEmpty(brandLine.text))
                 {
-                    brandLine.text = "Congo · tricolore · FR · Lingala · Kituba";
+                    brandLine.text = "Congo · tricolore · FR · Lingala · Kitouba";
                 }
 
                 return;
@@ -110,7 +115,7 @@ namespace CongoGames.UI
 
             if (brandLine != null && string.IsNullOrEmpty(brandLine.text))
             {
-                brandLine.text = "Congo · tricolore · FR · Lingala · Kituba";
+                brandLine.text = "Congo · tricolore · FR · Lingala · Kitouba";
             }
         }
 

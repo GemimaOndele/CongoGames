@@ -9,6 +9,7 @@ namespace CongoGames.Core
         public int Score;
         public int Streak;
         public long LastAnswerTs;
+        public string AvatarUrl;
 
         public PlayerData(string username)
         {
@@ -16,6 +17,7 @@ namespace CongoGames.Core
             Score = 0;
             Streak = 0;
             LastAnswerTs = 0;
+            AvatarUrl = "";
         }
     }
 }

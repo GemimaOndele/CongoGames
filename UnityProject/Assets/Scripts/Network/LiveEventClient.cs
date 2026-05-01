@@ -33,6 +33,8 @@ namespace CongoGames.Network
         public string[] options;
         public string correctAnswer;
         public string explanation;
+        public string avatarUrl;
+        public string profilePictureUrl;
 
         public int httpPort;
         public string httpApiBase;
@@ -40,6 +42,8 @@ namespace CongoGames.Network
 
     public class LiveEventClient : MonoBehaviour
     {
+        public event Action<int, string> OnLikePulse;
+        public event Action<string, string, string> OnChatPulse;
         [SerializeField] private string wsUrl = "wss://congogames-ws-production.up.railway.app";
         [Tooltip("Ports WS locaux essayés en plus de ws://localhost:8080 … 8120 (fusion automatique).")]
         [SerializeField] private string[] localFallbackWsUrls = { "ws://localhost:8080", "ws://localhost:8081", "ws://localhost:8082" };
@@ -53,6 +57,7 @@ namespace CongoGames.Network
         private string lastQuestionText = "";
         private string lastSystemText = "";
         private string lastError = "";
+        private string lastEventAvatarUrl = "";
         private long lastEventTs;
 
         public bool IsConnected => socket != null && socket.State == WebSocketState.Open;
@@ -62,7 +67,10 @@ namespace CongoGames.Network
         public string LastQuestionText => lastQuestionText;
         public string LastSystemText => lastSystemText;
         public string LastError => lastError;
+        public string LastEventAvatarUrl => lastEventAvatarUrl;
         public long LastEventTimestamp => lastEventTs;
+        public long SessionLikeCount => sessionLikeCount;
+        private long sessionLikeCount;
 
         public void BindQuestionUI(QuestionUI ui)
         {
@@ -192,9 +200,25 @@ namespace CongoGames.Network
             byte[] buffer = new byte[4096];
             while (socket != null && socket.State == WebSocketState.Open && !token.IsCancellationRequested)
             {
-                WebSocketReceiveResult result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
-                string json = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                HandleRawMessage(json);
+                try
+                {
+                    WebSocketReceiveResult result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
+                    if (result == null || result.Count <= 0) continue;
+                    string json = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    HandleRawMessage(json);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch (ObjectDisposedException)
+                {
+                    break;
+                }
+                catch (WebSocketException)
+                {
+                    if (token.IsCancellationRequested) break;
+                }
             }
         }
 
@@ -204,6 +228,7 @@ namespace CongoGames.Network
             if (msg == null || string.IsNullOrEmpty(msg.type)) return;
             lastEventType = msg.type;
             lastEventUser = msg.user ?? "";
+            lastEventAvatarUrl = msg.avatarUrl ?? msg.profilePictureUrl ?? "";
             lastEventTs = msg.ts;
 
             if (msg.type == "chat")
@@ -224,6 +249,12 @@ namespace CongoGames.Network
                 return;
             }
 
+            if (msg.type == "like" || msg.type == "tap")
+            {
+                HandleLike(msg);
+                return;
+            }
+
             if (msg.type == "question")
             {
                 HandleQuestion(msg);
@@ -232,6 +263,15 @@ namespace CongoGames.Network
 
         private void HandleChat(LiveMessage msg)
         {
+            if (ScoreManager.Instance != null)
+            {
+                ScoreManager.Instance.UpdatePlayerAvatar(msg.user, msg.avatarUrl ?? msg.profilePictureUrl ?? "");
+            }
+            string raw = (msg.message ?? msg.text ?? string.Empty).Trim();
+            if (!string.IsNullOrEmpty(raw))
+            {
+                OnChatPulse?.Invoke(msg.user ?? "", raw, msg.avatarUrl ?? msg.profilePictureUrl ?? "");
+            }
             string answer = (msg.message ?? string.Empty).Trim().ToUpperInvariant();
             if (answer != "A" && answer != "B" && answer != "C" && answer != "D") return;
 
@@ -247,6 +287,10 @@ namespace CongoGames.Network
         private void HandleGift(LiveMessage msg)
         {
             if (!msg.accepted) return;
+            if (ScoreManager.Instance != null)
+            {
+                ScoreManager.Instance.UpdatePlayerAvatar(msg.user, msg.avatarUrl ?? msg.profilePictureUrl ?? "");
+            }
 
             string modeFromGift = TikTokGiftModeRegistry.ResolveGameSwitchMode(msg);
             if (!string.IsNullOrEmpty(modeFromGift))
@@ -284,7 +328,21 @@ namespace CongoGames.Network
             {
                 GameModeManager.Instance.StartMode("speed-chrono");
                 AIHostManager.Instance?.Speak("Bonus round active.");
+                return;
             }
+
+            if (msg.action == "likes" || msg.action == "tap")
+            {
+                HandleLike(msg);
+            }
+        }
+
+        private void HandleLike(LiveMessage msg)
+        {
+            int delta = msg != null ? msg.value : 0;
+            if (delta <= 0) delta = 1;
+            sessionLikeCount += delta;
+            OnLikePulse?.Invoke(delta, msg != null ? (msg.user ?? "") : "");
         }
 
         private void HandleQuestion(LiveMessage msg)
@@ -315,12 +373,38 @@ namespace CongoGames.Network
             }
         }
 
-        private async void OnDestroy()
+        private void OnDisable()
         {
-            if (cts != null) cts.Cancel();
-            if (socket != null && socket.State == WebSocketState.Open)
+            ShutdownSocketAndTokens();
+        }
+
+        private void OnDestroy()
+        {
+            ShutdownSocketAndTokens();
+        }
+
+        private void ShutdownSocketAndTokens()
+        {
+            if (cts != null)
             {
-                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                try { cts.Cancel(); } catch { }
+                cts.Dispose();
+                cts = null;
+            }
+
+            if (socket != null)
+            {
+                try
+                {
+                    socket.Abort();
+                }
+                catch { }
+                try
+                {
+                    socket.Dispose();
+                }
+                catch { }
+                socket = null;
             }
         }
     }

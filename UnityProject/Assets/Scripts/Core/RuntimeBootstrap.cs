@@ -67,6 +67,7 @@ namespace CongoGames.Core
             scaler.matchWidthOrHeight = 0.55f;
             WebGlCanvasTuning.ApplyToScaler(scaler);
             canvasGo.AddComponent<GraphicRaycaster>();
+            canvasGo.AddComponent<HostTransitionOverlay>();
 #if UNITY_WEBGL && !UNITY_EDITOR
             canvasGo.AddComponent<WebGlUiScaleRuntime>();
 #endif
@@ -365,9 +366,17 @@ namespace CongoGames.Core
             EnsureThemeMusicForCustomScene(surf);
             PatchAllCanvasScalersForWebGl();
             Canvas modeCanvas = surf.GetComponentInParent<Canvas>();
-            if (modeCanvas != null && modeCanvas.GetComponent<ThemeUrlDebugBar>() == null)
+            if (modeCanvas != null)
             {
-                modeCanvas.gameObject.AddComponent<ThemeUrlDebugBar>();
+                if (modeCanvas.GetComponent<HostTransitionOverlay>() == null)
+                {
+                    modeCanvas.gameObject.AddComponent<HostTransitionOverlay>();
+                }
+
+                if (modeCanvas.GetComponent<ThemeUrlDebugBar>() == null)
+                {
+                    modeCanvas.gameObject.AddComponent<ThemeUrlDebugBar>();
+                }
             }
 
 #if UNITY_WEBGL && !UNITY_EDITOR

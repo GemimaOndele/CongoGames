@@ -224,10 +224,17 @@ namespace CongoGames.AI
             string r = ModeRulesOneLiner(toId);
             if (string.IsNullOrEmpty(fromId) || fromId == toId)
             {
-                return name + ". " + r;
+                return "Question suivante, mode " + name + ". " + r;
             }
 
-            return "Place à " + name + ". " + r;
+            return "Question suivante, mode " + name + ". " + r;
+        }
+
+        public static string BuildNextQuestionLine(string modeId)
+        {
+            string name = GameModeManager.GetModeDisplayName(modeId);
+            string r = ModeRulesOneLiner(modeId);
+            return "Question suivante, mode " + name + ". " + r;
         }
 
         public static string ModeRulesOneLiner(string modeId)

@@ -42,7 +42,7 @@ namespace CongoGames.Core
             {
                 "MELESI", "MBOTE", "MWANA", "MANGI", "TATA", "MAMA", "BISO", "KOKO", "MOTO", "MOKO", "PONA", "SUKA", "SIMBA", "BOKO", "BANDA", "KATI", "PEKO", "SUKI", "POTO", "MUNA", "MOKI", "BANA", "LISI", "NZOTO", "MOTI", "YAYA", "BUKA", "MELI", "MOSI", "LIBO"
             }),
-            new Theme("kituba", "Kituba — vocabulaire (mots à retrouver)", new[]
+            new Theme("kituba", "Kitouba — vocabulaire (mots à retrouver)", new[]
             {
                 "MALAMU", "SANTU", "MUNTU", "BANTU", "BOKO", "DIBU", "KUTA", "BUKA", "SUKA", "KUKU", "KISI", "MUKA", "TUKA", "DUKA", "ZONI", "TONI", "MUKO", "MBOA", "BUKI", "KONO", "TUKO", "BUKO", "KITA", "BUKU", "DUKO", "TATA", "MAMA", "MUNA", "SUKI", "MPASI"
             }),
@@ -68,7 +68,7 @@ namespace CongoGames.Core
         {
             int n = wordCount ?? Random.Range(MinWords, MaxWords + 1);
             n = Mathf.Clamp(n, MinWords, MaxWords);
-            const int maxLenFor7Grid = 7;
+            const int maxLenForGrid = 12;
             Theme t = Themes[Random.Range(0, Themes.Length)];
             themeLabel = t.Label;
             var pool = new List<string>(t.Words.Length);
@@ -76,7 +76,7 @@ namespace CongoGames.Core
             {
                 if (string.IsNullOrEmpty(w)) continue;
                 string u = SanitizeForGrid(w);
-                if (u.Length >= 4 && u.Length <= maxLenFor7Grid) pool.Add(u);
+                if (u.Length >= 4 && u.Length <= maxLenForGrid) pool.Add(u);
             }
 
             if (pool.Count < n)
@@ -169,6 +169,93 @@ namespace CongoGames.Core
                 case "BUKA": return "ouvrir (souvent)";
                 default: return "";
             }
+        }
+
+        /// <summary>
+        /// Indice joueur (thème Congo), sans jargon « prompt » ni méta de dev.
+        /// </summary>
+        public static string InGameThemeHintFr(string themeLabel)
+        {
+            string s = (themeLabel ?? "").Trim();
+            if (string.IsNullOrEmpty(s))
+            {
+                return "Tous les mots à trouver vont dans le sens du thème affiché dans le titre.";
+            }
+
+            if (s.IndexOf("Géo", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("lieux", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : cartes, fleuves, villes et régions du Congo.";
+            }
+
+            if (s.IndexOf("Forêt", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("fleuve", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("faune", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : nature, eau, animaux et paysages.";
+            }
+
+            if (s.IndexOf("Culture", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("fête", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("drapeau", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : fêtes, musique, public et symboles nationaux.";
+            }
+
+            if (s.IndexOf("Lingala", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : mots d'usage courant en Lingala (salutations, famille...).";
+            }
+
+            if (s.IndexOf("Kituba", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("Kitouba", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : mots d'usage courant en Kitouba (politesse, maison...).";
+            }
+
+            if (s.IndexOf("Stade", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("foot", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : ballon, équipe, stade et ambiance match.";
+            }
+
+            if (s.IndexOf("Indépendance", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("symboles", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : dates fortes, droits, fierté et symboles du pays.";
+            }
+
+            if (s.IndexOf("Commerce", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("quotidien", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : marché, prix, courses, travail et vie de tous les jours.";
+            }
+
+            return "Indice : reste dans le thème du titre — lieux, habitudes et mots du quotidien.";
+        }
+
+        /// <summary>Définition courte pour grille mots croisés.</summary>
+        public static string BuildCrosswordDefinitionFr(string word, string themeLabel)
+        {
+            string w = SanitizeForGrid(word ?? "");
+            if (string.IsNullOrEmpty(w))
+            {
+                return "Mot du thème.";
+            }
+
+            string gloss = TryGlossFr(w);
+            if (!string.IsNullOrEmpty(gloss))
+            {
+                return "Terme courant : " + gloss + ".";
+            }
+
+            if (w.EndsWith("E", StringComparison.Ordinal))
+            {
+                return "Nom du thème (" + w.Length + " lettres), souvent utilisé au quotidien.";
+            }
+
+            string hint = InGameThemeHintFr(themeLabel);
+            return hint.Replace("Indice : ", "") + " (" + w.Length + " lettres).";
         }
     }
 }

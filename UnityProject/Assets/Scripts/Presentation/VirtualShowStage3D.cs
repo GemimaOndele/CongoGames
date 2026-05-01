@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -416,6 +417,11 @@ namespace CongoGames.Presentation
             public static ColorSet ForMode(string id)
             {
                 string s = (id ?? "").Trim().ToLowerInvariant();
+                if (s.EndsWith("_alt", StringComparison.Ordinal))
+                {
+                    s = s.Substring(0, s.Length - 4);
+                }
+
                 // Une palette distincte par mode (plateau 3D « show TV » animé en temps réel).
                 switch (s)
                 {
@@ -432,6 +438,11 @@ namespace CongoGames.Presentation
 
                 if (s.Contains("blind") || s.Contains("chrono") || s.Contains("speed")) return ChronoStyle();
                 if (s.Contains("image")) return ImageStyle();
+                if (s.Contains("crossword")) return CrosswordStyle();
+                if (s.Contains("scramble") || s.Contains("melange")) return WordScrambleStyle();
+                if (s.Contains("memory")) return MemoryStyle();
+                if (s.Contains("semantic")) return SemanticStyle();
+                if (s.Contains("mystery")) return MysteryStyle();
                 return QuizCongoStyle();
             }
 

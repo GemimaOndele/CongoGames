@@ -6,15 +6,30 @@ using Random = UnityEngine.Random;
 namespace CongoGames.Core
 {
     /// <summary>
-    /// Remplit une grille 7×7 (ou n×n) avec des mots en ligne droite (H, V) ; cases restantes = lettres aléatoires.
+    /// Une ligne de mot placée dans la grille (direction incluse : H, V, diagonales, avant/arrière).
+    /// </summary>
+    [Serializable]
+    public struct WordLinePlacement
+    {
+        public string Word;
+        public int StartR;
+        public int StartC;
+        public int Dr;
+        public int Dc;
+    }
+
+    /// <summary>
+    /// Remplit une grille n×n avec des mots en ligne droite (8 directions) ; cases restantes = lettres aléatoires.
+    /// Les mots longs sont placés en premier pour favoriser croisements et densité (style mots mêlés classique).
     /// </summary>
     public static class WordSearchPlacer
     {
         private const string Fill = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-        public static bool TryBuild(int size, IReadOnlyList<string> words, int maxAttempts, out char[,] grid)
+        public static bool TryBuild(int size, IReadOnlyList<string> words, int maxAttempts, out char[,] grid, out List<WordLinePlacement> placements)
         {
             grid = null;
+            placements = null;
             if (words == null || words.Count == 0 || size < 3)
             {
                 return false;
@@ -30,19 +45,23 @@ namespace CongoGames.Core
                 }
 
                 var toPlace = new List<string>(words);
-                for (int i = toPlace.Count - 1; i > 0; i--)
+                toPlace.Sort((a, b) =>
                 {
-                    int j = Random.Range(0, i + 1);
-                    (toPlace[i], toPlace[j]) = (toPlace[j], toPlace[i]);
-                }
+                    int la = string.IsNullOrEmpty(a) ? 0 : a.Length;
+                    int lb = string.IsNullOrEmpty(b) ? 0 : b.Length;
+                    int cmp = lb.CompareTo(la);
+                    if (cmp != 0) return cmp;
+                    return string.CompareOrdinal(a, b);
+                });
 
+                var placedLines = new List<WordLinePlacement>(toPlace.Count);
                 bool ok = true;
                 foreach (string raw in toPlace)
                 {
                     string w = (raw ?? "").Trim().ToUpperInvariant();
                     w = w.Replace("É", "E").Replace("È", "E");
                     if (w.Length < 2 || w.Length > size) { ok = false; break; }
-                    if (!PlaceOneWord(g, size, w))
+                    if (!PlaceOneWord(g, size, w, placedLines))
                     {
                         ok = false;
                         break;
@@ -60,6 +79,7 @@ namespace CongoGames.Core
                 }
 
                 grid = g;
+                placements = placedLines;
                 return true;
             }
 
@@ -93,7 +113,7 @@ namespace CongoGames.Core
             return true;
         }
 
-        private static bool PlaceOneWord(char[,] g, int size, string w)
+        private static bool PlaceOneWord(char[,] g, int size, string w, List<WordLinePlacement> record)
         {
             int len = w.Length;
             if (len > size) return false;
@@ -113,6 +133,7 @@ namespace CongoGames.Core
                 if (FitsLine(g, size, r, c, dr, dc, w))
                 {
                     ApplyLine(g, r, c, dr, dc, w);
+                    record?.Add(new WordLinePlacement { Word = w, StartR = r, StartC = c, Dr = dr, Dc = dc });
                     return true;
                 }
             }
@@ -132,6 +153,7 @@ namespace CongoGames.Core
                     if (FitsLine(g, size, r, c, dr, dc, w))
                     {
                         ApplyLine(g, r, c, dr, dc, w);
+                        record?.Add(new WordLinePlacement { Word = w, StartR = r, StartC = c, Dr = dr, Dc = dc });
                         return true;
                     }
                 }

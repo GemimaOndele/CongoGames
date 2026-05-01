@@ -1,0 +1,668 @@
+{
+  "items": [
+    {
+      "find": "Afara Tsena",
+      "replace": "Afara Tsena"
+    },
+    {
+      "find": "Afro Mbokalisation (Audio)",
+      "replace": "Afro Mbokalisation (audio)"
+    },
+    {
+      "find": "Amour de Nombakélé",
+      "replace": "Amour De Nombakélé"
+    },
+    {
+      "find": "Ancien Combattant",
+      "replace": "Ancien Combattant"
+    },
+    {
+      "find": "Anti rouille",
+      "replace": "Anti Rouille"
+    },
+    {
+      "find": "Aurlus Mabele",
+      "replace": "Aurlus Mabele"
+    },
+    {
+      "find": "Aurlus Mabélé feat Le groupe_Loketo",
+      "replace": "Aurlus Mabélé featuring Le Groupe loketo"
+    },
+    {
+      "find": "AVB",
+      "replace": "A V B"
+    },
+    {
+      "find": "Avertissement buzoba",
+      "replace": "Avertissement Buzoba"
+    },
+    {
+      "find": "B.O.C #KeDuSal 1",
+      "replace": "B.o.c #kedusal 1"
+    },
+    {
+      "find": "Blemix feat Kb le roi",
+      "replace": "Blemix featuring Kb Le Roi"
+    },
+    {
+      "find": "Bokoko",
+      "replace": "Bokoko"
+    },
+    {
+      "find": "Bolaye",
+      "replace": "Bolaye"
+    },
+    {
+      "find": "Bongo",
+      "replace": "Bongo"
+    },
+    {
+      "find": "Buala yayi mambu",
+      "replace": "Buala Yayi Mambu"
+    },
+    {
+      "find": "CARINE FLEUR EDOUARE",
+      "replace": "Carine Fleur Edouare"
+    },
+    {
+      "find": "Casimir Zao",
+      "replace": "Casimir Zao"
+    },
+    {
+      "find": "Caterpillars",
+      "replace": "Caterpillars"
+    },
+    {
+      "find": "Cheri Beetho (Kingoli Universel)",
+      "replace": "Cheri Beetho (kingoli Universel)"
+    },
+    {
+      "find": "Cheri Beetho Kingoli Universel",
+      "replace": "Cheri Beetho Kingoli Universel"
+    },
+    {
+      "find": "Cino black feat Zaparo de guerre",
+      "replace": "Cino Black featuring Zaparo De Guerre"
+    },
+    {
+      "find": "Congo Uni",
+      "replace": "Congo Uni"
+    },
+    {
+      "find": "Congo(Hymne à la paix)",
+      "replace": "Congo(hymne À La Paix)"
+    },
+    {
+      "find": "Contentieux",
+      "replace": "Contentieux"
+    },
+    {
+      "find": "Coq Manu le Coq feat Trésor B",
+      "replace": "Coq Manu Le Coq featuring Trésor B"
+    },
+    {
+      "find": "Corbillard",
+      "replace": "Corbillard"
+    },
+    {
+      "find": "Dans mes délires",
+      "replace": "Dans Mes Délires"
+    },
+    {
+      "find": "Davy Kassa feat Elveronne Ndinga",
+      "replace": "Davy Kassa featuring Elveronne Ndinga"
+    },
+    {
+      "find": "Délinquant",
+      "replace": "Délinquant"
+    },
+    {
+      "find": "Départ pour l'école",
+      "replace": "Départ Pour L'école"
+    },
+    {
+      "find": "Deux à deux",
+      "replace": "Deux À Deux"
+    },
+    {
+      "find": "Dialogue avec un incrédule",
+      "replace": "Dialogue Avec Un Incrédule"
+    },
+    {
+      "find": "Diesel Gucci",
+      "replace": "Diesel Gucci"
+    },
+    {
+      "find": "Dj Boogie Black",
+      "replace": "Dj Boogie Black"
+    },
+    {
+      "find": "Dj Bookson feat Marvy",
+      "replace": "Dj Bookson featuring Marvy"
+    },
+    {
+      "find": "Dj Bookson feat Marvy Mvila",
+      "replace": "Dj Bookson featuring Marvy Mvila"
+    },
+    {
+      "find": "Djoyiyo",
+      "replace": "Djoyiyo"
+    },
+    {
+      "find": "Éden",
+      "replace": "Éden"
+    },
+    {
+      "find": "Embargo",
+      "replace": "Embargo"
+    },
+    {
+      "find": "Embeudah Musik",
+      "replace": "Embeudah Musik"
+    },
+    {
+      "find": "Etat Major",
+      "replace": "Etat Major"
+    },
+    {
+      "find": "Extra Musica",
+      "replace": "Extra Moussica"
+    },
+    {
+      "find": "éyinda",
+      "replace": "Éyinda"
+    },
+    {
+      "find": "Fernand Mabala",
+      "replace": "Fernand Mabala"
+    },
+    {
+      "find": "Franklin Boukaka",
+      "replace": "Franklin Boukaka"
+    },
+    {
+      "find": "Give Me Freedom",
+      "replace": "Give Me Freedom"
+    },
+    {
+      "find": "Groupe AVB",
+      "replace": "Groupe A V B"
+    },
+    {
+      "find": "Heritage",
+      "replace": "Heritage"
+    },
+    {
+      "find": "Hey walla (afro funk)",
+      "replace": "Hey Walla (afro Funk)"
+    },
+    {
+      "find": "Historiette de Brazzaville",
+      "replace": "Historiette De Brazzaville"
+    },
+    {
+      "find": "HRB (Hommage à Rapha BOUNZEKI)",
+      "replace": "Hrb (hommage À Rapha Bounzeki)"
+    },
+    {
+      "find": "Hymne à Brazzaville",
+      "replace": "Hymne À Brazzaville"
+    },
+    {
+      "find": "Iza mama africa",
+      "replace": "Iza Mama Africa"
+    },
+    {
+      "find": "Jacques Loubelo",
+      "replace": "Jacques Loubelo"
+    },
+    {
+      "find": "Jalousie",
+      "replace": "Jalousie"
+    },
+    {
+      "find": "Jean Baron feat le groupe_Loketo",
+      "replace": "Jean Baron featuring Le Groupe loketo"
+    },
+    {
+      "find": "Jean Serge Essous",
+      "replace": "Jean Serge Essous"
+    },
+    {
+      "find": "Journal intime",
+      "replace": "Journal Intime"
+    },
+    {
+      "find": "Kedjevara feat Extra Musica Nouvel Horizon",
+      "replace": "Kedjevara featuring Extra Moussica Nouvel Horizon"
+    },
+    {
+      "find": "Kedjevara feat Le groupe_Extra Musica Nouvel Horizon",
+      "replace": "Kedjevara featuring Le Groupe Extra Moussica Nouvel Horizon"
+    },
+    {
+      "find": "Key kolos",
+      "replace": "Key Kolos"
+    },
+    {
+      "find": "Key Kolos feat Nestelia Forest",
+      "replace": "Key Kolos featuring Nestelia Forest"
+    },
+    {
+      "find": "KILOMBO CONGO",
+      "replace": "Kilombo Congo"
+    },
+    {
+      "find": "Kongo Akoloba",
+      "replace": "Kongo Akoloba"
+    },
+    {
+      "find": "L'argent appelle l'argent",
+      "replace": "L'argent Appelle L'argent"
+    },
+    {
+      "find": "La Paix Au Congo",
+      "replace": "La Paix Au Congo"
+    },
+    {
+      "find": "Le bûcheron",
+      "replace": "Le Bûcheron"
+    },
+    {
+      "find": "Les Bantous de la Capitale",
+      "replace": "Les Bantous De La Capitale"
+    },
+    {
+      "find": "Lombo l'adjémbé",
+      "replace": "Lombo L'adjémbé"
+    },
+    {
+      "find": "Louboutin",
+      "replace": "Louboutin"
+    },
+    {
+      "find": "Loufoulakari",
+      "replace": "Loufoulakari"
+    },
+    {
+      "find": "Louz Baby",
+      "replace": "Louz Baby"
+    },
+    {
+      "find": "Louz Baby x Paterne Maestro",
+      "replace": "Louz Baby avec Paterne Maestro"
+    },
+    {
+      "find": "Love Story",
+      "replace": "Love Story"
+    },
+    {
+      "find": "Mac Itoua Caleb",
+      "replace": "Mac Itoua Caleb"
+    },
+    {
+      "find": "Makambo mibalé",
+      "replace": "Makambo Mibalé"
+    },
+    {
+      "find": "Makhalba Malecheck",
+      "replace": "Makhalba Malecheck"
+    },
+    {
+      "find": "Malou",
+      "replace": "Malou"
+    },
+    {
+      "find": "Maman",
+      "replace": "Maman"
+    },
+    {
+      "find": "Mamie claudia",
+      "replace": "Mamie Claudia"
+    },
+    {
+      "find": "Mamou",
+      "replace": "Mamou"
+    },
+    {
+      "find": "Marcory Gasoil",
+      "replace": "Marcory Gasoil"
+    },
+    {
+      "find": "Mav Cacharel",
+      "replace": "Mav Cacharel"
+    },
+    {
+      "find": "Mbokalisation 3.0",
+      "replace": "Mbokalisation 3.0"
+    },
+    {
+      "find": "Mbongo",
+      "replace": "Mbongo"
+    },
+    {
+      "find": "Mentalité",
+      "replace": "Mentalité"
+    },
+    {
+      "find": "Mentalité (Vocal Bantou)",
+      "replace": "Mentalité (vocal Bantou)"
+    },
+    {
+      "find": "Mère ya palais",
+      "replace": "Mère Ya Palais"
+    },
+    {
+      "find": "Michelle Moutouari",
+      "replace": "Michelle Moutouari"
+    },
+    {
+      "find": "Minguinita",
+      "replace": "Minguinita"
+    },
+    {
+      "find": "Missengue",
+      "replace": "Missengue"
+    },
+    {
+      "find": "Mlg Mochristo",
+      "replace": "Mlg Mochristo"
+    },
+    {
+      "find": "Mobali",
+      "replace": "Mobali"
+    },
+    {
+      "find": "Moselebende",
+      "replace": "Moselebende"
+    },
+    {
+      "find": "Mvaneno nlele",
+      "replace": "Mvaneno Nlele"
+    },
+    {
+      "find": "Mvila Tala mbasse",
+      "replace": "Mvila Tala Mbasse"
+    },
+    {
+      "find": "Mwana ya mama",
+      "replace": "Mwana Ya Mama"
+    },
+    {
+      "find": "My Lova",
+      "replace": "My Lova"
+    },
+    {
+      "find": "N'Kembo",
+      "replace": "N'kembo"
+    },
+    {
+      "find": "Na kati",
+      "replace": "Na Kati"
+    },
+    {
+      "find": "Na tolo",
+      "replace": "Na Tolo"
+    },
+    {
+      "find": "Ndjindji",
+      "replace": "Ndjindji"
+    },
+    {
+      "find": "Nestelia Forest",
+      "replace": "Nestelia Forest"
+    },
+    {
+      "find": "Nestelia Forest feat Wayé",
+      "replace": "Nestelia Forest featuring Wayé"
+    },
+    {
+      "find": "Ngoma ya la sape",
+      "replace": "Ngoma Ya La Sape"
+    },
+    {
+      "find": "Ni béto [remix]",
+      "replace": "Ni Béto [remix]"
+    },
+    {
+      "find": "Niska",
+      "replace": "Niska"
+    },
+    {
+      "find": "Nkwikila",
+      "replace": "Nkwikila"
+    },
+    {
+      "find": "Norbat de Paris",
+      "replace": "Norbat De Paris"
+    },
+    {
+      "find": "Ntimani",
+      "replace": "Ntimani"
+    },
+    {
+      "find": "Ntonga nga",
+      "replace": "Ntonga Nga"
+    },
+    {
+      "find": "Nzongo Soul",
+      "replace": "Nzongo Soul"
+    },
+    {
+      "find": "Nzoungou",
+      "replace": "Ndzoungou"
+    },
+    {
+      "find": "Ominga",
+      "replace": "Ominga"
+    },
+    {
+      "find": "Pamelo Mounka",
+      "replace": "Pamelo Mounka"
+    },
+    {
+      "find": "Papa",
+      "replace": "Papa"
+    },
+    {
+      "find": "papa sassou & adou danga [Freestyle part 1]",
+      "replace": "Papa Sassou et Adou Danga [freestyle Part 1]"
+    },
+    {
+      "find": "Patrouille des stars",
+      "replace": "Patrouille Des Stars"
+    },
+    {
+      "find": "Pembey Sheiro",
+      "replace": "Pembey Sheiro"
+    },
+    {
+      "find": "Pembey Sheiro Feat Anaïs Kissangou",
+      "replace": "Pembey Sheiro featuring Anaïs Kissangou"
+    },
+    {
+      "find": "Philosophie",
+      "replace": "Philosophie"
+    },
+    {
+      "find": "Pierre Moutouari",
+      "replace": "Pierre Moutouari"
+    },
+    {
+      "find": "Pierrette Adams",
+      "replace": "Pierrette Adams"
+    },
+    {
+      "find": "Polémique",
+      "replace": "Polémique"
+    },
+    {
+      "find": "POZO CHARABIA",
+      "replace": "Pozo Charabia"
+    },
+    {
+      "find": "Pozo charabia feat Mj Nader",
+      "replace": "Pozo Charabia featuring Mj Nader"
+    },
+    {
+      "find": "POZO CHARABIA Feat MJ NADER (Freestyle part 1 Papa SASSOU & ADOU DANGA)",
+      "replace": "Pozo Charabia featuring Mj Nader (freestyle Part 1 Papa Sassou et Adou Danga)"
+    },
+    {
+      "find": "Rapha Bounzeki",
+      "replace": "Rapha Bounzeki"
+    },
+    {
+      "find": "Réseaux",
+      "replace": "Réseaux"
+    },
+    {
+      "find": "Roga roga",
+      "replace": "Roga Roga"
+    },
+    {
+      "find": "ROGA ROGA EXTRA MUSICA",
+      "replace": "Roga Roga Extra Moussica"
+    },
+    {
+      "find": "Roga roga x Le groupe_Extra Musica",
+      "replace": "Roga Roga avec Le Groupe Extra Moussica"
+    },
+    {
+      "find": "Sam SamouraÏ",
+      "replace": "Sam Samouraï"
+    },
+    {
+      "find": "Sebas Enemen",
+      "replace": "Sebas Enemen"
+    },
+    {
+      "find": "Siboy feat. Benash Damso",
+      "replace": "Siboy featuring. Benash Damso"
+    },
+    {
+      "find": "Sosey",
+      "replace": "Sosey"
+    },
+    {
+      "find": "Soûlard",
+      "replace": "Soulard"
+    },
+    {
+      "find": "Soulard",
+      "replace": "Soulard"
+    },
+    {
+      "find": "Soûlard [remix]",
+      "replace": "Soulard [remix]"
+    },
+    {
+      "find": "Soûlard remix",
+      "replace": "Soulard Remix"
+    },
+    {
+      "find": "Sylvain Akouala",
+      "replace": "Sylvain Akouala"
+    },
+    {
+      "find": "Tala Mbasse",
+      "replace": "Tala Mbasse"
+    },
+    {
+      "find": "Teddy Benzo Mixton feat Spinho",
+      "replace": "Teddy Benzo Mixton featuring Spinho"
+    },
+    {
+      "find": "Théo Blaise Kounkou",
+      "replace": "Théo Blaise Kounkou"
+    },
+    {
+      "find": "Tia lokolo",
+      "replace": "Tia Lokolo"
+    },
+    {
+      "find": "Tidiane Mario",
+      "replace": "Tidiane Mario"
+    },
+    {
+      "find": "Tidiane Mario x Tété Ketch x Vinny Baltazard",
+      "replace": "Tidiane Mario avec Tété Ketch avec Vinny Baltazard"
+    },
+    {
+      "find": "Tika zoubida (OFFICIAL VIDEO CLIP by BIG KLOZ director)",
+      "replace": "Tika Zoubida (official Video Clip By Big Kloz Director)"
+    },
+    {
+      "find": "Tikulu",
+      "replace": "Tikulu"
+    },
+    {
+      "find": "Tolérance zéro rupture",
+      "replace": "Tolérance Zéro Rupture"
+    },
+    {
+      "find": "tonton partout partout",
+      "replace": "Tonton Partout Partout"
+    },
+    {
+      "find": "Tour de contrôle",
+      "replace": "Tour De Contrôle"
+    },
+    {
+      "find": "Très faché Mouyirika",
+      "replace": "Très Faché Mouyirika"
+    },
+    {
+      "find": "Trésor Mvoula",
+      "replace": "Trésor Mvoula"
+    },
+    {
+      "find": "Tule kule",
+      "replace": "Tule Kule"
+    },
+    {
+      "find": "Vieux Thomas",
+      "replace": "Vieux Thomas"
+    },
+    {
+      "find": "Wayé feat Casimir Zao",
+      "replace": "Wayé featuring Casimir Zao"
+    },
+    {
+      "find": "Wele",
+      "replace": "Wele"
+    },
+    {
+      "find": "Ya Nga Bébé",
+      "replace": "Ya Nga Bébé"
+    },
+    {
+      "find": "Ya Tatchi",
+      "replace": "Ya Tatchi"
+    },
+    {
+      "find": "Yatama",
+      "replace": "Yatama"
+    },
+    {
+      "find": "Yo mama leki",
+      "replace": "Yo Mama Leki"
+    },
+    {
+      "find": "Youlou mabiala",
+      "replace": "Youlou Mabiala"
+    },
+    {
+      "find": "Zitany Neil",
+      "replace": "Zitany Neil"
+    },
+    {
+      "find": "Zolana",
+      "replace": "Zolana"
+    },
+    {
+      "find": "Zuko Yadeblè feat. Lema & Hardy S, Djam Kiss, Paterne Maestro & MC Baba, Wayé, Kosar X Flatt Boy, Authentik,Vitch prodz, Freud Vinces,Refle Kazama,Blacky Armani,Makhalba Malecheck",
+      "replace": "Zuko Yadeblè featuring. Lema et Hardy S, Djam Kiss, Paterne Maestro et MC Baba, Wayé, Kosar avec Flatt Boy, Authentik,vitch Prodz, Freud Vinces,refle Kazama,blacky Armani,makhalba Malecheck"
+    }
+  ]
+}

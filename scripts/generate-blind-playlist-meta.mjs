@@ -1,6 +1,6 @@
 /**
- * Parse Congogame/playlist/*.mp3 "Artiste - Titre.mp3" -> StreamingAssets Datasets JSON pour le blind test.
- * Lancé après copy-playlist (même ordre de tri = track01, track02…).
+ * Parse Congogame/playlist/*.mp3 (noms réels) -> blind_playlist_meta.json.
+ * Le blind test se base sur ces noms de fichiers (artiste/groupe/titre/style).
  */
 import { readdir, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
@@ -12,16 +12,44 @@ const playlistDir = path.join(root, "playlist");
 const outDir = path.join(root, "UnityProject", "Assets", "Resources", "Datasets");
 const outFile = path.join(outDir, "blind_playlist_meta.json");
 
-function parseName(base) {
-  const sep = " - ";
-  const i = base.indexOf(sep);
-  if (i <= 0) {
-    return { artist: base.trim() || "?", title: "—" };
+function normalizeSpaces(s) {
+  return (s || "").replace(/\s+/g, " ").trim();
+}
+
+function parseArtistAndTitle(baseRaw) {
+  let base = normalizeSpaces(baseRaw);
+  let artist = base;
+  let title = "—";
+
+  const spacedSep = base.indexOf(" - ");
+  const genericSep = spacedSep < 0 ? base.indexOf("-") : -1;
+  const cut = spacedSep >= 0 ? spacedSep : genericSep;
+  if (cut > 0 && cut < base.length - 1) {
+    const sepLen = spacedSep >= 0 ? 3 : 1;
+    artist = normalizeSpaces(base.slice(0, cut));
+    title = normalizeSpaces(base.slice(cut + sepLen)) || "—";
   }
+
+  // Préfixe explicite groupe.
+  artist = artist.replace(/^Le groupe_/i, "").trim();
+  artist = normalizeSpaces(artist);
+  title = normalizeSpaces(title);
+
   return {
-    artist: base.slice(0, i).trim() || "?",
-    title: base.slice(i + sep.length).trim() || "—",
+    artist: artist || "?",
+    title: title || "—",
   };
+}
+
+function extractTagValues(base) {
+  const tags = [];
+  const re = /(\[[^\]]+\]|\([^)]+\))/g;
+  let m;
+  while ((m = re.exec(base)) !== null) {
+    const t = m[0].slice(1, -1).trim();
+    if (t) tags.push(t);
+  }
+  return tags;
 }
 
 const files = (await readdir(playlistDir).catch(() => []))
@@ -30,14 +58,32 @@ const files = (await readdir(playlistDir).catch(() => []))
 
 const items = [];
 let n = 1;
+function postProcessMetaItem(item) {
+  const fb = item.fileBase || "";
+  // Fichier renommé côté utilisateur : "Mvila" fait partie du nom de l'invité (Marvy Mvila), titre affiché = Tala Mbasse.
+  if (/Dj Bookson feat Marvy.*Mvila Tala mbasse/i.test(fb)) {
+    return {
+      ...item,
+      artist: "Dj Bookson feat Marvy Mvila",
+      title: "Tala Mbasse",
+    };
+  }
+  return item;
+}
+
 for (const f of files) {
   const base = f.replace(/\.mp3$/i, "");
-  const { artist, title } = parseName(base);
-  items.push({
-    fileBase: "track" + n.toString().padStart(2, "0"),
-    artist,
-    title,
-  });
+  const { artist, title } = parseArtistAndTitle(base);
+  const tags = extractTagValues(base);
+  items.push(
+    postProcessMetaItem({
+      fileBase: base,
+      fileName: f,
+      artist,
+      title,
+      tags,
+    })
+  );
   n++;
 }
 

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -367,6 +370,7 @@ namespace CongoGames.Core
             s_blindMetaBlockStart = -1;
             s_blindMetaBlockLength = 0;
             var list = new List<BlindRound>(BlindRoundsDefault.Length + 4);
+            var playlistOnly = new List<BlindRound>(64);
             foreach (BlindRound r in BlindRoundsDefault)
             {
                 list.Add(r);
@@ -402,11 +406,24 @@ namespace CongoGames.Core
             }
 
             int beforePlaylistMeta = list.Count;
-            AppendBlindRoundsFromPlaylistMeta(list);
+            int playlistAdded = AppendBlindRoundsFromPlaylistMeta(list);
             if (list.Count > beforePlaylistMeta)
             {
                 s_blindMetaBlockStart = beforePlaylistMeta;
                 s_blindMetaBlockLength = list.Count - beforePlaylistMeta;
+            }
+
+            // Construction dédiée "playlist-only" pour verrouiller la cohérence
+            // question <-> propositions <-> morceau joué.
+            int playlistOnlyAdded = AppendBlindRoundsFromPlaylistMeta(playlistOnly);
+
+            // Si la playlist est disponible, on force un blind test 100% corrélé
+            // aux noms de fichiers de la playlist (artiste/titre) et à leur audio.
+            if (playlistAdded > 0 && playlistOnlyAdded > 0)
+            {
+                list = playlistOnly;
+                s_blindMetaBlockStart = 0;
+                s_blindMetaBlockLength = list.Count;
             }
 
             blindRoundsRuntime = list.ToArray();
@@ -422,6 +439,20 @@ namespace CongoGames.Core
             public string fileBase;
             public string artist;
             public string title;
+        }
+
+        [Serializable] private class BlindFactsFile
+        {
+            public BlindFactItem[] items;
+        }
+
+        [Serializable] private class BlindFactItem
+        {
+            public string fileBase;
+            public int releaseYear;
+            public string language;
+            public string inspiration;
+            public bool verified;
         }
 
         private static readonly string[] ArtistTrapChoices =
@@ -475,39 +506,48 @@ namespace CongoGames.Core
             "Mon Soleil",
             "Jerusalema"
         };
+        private static readonly Regex CollaborationSplitRegex = new Regex(@"\s*(?:feat\.?|ft\.?|versus|vs|,|&| x )\s*", RegexOptions.IgnoreCase);
 
-        private static void AppendBlindRoundsFromPlaylistMeta(List<BlindRound> list)
+        private static int AppendBlindRoundsFromPlaylistMeta(List<BlindRound> list)
         {
-            if (list == null) return;
+            if (list == null) return 0;
+            int added = 0;
             TextAsset ta = Resources.Load<TextAsset>("Datasets/blind_playlist_meta");
-            if (ta == null) return;
+            if (ta == null) return 0;
             try
             {
                 BlindPlaylistMetaFile f = JsonUtility.FromJson<BlindPlaylistMetaFile>(ta.text);
-                if (f?.items == null || f.items.Length == 0) return;
+                if (f?.items == null || f.items.Length == 0) return 0;
                 var normalized = f.items
                     .Where(x => x != null && !string.IsNullOrEmpty(x.fileBase))
                     .Select(NormalizeBlindMetaItem)
                     .Where(x => x.HasValue)
                     .Select(x => x.Value)
                     .ToList();
-                if (normalized.Count == 0) return;
+                if (normalized.Count == 0) return 0;
                 var titles = normalized
                     .Select(x => x.title)
                     .Where(x => !string.IsNullOrEmpty(x))
-                    .Distinct()
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();
                 var artists = normalized
                     .Select(x => x.artist)
                     .Where(x => !string.IsNullOrEmpty(x))
-                    .Distinct()
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();
-                if (titles.Count < 1 || artists.Count < 1) return;
+                var collaboratorPool = normalized
+                    .SelectMany(x => ExtractCollaborationArtists(NormalizeArtistDisplay(x.artist)))
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                if (titles.Count < 1 || artists.Count < 1) return 0;
+                Dictionary<string, BlindFactItem> factsByTrack = LoadBlindFactsByTrack();
                 foreach (var it in normalized)
                 {
                     string t = NormalizeTitleDisplay(it.title);
                     string a = NormalizeArtistDisplay(it.artist);
                     if (t.Length < 1 || a.Length < 1) continue;
+                    factsByTrack.TryGetValue(it.fileBase, out BlindFactItem fact);
                     bool classic = IsClassicArtist(a);
                     string[] tChoices = BuildFourUniques(t, titles, MergeTrapChoices(
                         TitleTrapChoices,
@@ -518,10 +558,11 @@ namespace CongoGames.Core
                         "Après l’extrait (~1 min), quel est le titre de ce morceau ?",
                         tChoices,
                         ti,
-                        "Indice : le nom de fichier suit en général « Artiste - Titre ».",
+                        "Indice : concentre-toi sur la voix, le refrain et l'ambiance.",
                         it.fileBase,
                         null,
                         classic ? "Titre (playlist • classique)" : "Titre (playlist • moderne)"));
+                    added++;
                     string[] aChoices = BuildFourUniques(a, artists, MergeTrapChoices(
                         ArtistTrapChoices,
                         classic ? ArtistTrapClassique : ArtistTrapModerne));
@@ -531,16 +572,210 @@ namespace CongoGames.Core
                         "Après l’extrait, qui interprète ce morceau (artiste ou groupe) ?",
                         aChoices,
                         ai,
-                        "Indice : l’artiste est en général placé avant le tiret.",
+                        "Indice : écoute le timbre de voix, le style et l'identité du groupe.",
                         it.fileBase,
                         null,
                         classic ? "Artiste (playlist • classique)" : "Artiste (playlist • moderne)"));
+                    added++;
+
+                    List<string> collabs = ExtractCollaborationArtists(a);
+                    if (collabs.Count >= 2)
+                    {
+                        string collabTarget = collabs[Random.Range(1, collabs.Count)];
+                        string[] cChoices = BuildFourUniques(
+                            collabTarget,
+                            collaboratorPool.Where(x => !string.Equals(x, collabTarget, StringComparison.Ordinal)).ToList(),
+                            MergeTrapChoices(ArtistTrapChoices, classic ? ArtistTrapClassique : ArtistTrapModerne));
+                        int ci = System.Array.IndexOf(cChoices, collabTarget);
+                        if (ci < 0) ci = 0;
+                        list.Add(new BlindRound(
+                            "Sur cette collaboration, quel nom apparaît parmi les artistes invités ?",
+                            cChoices,
+                            ci,
+                            BuildCollaborationHint(it.fileBase, t, a, fact),
+                            it.fileBase,
+                            null,
+                            "Collaboration (playlist)"));
+                        added++;
+                    }
+
+                    if (fact != null && fact.verified)
+                    {
+                        if (fact.releaseYear >= 1900 && fact.releaseYear <= 2100)
+                        {
+                            string[] yearChoices = BuildYearChoices(fact.releaseYear, factsByTrack.Values);
+                            int yi = System.Array.IndexOf(yearChoices, fact.releaseYear.ToString());
+                            if (yi < 0) yi = 0;
+                            list.Add(new BlindRound(
+                                "Selon les sources vérifiées, en quelle année ce morceau est-il sorti ?",
+                                yearChoices,
+                                yi,
+                                "Indice : concentre-toi sur l'époque musicale du morceau.",
+                                it.fileBase,
+                                null,
+                                "Année (vérifiée)"));
+                            added++;
+                        }
+
+                        string lang = (fact.language ?? "").Trim().ToUpperInvariant();
+                        if (lang.Length >= 3)
+                        {
+                            string[] langChoices = BuildLanguageChoices(lang);
+                            int li = System.Array.IndexOf(langChoices, lang);
+                            if (li < 0) li = 0;
+                            list.Add(new BlindRound(
+                                "D'après les sources vérifiées, quelle est la langue principale de ce titre ?",
+                                langChoices,
+                                li,
+                                "Indice : écoute la diction dominante du morceau.",
+                                it.fileBase,
+                                null,
+                                "Langue (vérifiée)"));
+                            added++;
+                        }
+
+                        string insp = (fact.inspiration ?? "").Trim();
+                        if (insp.Length >= 8)
+                        {
+                            string[] inspChoices = BuildInspirationChoices(insp, factsByTrack.Values);
+                            int ii = System.Array.IndexOf(inspChoices, insp);
+                            if (ii < 0) ii = 0;
+                            list.Add(new BlindRound(
+                                "Selon les sources vérifiées, ce morceau rend surtout hommage ou s'inspire de quoi ?",
+                                inspChoices,
+                                ii,
+                                "Indice : écoute le contexte annoncé autour du titre.",
+                                it.fileBase,
+                                null,
+                                "Inspiration (vérifiée)"));
+                            added++;
+                        }
+                    }
                 }
             }
             catch (Exception e)
             {
                 Debug.LogWarning("blind_playlist_meta : " + e.Message);
             }
+            return added;
+        }
+
+        private static Dictionary<string, BlindFactItem> LoadBlindFactsByTrack()
+        {
+            var map = new Dictionary<string, BlindFactItem>(StringComparer.OrdinalIgnoreCase);
+            LoadBlindFactsIntoMap(map, "Datasets/blind_playlist_facts", "blind_playlist_facts");
+            // Overrides manuels prioritaires (corrections validées avec l'utilisateur).
+            LoadBlindFactsIntoMap(map, "Datasets/blind_playlist_facts_overrides", "blind_playlist_facts_overrides");
+
+            return map;
+        }
+
+        private static void LoadBlindFactsIntoMap(
+            Dictionary<string, BlindFactItem> map,
+            string resourcePath,
+            string logPrefix)
+        {
+            if (map == null) return;
+            TextAsset ta = Resources.Load<TextAsset>(resourcePath);
+            if (ta == null || string.IsNullOrWhiteSpace(ta.text))
+            {
+                return;
+            }
+
+            try
+            {
+                BlindFactsFile f = JsonUtility.FromJson<BlindFactsFile>(ta.text);
+                if (f?.items == null) return;
+                foreach (BlindFactItem it in f.items)
+                {
+                    if (it == null || string.IsNullOrWhiteSpace(it.fileBase)) continue;
+                    map[it.fileBase.Trim()] = it;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(logPrefix + " : " + e.Message);
+            }
+        }
+
+        private static string[] BuildYearChoices(int year, IEnumerable<BlindFactItem> facts)
+        {
+            var pool = new List<string>();
+            if (facts != null)
+            {
+                pool.AddRange(facts
+                    .Where(x => x != null && x.releaseYear >= 1900 && x.releaseYear <= 2100 && x.releaseYear != year)
+                    .Select(x => x.releaseYear.ToString()));
+            }
+
+            pool.Add((year - 1).ToString());
+            pool.Add((year + 1).ToString());
+            pool.Add((year - 2).ToString());
+            pool.Add((year + 2).ToString());
+            pool.Add((year - 5).ToString());
+            pool.Add((year + 5).ToString());
+
+            return BuildFourUniques(year.ToString(), pool.Distinct().ToList(), null);
+        }
+
+        private static string[] BuildLanguageChoices(string lang)
+        {
+            var pool = new List<string>
+            {
+                "LINGALA",
+                "KITOUBA",
+                "FRANÇAIS",
+                "MBOCHI",
+                "LARI",
+                "ANGLAIS"
+            };
+            return BuildFourUniques(lang, pool, null);
+        }
+
+        private static string[] BuildInspirationChoices(string inspiration, IEnumerable<BlindFactItem> facts)
+        {
+            var pool = new List<string>();
+            if (facts != null)
+            {
+                pool.AddRange(facts
+                    .Where(x => x != null && !string.IsNullOrWhiteSpace(x.inspiration))
+                    .Select(x => x.inspiration.Trim())
+                    .Where(x => !string.Equals(x, inspiration, StringComparison.Ordinal)));
+            }
+
+            pool.Add("Une pure improvisation sans référence précise.");
+            pool.Add("Une commande publicitaire sans lien à un artiste.");
+            pool.Add("Un jingle de studio sans histoire particulière.");
+            pool.Add("Un exercice vocal sans dédicace ni hommage.");
+
+            return BuildFourUniques(inspiration, pool.Distinct().ToList(), null);
+        }
+
+        private static List<string> ExtractCollaborationArtists(string artistRaw)
+        {
+            string s = NormalizeArtistDisplay(artistRaw);
+            if (string.IsNullOrWhiteSpace(s))
+            {
+                return new List<string>();
+            }
+
+            string[] parts = CollaborationSplitRegex.Split(s);
+            var names = parts
+                .Select(x => NormalizeContributorToken(x))
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct()
+                .ToList();
+            return names;
+        }
+
+        private static string NormalizeContributorToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token)) return "";
+            string t = token.Trim();
+            t = t.Replace("Le groupe_", "", StringComparison.OrdinalIgnoreCase).Trim();
+            t = t.Replace("le groupe_", "", StringComparison.OrdinalIgnoreCase).Trim();
+            while (t.Contains("  ")) t = t.Replace("  ", " ");
+            return t;
         }
 
         private static bool IsClassicArtist(string artist)
@@ -620,22 +855,35 @@ namespace CongoGames.Core
         private static string[] BuildFourUniques(string correct, List<string> pool, IReadOnlyList<string> traps)
         {
             if (string.IsNullOrEmpty(correct)) correct = "?";
-            List<string> wrong = pool
-                .Where(s => s != null && s != correct)
-                .Distinct()
-                .ToList();
+            string correctKey = CanonicalChoiceKey(correct);
+            var wrong = new List<string>();
+            var used = new HashSet<string>(StringComparer.Ordinal);
+            used.Add(correctKey);
+
+            if (pool != null)
+            {
+                foreach (string s in pool)
+                {
+                    if (string.IsNullOrWhiteSpace(s)) continue;
+                    string val = s.Trim();
+                    string key = CanonicalChoiceKey(val);
+                    if (used.Contains(key)) continue;
+                    used.Add(key);
+                    wrong.Add(val);
+                }
+            }
             if (traps != null)
             {
                 foreach (string trap in traps)
                 {
-                    if (!string.IsNullOrWhiteSpace(trap) && trap != correct)
-                    {
-                        wrong.Add(trap.Trim());
-                    }
+                    if (string.IsNullOrWhiteSpace(trap)) continue;
+                    string val = trap.Trim();
+                    string key = CanonicalChoiceKey(val);
+                    if (used.Contains(key)) continue;
+                    used.Add(key);
+                    wrong.Add(val);
                 }
             }
-
-            wrong = wrong.Distinct().ToList();
             for (int i = wrong.Count - 1; i > 0; i--)
             {
                 int j = Random.Range(0, i + 1);
@@ -649,23 +897,77 @@ namespace CongoGames.Core
             return pick.Take(4).ToArray();
         }
 
+        private static string CanonicalChoiceKey(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return "";
+            }
+
+            string s = raw.Trim();
+            s = s.ToLowerInvariant();
+            s = RemoveDiacritics(s);
+            s = s.Replace("_", " ");
+            s = Regex.Replace(s, @"\s+", " ");
+            return s.Trim();
+        }
+
+        private static string RemoveDiacritics(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return "";
+            }
+
+            string norm = input.Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder(norm.Length);
+            for (int i = 0; i < norm.Length; i++)
+            {
+                char c = norm[i];
+                UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (cat != UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb.ToString().Normalize(NormalizationForm.FormC);
+        }
+
+        private static string BuildCollaborationHint(string fileBase, string title, string artist, BlindFactItem fact)
+        {
+            if (fact != null && !string.IsNullOrWhiteSpace(fact.inspiration))
+            {
+                return "Indice : " + fact.inspiration.Trim();
+            }
+
+            if (!string.IsNullOrWhiteSpace(title))
+            {
+                return "Indice : pense au morceau \"" + title.Trim() + "\" et a ses artistes invites.";
+            }
+
+            if (!string.IsNullOrWhiteSpace(artist))
+            {
+                return "Indice : reste sur les artistes associes a \"" + artist.Trim() + "\".";
+            }
+
+            if (!string.IsNullOrWhiteSpace(fileBase))
+            {
+                return "Indice : cherche le nom invite relie a ce morceau.";
+            }
+
+            return "Indice : concentre-toi sur l'invite associe au titre entendu.";
+        }
+
         private static string NormalizeArtistDisplay(string raw)
         {
             string s = (raw ?? "").Trim();
             if (s.Length == 0) return "";
-            int p = s.IndexOf('(');
-            if (p > 0) s = s.Substring(0, p).Trim();
-            string low = s.ToLowerInvariant();
-            string[] markers = { " feat ", " ft ", " x ", " & ", "," };
-            int cut = -1;
-            foreach (string m in markers)
-            {
-                int k = low.IndexOf(m, StringComparison.Ordinal);
-                if (k > 1 && (cut < 0 || k < cut)) cut = k;
-            }
-
-            if (cut > 1) s = s.Substring(0, cut).Trim();
-            if (s.Length > 36) s = s.Substring(0, 35).TrimEnd() + "…";
+            s = s.Replace("Le groupe_", "", StringComparison.OrdinalIgnoreCase).Trim();
+            s = s.Replace("le groupe_", "", StringComparison.OrdinalIgnoreCase).Trim();
+            while (s.Contains("  ")) s = s.Replace("  ", " ");
+            // On conserve les collaborations (feat/x/&/vs) pour rester fidèle au nom de fichier.
+            if (s.Length > 92) s = s.Substring(0, 91).TrimEnd() + "…";
             return s;
         }
 
@@ -675,6 +977,8 @@ namespace CongoGames.Core
             if (s.Length == 0) return "";
             int p = s.IndexOf('(');
             if (p > 0) s = s.Substring(0, p).Trim();
+            int b = s.IndexOf('[');
+            if (b > 0) s = s.Substring(0, b).Trim();
             if (s.Length > 44) s = s.Substring(0, 43).TrimEnd() + "…";
             return s;
         }
@@ -891,13 +1195,41 @@ namespace CongoGames.Core
                 if (m0 + mlen <= len && mlen % 2 == 0)
                 {
                     int pairCount = mlen / 2;
-                    int startPair = Random.Range(0, pairCount);
                     idx = new List<int>(len);
-                    for (int k = 0; k < pairCount; k++)
+
+                    var pairStarts = new List<int>(pairCount);
+                    for (int p = 0; p < pairCount; p++)
                     {
-                        int p = (startPair + k) % pairCount;
-                        idx.Add(m0 + p * 2);
-                        idx.Add(m0 + p * 2 + 1);
+                        pairStarts.Add(m0 + p * 2);
+                    }
+
+                    for (int i = pairStarts.Count - 1; i > 0; i--)
+                    {
+                        int j = Random.Range(0, i + 1);
+                        (pairStarts[i], pairStarts[j]) = (pairStarts[j], pairStarts[i]);
+                    }
+
+                    // Passe 1 : une question par piste (titre OU artiste), ordre aléatoire.
+                    var deferred = new List<int>(pairCount);
+                    foreach (int start in pairStarts)
+                    {
+                        bool askTitleFirst = Random.value < 0.5f;
+                        int first = askTitleFirst ? start : start + 1;
+                        int second = askTitleFirst ? start + 1 : start;
+                        idx.Add(first);
+                        deferred.Add(second);
+                    }
+
+                    // Passe 2 : seconde question de chaque piste, encore mélangée.
+                    for (int i = deferred.Count - 1; i > 0; i--)
+                    {
+                        int j = Random.Range(0, i + 1);
+                        (deferred[i], deferred[j]) = (deferred[j], deferred[i]);
+                    }
+
+                    foreach (int d in deferred)
+                    {
+                        idx.Add(d);
                     }
 
                     for (int i = 0; i < len; i++)

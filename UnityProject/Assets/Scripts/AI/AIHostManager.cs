@@ -20,7 +20,7 @@ namespace CongoGames.AI
         [SerializeField] private int discoverPortMin = 3000;
         [SerializeField] private int discoverPortMax = 3010;
         [SerializeField] private bool preferTtsOverLogs = true;
-        [SerializeField] private int maxQueuedLines = 6;
+        [SerializeField] private int maxQueuedLines = 48;
         [Tooltip("Si faux, les répliques de l’animateur ne polluent pas la Console (recommandé).")]
         [SerializeField] private bool logHostLinesToConsole = false;
         [SerializeField] private float ttsQuotaCooldownSec = 300f;
@@ -30,6 +30,7 @@ namespace CongoGames.AI
         private AudioSource audioSource;
         private AudioCacheManager cache;
         private readonly Queue<string> speechQueue = new Queue<string>();
+        private readonly object speechQueueLock = new object();
         private Coroutine processCo;
         private bool speaking;
         private bool ttsProbeDone;
@@ -37,6 +38,21 @@ namespace CongoGames.AI
         private float ttsSuspendedUntil;
         private string lastTtsThrottleKey = "";
         private float lastTtsThrottleTime;
+        private static bool speechRulesLoaded;
+        private static SpeechReplaceRule[] externalSpeechRules = Array.Empty<SpeechReplaceRule>();
+
+        [Serializable]
+        private sealed class SpeechReplaceRule
+        {
+            public string find;
+            public string replace;
+        }
+
+        [Serializable]
+        private sealed class SpeechReplaceFile
+        {
+            public SpeechReplaceRule[] items;
+        }
 
         private void Awake()
         {
@@ -55,6 +71,22 @@ namespace CongoGames.AI
         private void Start()
         {
             StartCoroutine(BootstrapTts());
+        }
+
+        private void OnDestroy()
+        {
+            InterruptSpeech();
+            if (audioSource != null)
+            {
+                audioSource.Stop();
+                audioSource.clip = null;
+            }
+
+            cache?.ClearAndRelease();
+            if (ReferenceEquals(Instance, this))
+            {
+                Instance = null;
+            }
         }
 
         public void ApplyLiveServerHints(string httpApiBase, int httpPort)
@@ -76,7 +108,16 @@ namespace CongoGames.AI
         }
 
         public string TtsHttpBase => ttsHttpBase;
-        public bool IsSpeakingNow => speaking || (audioSource != null && audioSource.isPlaying) || speechQueue.Count > 0;
+        public bool IsSpeakingNow
+        {
+            get
+            {
+                lock (speechQueueLock)
+                {
+                    return speaking || (audioSource != null && audioSource.isPlaying) || speechQueue.Count > 0;
+                }
+            }
+        }
 
         private IEnumerator BootstrapTts()
         {
@@ -126,27 +167,210 @@ namespace CongoGames.AI
                 return;
             }
 
+            string normalized = NormalizeForSpeech(line);
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                return;
+            }
+
             if (logHostLinesToConsole)
             {
-                Debug.Log("CongoGames host: " + line);
+                Debug.Log("CongoGames host: " + normalized);
             }
 
-            if (speechQueue.Count >= maxQueuedLines)
+            lock (speechQueueLock)
             {
-                speechQueue.Dequeue();
-            }
+                if (speechQueue.Count >= maxQueuedLines)
+                {
+                    speechQueue.Dequeue();
+                }
 
-            speechQueue.Enqueue(line.Trim());
-            if (!speaking)
+                speechQueue.Enqueue(normalized);
+            }
+            // Évite de lancer plusieurs coroutines ProcessQueue en parallèle.
+            if (processCo == null)
             {
                 processCo = StartCoroutine(ProcessQueue());
             }
         }
 
+        private static string NormalizeForSpeech(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return "";
+            string s = input.Trim();
+
+            // Connecteurs fréquents dans les titres/artistes pour une prononciation plus naturelle.
+            s = s.Replace(" feat. ", " featuring ");
+            s = s.Replace(" feat ", " featuring ");
+            s = s.Replace(" ft. ", " featuring ");
+            s = s.Replace(" ft ", " featuring ");
+            s = s.Replace(" & ", " et ");
+            s = s.Replace(" x ", " avec ");
+            s = s.Replace(" vs ", " versus ");
+
+            // Remplacement des séparateurs techniques utilisés dans les noms de fichiers.
+            s = s.Replace(" - ", ", ");
+            s = s.Replace("_", " ");
+            s = s.Replace("/", " ");
+            s = s.Replace("\\", " ");
+
+            // Nettoyage ponctuation répétée qui dégrade parfois la TTS.
+            while (s.Contains("  ")) s = s.Replace("  ", " ");
+            s = s.Replace("..", ".");
+            s = s.Replace(",,", ",");
+            s = s.Replace(" ;", ",");
+            s = s.Replace(" :", ",");
+
+            // Mini dictionnaire local: prononciation plus stable des noms propres congolais.
+            s = ApplySpeechDictionary(s);
+
+            return s.Trim();
+        }
+
+        private static string ApplySpeechDictionary(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return "";
+
+            string[,] dict =
+            {
+                { "Roga Roga", "Roga Roga" },
+                { "Extra Musica", "Extra Moussica" },
+                { "Nzungou", "Ndzoungou" },
+                { "Bokoko", "Bokoko" },
+                { "Pozo Charabia", "Pozo Charabia" },
+                { "MJ Nader", "Em Jay Nader" },
+                { "Adou Danga", "Adou Danga" },
+                { "Sassou", "Sassou" },
+                { "Pointe-Noire", "Pointe Noire" },
+                { "Kouilou", "Kouilou" },
+                { "Likouala", "Likouala" },
+                { "Sangha", "Sangha" },
+                { "Odzala", "Odzala" },
+                { "Mbochi", "Mbochi" },
+                { "Mboshi", "Mbochi" },
+                { "Lingala", "LiNgala" },
+                { "Kituba", "Kitouba" },
+                { "MBOTE", "M'boté" },
+                { "Mbote", "M'boté" },
+                { "Brazzaville", "Brazzaville" },
+                { "Ndombolo", "Ndom bolo" },
+                { "Nzoto", "Nzoto" },
+
+                // Passe 2 ultra-ciblée (playlist blind test).
+                { "CARINE FLEUR EDOUARE", "Carine Fleur Édouard" },
+                { "Casimir Zao", "Casimir Zao" },
+                { "Cino black", "Cino Black" },
+                { "Zaparo de guerre", "Zaparo de guerre" },
+                { "Davy Kassa", "Davy Kassa" },
+                { "Elveronne Ndinga", "Elveronne Ndinga" },
+                { "Franklin Boukaka", "Franklin Boukaka" },
+                { "Groupe AVB", "Groupe A V B" },
+                { "Kedjevara", "Kédjévara" },
+                { "Nouvel Horizon", "Nouvel Horizon" },
+                { "Les Bantous de la Capitale", "Les Bantous de la Capitale" },
+                { "Louz Baby", "Louz Baby" },
+                { "Paterne Maestro", "Paterne Maestro" },
+                { "Michelle Moutouari", "Michelle Moutouari" },
+                { "Norbat de Paris", "Norbat de Paris" },
+                { "Pamelo Mounka", "Pamelo Mounka" },
+                { "Pierre Moutouari", "Pierre Moutouari" },
+                { "Pierrette Adams", "Pierrette Adams" },
+                { "Teddy Benzo Mixton", "Teddy Benzo Mixton" },
+                { "Spinho", "Spin ho" },
+                { "Tidiane Mario", "Tidiane Mario" },
+                { "Tété Ketch", "Tété Ketch" },
+                { "Vinny Baltazard", "Vini Baltazard" },
+                { "Wayé", "Wayé" },
+                { "YOULOU MABIALA", "Youlou Mabiala" },
+                { "Zitany Neil", "Zitany Neil" },
+                { "KILOMBO CONGO", "Kilombo Congo" },
+                { "LOUFOULAKARI", "Loufoulakari" },
+                { "MBONGO", "Mbongo" },
+                { "TIA LOKOLO", "Tia Lokolo" },
+                { "Moselebende", "Moselebendé" },
+                { "Ya Nga Bébé", "Ya Nga Bébé" }
+            };
+
+            string result = text;
+            int n = dict.GetLength(0);
+            for (int i = 0; i < n; i++)
+            {
+                string from = dict[i, 0];
+                string to = dict[i, 1];
+                result = ReplaceInsensitive(result, from, to);
+            }
+
+            SpeechReplaceRule[] rules = LoadSpeechRulesFromResources();
+            for (int i = 0; i < rules.Length; i++)
+            {
+                SpeechReplaceRule r = rules[i];
+                if (r == null || string.IsNullOrWhiteSpace(r.find) || string.IsNullOrWhiteSpace(r.replace))
+                {
+                    continue;
+                }
+
+                result = ReplaceInsensitive(result, r.find.Trim(), r.replace.Trim());
+            }
+
+            return result;
+        }
+
+        private static SpeechReplaceRule[] LoadSpeechRulesFromResources()
+        {
+            if (speechRulesLoaded)
+            {
+                return externalSpeechRules ?? Array.Empty<SpeechReplaceRule>();
+            }
+
+            speechRulesLoaded = true;
+            try
+            {
+                TextAsset ta = Resources.Load<TextAsset>("Datasets/tts_pronunciation_overrides");
+                if (ta == null || string.IsNullOrWhiteSpace(ta.text))
+                {
+                    externalSpeechRules = Array.Empty<SpeechReplaceRule>();
+                    return externalSpeechRules;
+                }
+
+                SpeechReplaceFile parsed = JsonUtility.FromJson<SpeechReplaceFile>(ta.text);
+                externalSpeechRules = parsed?.items ?? Array.Empty<SpeechReplaceRule>();
+            }
+            catch (Exception e)
+            {
+                externalSpeechRules = Array.Empty<SpeechReplaceRule>();
+                Debug.LogWarning("tts_pronunciation_overrides : " + e.Message);
+            }
+
+            return externalSpeechRules;
+        }
+
+        private static string ReplaceInsensitive(string input, string find, string replace)
+        {
+            if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(find)) return input ?? "";
+            int idx = input.IndexOf(find, StringComparison.OrdinalIgnoreCase);
+            if (idx < 0) return input;
+
+            var sb = new System.Text.StringBuilder(input.Length + 24);
+            int start = 0;
+            while (idx >= 0)
+            {
+                sb.Append(input, start, idx - start);
+                sb.Append(replace);
+                start = idx + find.Length;
+                idx = input.IndexOf(find, start, StringComparison.OrdinalIgnoreCase);
+            }
+
+            sb.Append(input, start, input.Length - start);
+            return sb.ToString();
+        }
+
         /// <summary>Stop la voix en cours, vide la file — pour éviter chevauchement avec SFX d’action (quiz, chrono, etc.).</summary>
         public void InterruptSpeech()
         {
-            speechQueue.Clear();
+            lock (speechQueueLock)
+            {
+                speechQueue.Clear();
+            }
             if (audioSource != null && audioSource.isPlaying)
             {
                 audioSource.Stop();
@@ -168,6 +392,10 @@ namespace CongoGames.AI
 
             speaking = true;
             SetSpeakingVisual(true);
+            if (logHostLinesToConsole)
+            {
+                Debug.Log("CongoGames TTS queue: démarrage");
+            }
 
             float wait = 0f;
             while (!ttsProbeDone && wait < 5f)
@@ -176,14 +404,14 @@ namespace CongoGames.AI
                 yield return null;
             }
 
-            while (speechQueue.Count > 0)
+            while (true)
             {
+                if (!TryDequeueSpeech(out string line)) break;
+
                 if (!ttsAvailable && Time.unscaledTime >= ttsSuspendedUntil)
                 {
                     yield return ReprobeTts();
                 }
-
-                string line = speechQueue.Dequeue();
                 bool playedAudio = false;
 
                 bool ttsMayCall = preferTtsOverLogs && ttsProbeDone && ttsAvailable && Time.unscaledTime >= ttsSuspendedUntil;
@@ -231,6 +459,25 @@ namespace CongoGames.AI
             speaking = false;
             SetSpeakingVisual(false);
             processCo = null;
+            if (logHostLinesToConsole)
+            {
+                Debug.Log("CongoGames TTS queue: arrêt (file vide)");
+            }
+        }
+
+        private bool TryDequeueSpeech(out string line)
+        {
+            lock (speechQueueLock)
+            {
+                if (speechQueue.Count > 0)
+                {
+                    line = speechQueue.Dequeue();
+                    return true;
+                }
+            }
+
+            line = null;
+            return false;
         }
 
         private sealed class PhrasePlayState

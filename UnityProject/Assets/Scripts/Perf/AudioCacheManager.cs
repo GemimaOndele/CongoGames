@@ -20,11 +20,34 @@ namespace CongoGames.Perf
                 // Simple eviction strategy for starter kit.
                 foreach (string cacheKey in new List<string>(clipCache.Keys))
                 {
+                    AudioClip old = clipCache[cacheKey];
                     clipCache.Remove(cacheKey);
+                    if (old != null)
+                    {
+                        Destroy(old);
+                    }
                     break;
                 }
             }
             clipCache[key] = clip;
+        }
+
+        public void ClearAndRelease()
+        {
+            foreach (AudioClip clip in clipCache.Values)
+            {
+                if (clip != null)
+                {
+                    Destroy(clip);
+                }
+            }
+
+            clipCache.Clear();
+        }
+
+        private void OnDestroy()
+        {
+            ClearAndRelease();
         }
     }
 }

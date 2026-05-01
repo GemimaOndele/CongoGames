@@ -43,9 +43,9 @@ namespace CongoGames.Core
         private static readonly Dictionary<string, string> ModeLabels = new Dictionary<string, string>
         {
             { "quiz", "Quiz culture" },
-            { "semantic", "Associations" },
-            { "word-scramble", "Mots mélangés" },
-            { "crossword-lite", "Mots croisés léger" },
+            { "semantic", "Sémantique" },
+            { "word-scramble", "Mots mélangés (mots mêlés)" },
+            { "crossword-lite", "Mots croisés" },
             { "blind-test", "Blind test" },
             { "mystery-word", "Mot mystère" },
             { "memory", "Mémoire" },
@@ -57,6 +57,13 @@ namespace CongoGames.Core
         private float timer;
         private float displayedRoundDuration;
         private Coroutine scheduleNextCo;
+        private Coroutine restartKeepCo;
+        private Coroutine modeTransitionOverlayCo;
+        private Coroutine startModeCo;
+        private bool modeTransitionLocked;
+
+        /// <summary>Délai après la fin de voix IA avant déblocage / lancement effectif (aligné UX).</summary>
+        public const float PostHostAnnounceDelaySec = 5f;
         /// <summary>Mots mélangés / mots croisés : ne pas enchaîner le mode suivant tant que les 2 grilles thématiques ne sont pas validées (démo) ; en live, le minuteur peut être dépassé.</summary>
         private bool gridThematicBlockComplete;
 
@@ -80,7 +87,7 @@ namespace CongoGames.Core
             if (activeMode != null && !string.Equals(activeMode.ModeId, "quiz", StringComparison.OrdinalIgnoreCase))
             {
                 displayedRoundDuration = roundDurationSec;
-                timer = Mathf.Min(timer, roundDurationSec);
+                timer = roundDurationSec;
             }
         }
 
@@ -90,7 +97,7 @@ namespace CongoGames.Core
             if (activeMode != null && string.Equals(activeMode.ModeId, "quiz", StringComparison.OrdinalIgnoreCase))
             {
                 displayedRoundDuration = quizSessionDurationSec;
-                timer = Mathf.Min(timer, quizSessionDurationSec);
+                timer = quizSessionDurationSec;
             }
         }
 
@@ -199,6 +206,11 @@ namespace CongoGames.Core
 
         private void Update()
         {
+            if (modeTransitionLocked)
+            {
+                return;
+            }
+
             if (keyboardPickModeInEditor && !IsLiveTikTokConnected() && EventSystem.current != null)
             {
                 GameObject sel = EventSystem.current.currentSelectedGameObject;
@@ -266,6 +278,22 @@ namespace CongoGames.Core
                 StopCoroutine(scheduleNextCo);
                 scheduleNextCo = null;
             }
+            if (restartKeepCo != null)
+            {
+                StopCoroutine(restartKeepCo);
+                restartKeepCo = null;
+            }
+            if (modeTransitionOverlayCo != null)
+            {
+                StopCoroutine(modeTransitionOverlayCo);
+                modeTransitionOverlayCo = null;
+            }
+            if (startModeCo != null)
+            {
+                StopCoroutine(startModeCo);
+                startModeCo = null;
+            }
+            modeTransitionLocked = false;
 
             string fromId = activeMode != null ? activeMode.ModeId : "";
             if (string.Equals(fromId, "quiz", StringComparison.OrdinalIgnoreCase) && ScoreManager.Instance != null)
@@ -277,6 +305,139 @@ namespace CongoGames.Core
                 }
             }
 
+            bool transitionBetweenModes = !string.IsNullOrEmpty(fromId) && fromId != modeId;
+            if (transitionBetweenModes)
+            {
+                modeTransitionLocked = true;
+                startModeCo = StartCoroutine(CoStartModeAfterAnnouncement(fromId, modeId, mode));
+                return;
+            }
+
+            ApplyAndBeginMode(fromId, modeId, mode);
+        }
+
+        public void NextMode()
+        {
+            if (modeRotation.Count == 0) return;
+            modeIndex = (modeIndex + 1) % modeRotation.Count;
+            StartMode(modeRotation[modeIndex]);
+        }
+
+        /// <summary>
+        /// Après une réponse locale : reste sur le même mini-jeu tant que le chrono de manche n'est pas épuisé,
+        /// sinon enchaîne le mini-jeu suivant (live : rotation rapide conservée).
+        /// </summary>
+        public void AdvanceRoundOrNextMode()
+        {
+            if (lockToSingleModeInLocalDemo && activeMode != null)
+            {
+                RestartCurrentModeKeepTimer();
+                return;
+            }
+
+            if (!IsLiveTikTokConnected() && RoundTimeRemaining > 0.05f)
+            {
+                RestartCurrentModeKeepTimer();
+                return;
+            }
+
+            ScheduleNextMode(1.1f);
+        }
+
+        /// <summary>Enchaîne sur le mini-jeu suivant après un court délai (réponse locale, bonne ou mauvaise).</summary>
+        public void ScheduleNextMode(float delaySec)
+        {
+            if (scheduleNextCo != null)
+            {
+                StopCoroutine(scheduleNextCo);
+            }
+
+            scheduleNextCo = StartCoroutine(CoScheduleNextMode(delaySec));
+        }
+
+        private IEnumerator CoScheduleNextMode(float delaySec)
+        {
+            yield return new WaitForSeconds(Mathf.Clamp(delaySec, 0.12f, 30f));
+            scheduleNextCo = null;
+            if (lockToSingleModeInLocalDemo && activeMode != null)
+            {
+                RestartCurrentModeKeepTimer();
+                yield break;
+            }
+
+            NextMode();
+        }
+
+        private void RestartCurrentModeKeepTimer()
+        {
+            if (activeMode == null)
+            {
+                return;
+            }
+
+            if (restartKeepCo != null)
+            {
+                StopCoroutine(restartKeepCo);
+            }
+
+            restartKeepCo = StartCoroutine(CoRestartCurrentModeKeepTimer());
+        }
+
+        private IEnumerator CoRestartCurrentModeKeepTimer()
+        {
+            if (activeMode == null)
+            {
+                restartKeepCo = null;
+                yield break;
+            }
+
+            string modeId = activeMode.ModeId;
+            float keepTimer = Mathf.Max(0.01f, timer);
+            float keepDisplayed = Mathf.Max(0.01f, displayedRoundDuration);
+
+            HostTransitionOverlay.Instance?.ShowQuestionIncoming();
+            AIHostManager.Instance?.InterruptSpeech();
+            AIHostManager.Instance?.Speak(LiaPunchlineBank.BuildNextQuestionLine(modeId));
+            yield return CoWaitUntilHostSilent(45f);
+            yield return new WaitForSecondsRealtime(PostHostAnnounceDelaySec);
+            HostTransitionOverlay.Instance?.Hide();
+
+            activeMode.End();
+            ModeSurfaceController.Instance?.Apply(modeId);
+            activeMode.Begin();
+            timer = keepTimer;
+            displayedRoundDuration = keepDisplayed;
+            restartKeepCo = null;
+        }
+
+        private IEnumerator CoHideOverlayAfterHostAnnounce()
+        {
+            yield return CoWaitUntilHostSilent(45f);
+            yield return new WaitForSecondsRealtime(PostHostAnnounceDelaySec);
+            HostTransitionOverlay.Instance?.Hide();
+            modeTransitionOverlayCo = null;
+        }
+
+        private IEnumerator CoStartModeAfterAnnouncement(string fromId, string toId, IGameMode mode)
+        {
+            HostTransitionOverlay.Instance?.ShowNewGameIncoming(GetModeDisplayName(toId));
+            AIHostManager.Instance?.InterruptSpeech();
+            string liaLine = LiaPunchlineBank.BuildTransitionWithRules(fromId, toId);
+            if (!string.IsNullOrEmpty(liaLine))
+            {
+                AIHostManager.Instance?.Speak(liaLine);
+            }
+
+            yield return CoWaitUntilHostSilent(45f);
+            yield return new WaitForSecondsRealtime(PostHostAnnounceDelaySec);
+            HostTransitionOverlay.Instance?.Hide();
+            ApplyAndBeginMode(fromId, toId, mode);
+            modeTransitionLocked = false;
+            startModeCo = null;
+        }
+
+        private void ApplyAndBeginMode(string fromId, string modeId, IGameMode mode)
+        {
             activeMode?.End();
             activeMode = mode;
             if (IsGridThematicModeId(modeId))
@@ -303,40 +464,19 @@ namespace CongoGames.Core
                     Debug.LogException(e);
                 }
             }
+        }
 
-            string liaLine = LiaPunchlineBank.BuildTransitionWithRules(fromId, modeId);
-            if (!string.IsNullOrEmpty(liaLine))
+        private IEnumerator CoWaitUntilHostSilent(float maxSec)
+        {
+            float end = Time.unscaledTime + Mathf.Max(2f, maxSec);
+            while (AIHostManager.Instance != null && AIHostManager.Instance.IsSpeakingNow && Time.unscaledTime < end)
             {
-                AIHostManager.Instance?.Speak(liaLine);
+                yield return null;
             }
         }
 
-        public void NextMode()
-        {
-            if (modeRotation.Count == 0) return;
-            modeIndex = (modeIndex + 1) % modeRotation.Count;
-            StartMode(modeRotation[modeIndex]);
-        }
-
-        /// <summary>Enchaîne sur le mini-jeu suivant après un court délai (réponse locale, bonne ou mauvaise).</summary>
-        public void ScheduleNextMode(float delaySec)
-        {
-            if (scheduleNextCo != null)
-            {
-                StopCoroutine(scheduleNextCo);
-            }
-
-            scheduleNextCo = StartCoroutine(CoScheduleNextMode(delaySec));
-        }
-
-        private IEnumerator CoScheduleNextMode(float delaySec)
-        {
-            yield return new WaitForSeconds(Mathf.Clamp(delaySec, 0.12f, 30f));
-            scheduleNextCo = null;
-            NextMode();
-        }
-
-        private static bool IsLiveTikTokConnected()
+        /// <summary>Live TikTok connecté : comportement présentateur / chat inchangé.</summary>
+        public static bool IsLiveTikTokConnected()
         {
             LiveEventClient live = FindAnyObjectByType<LiveEventClient>();
             return live != null && live.IsConnected;

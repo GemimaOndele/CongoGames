@@ -52,6 +52,16 @@ namespace CongoGames.Core
             NotifyLeaderboardChanged();
         }
 
+        public void UpdatePlayerAvatar(string username, string avatarUrl)
+        {
+            if (string.IsNullOrWhiteSpace(username)) return;
+            string clean = (avatarUrl ?? "").Trim();
+            PlayerData player = GetOrCreate(username);
+            if (string.Equals(player.AvatarUrl ?? "", clean, StringComparison.Ordinal)) return;
+            player.AvatarUrl = clean;
+            NotifyLeaderboardChanged();
+        }
+
         public void ApplyMultiplier(string username, int multiplier, int durationSec)
         {
             if (multiplier < 2 || durationSec <= 0) return;
@@ -91,6 +101,11 @@ namespace CongoGames.Core
             if (!players.TryGetValue(username, out PlayerData player))
             {
                 player = new PlayerData(username);
+                if (!string.IsNullOrWhiteSpace(PlayerProfileStore.ScoreUsernameForLocalPlay())
+                    && string.Equals(PlayerProfileStore.ScoreUsernameForLocalPlay(), username, StringComparison.OrdinalIgnoreCase))
+                {
+                    player.AvatarUrl = PlayerProfileStore.AvatarUrl ?? "";
+                }
                 players.Add(username, player);
             }
             return player;
