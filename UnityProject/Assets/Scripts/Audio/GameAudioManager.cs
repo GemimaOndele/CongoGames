@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using CongoGames.Presentation;
 
@@ -25,6 +26,11 @@ namespace CongoGames.Audio
         [Range(0f, 1f)]
         [Tooltip("Volume de la surcouche BGM (Inspector) quand le blend est actif. La piste Theme reste au niveau normal du ThemeMusicPlayer.")]
         [SerializeField] private float dedicatedOverlayVolume = 0.24f;
+
+        [Tooltip(
+            "Sans clip Inspector ni fichier Resources : joue un pad procédural léger par mode (deuxième couche audio). "
+            + "Désactiver pour n’entendre que la BGM Theme/ seule tant qu’aucun clip n’est assigné.")]
+        [SerializeField] private bool proceduralOverlayWhenNoAsset = true;
 
         [Header("Optionnel — remplacer entièrement la BGM Theme")]
         [Tooltip(
@@ -114,6 +120,15 @@ namespace CongoGames.Audio
 
         private void OnDestroy()
         {
+            foreach (KeyValuePair<string, AudioClip> kv in proceduralOverlayByMode)
+            {
+                if (kv.Value != null)
+                {
+                    Destroy(kv.Value);
+                }
+            }
+
+            proceduralOverlayByMode.Clear();
             if (Instance == this)
             {
                 Instance = null;
@@ -197,7 +212,7 @@ namespace CongoGames.Audio
             yield return null;
             yield return null;
 
-            AudioClip clip = GetClipForMode(modeId);
+            AudioClip clip = ResolveOverlayClip(modeId);
             if (clip == null)
             {
                 float s = overlayBgm != null ? overlayBgm.volume : 0f;
@@ -580,6 +595,38 @@ namespace CongoGames.Audio
                     return lobbyTheme;
                 default: return null;
             }
+        }
+
+        /// <summary>
+        /// Inspector → Resources/Audio/BgmOverlay/&lt;mode&gt; → pad procédural (cache par mode).
+        /// </summary>
+        private AudioClip ResolveOverlayClip(string modeId)
+        {
+            AudioClip c = GetClipForMode(modeId);
+            if (c != null)
+            {
+                return c;
+            }
+
+            string id = string.IsNullOrEmpty(modeId) ? "quiz" : modeId.Trim().ToLowerInvariant();
+            c = Resources.Load<AudioClip>("Audio/BgmOverlay/" + id);
+            if (c != null)
+            {
+                return c;
+            }
+
+            if (!proceduralOverlayWhenNoAsset)
+            {
+                return null;
+            }
+
+            if (!proceduralOverlayByMode.TryGetValue(id, out AudioClip pad) || pad == null)
+            {
+                pad = ProceduralClips.BuildAmbientPadForMode(id);
+                proceduralOverlayByMode[id] = pad;
+            }
+
+            return pad;
         }
 
         private static float GetFadeForMode(string modeId)
