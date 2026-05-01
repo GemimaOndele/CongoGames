@@ -1,4 +1,5 @@
 using UnityEngine;
+using CongoGames.Audio;
 
 namespace CongoGames.Presentation
 {
@@ -12,11 +13,14 @@ namespace CongoGames.Presentation
         public static void NotifyModeStarted(string modeId)
         {
             string id = string.IsNullOrEmpty(modeId) ? "default" : modeId.Trim().ToLowerInvariant();
+            bool skipBuiltInThemeMusic = GameAudioManager.Instance != null && GameAudioManager.Instance.TryBeginModeBgm(id);
             ThemeMusicPlayer music = Object.FindAnyObjectByType<ThemeMusicPlayer>();
-            if (music != null)
+            if (!skipBuiltInThemeMusic && music != null)
             {
                 music.ApplyGameMode(id);
             }
+
+            GameAudioManager.Instance?.ScheduleBlendOverlayAfterTheme(id);
 
             ThemeBackgroundController bg = Object.FindAnyObjectByType<ThemeBackgroundController>();
             if (bg != null)

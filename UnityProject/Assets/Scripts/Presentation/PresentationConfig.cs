@@ -21,7 +21,8 @@ namespace CongoGames.Presentation
         public static PresentationQualityTier Tier { get; set; } = PresentationQualityTier.Cinematic;
 
         /// <summary>Scène 3D « plateau TV » (Render Texture → fond) au lieu du seul fond 2D / vidéo.</summary>
-        public static bool UseVirtual3DShowStage { get; set; } = true;
+        /// <remarks>Doit rester aligné avec le défaut PlayerPrefs (0 = vidéo d’abord).</remarks>
+        public static bool UseVirtual3DShowStage { get; set; } = false;
 
 
         public static int VirtualStageWidth => Tier switch
@@ -46,10 +47,21 @@ namespace CongoGames.Presentation
             _ => 1f
         };
 
+        private const string PrefsMigrationThemeVideoV2 = "CongoPrefsMigr_ThemeVideoV2";
+
         public static void ApplyFromPlayerPrefs()
         {
             int v = PlayerPrefs.GetInt(PrefsPresentQuality, (int)PresentationQualityTier.Cinematic);
             Tier = (PresentationQualityTier)Mathf.Clamp(v, 0, 2);
+
+            // Une fois par machine : réinitialiser l’ancien défaut « 3D partout » pour laisser passer les MP4 Theme/.
+            if (PlayerPrefs.GetInt(PrefsMigrationThemeVideoV2, 0) == 0)
+            {
+                PlayerPrefs.DeleteKey(PrefsUseVirtual3D);
+                PlayerPrefs.SetInt(PrefsMigrationThemeVideoV2, 1);
+                PlayerPrefs.Save();
+            }
+
             // Défaut 0 : privilégier les .mp4 locaux (Theme/<mode>/background.mp4) ; F9 peut réactiver le plateau 3D.
             UseVirtual3DShowStage = PlayerPrefs.GetInt(PrefsUseVirtual3D, 0) != 0;
         }
