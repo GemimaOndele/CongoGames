@@ -21,11 +21,11 @@ namespace CongoGames.Audio
             "Activé : la musique chargée depuis Theme/ (StreamingAssets) continue ; les clips BGM ci-dessous "
             + "s’ajoutent en surcouche (volume « overlay ») quand un clip existe pour le mode. "
             + "Désactivé : seul le thème classique joue, sauf si « remplacer » est coché.")]
-        [SerializeField] private bool blendDedicatedClipsWithStreamingMusic = true;
+        [SerializeField] private bool blendDedicatedClipsWithStreamingMusic;
 
         [Range(0f, 1f)]
         [Tooltip("Volume de la surcouche BGM (Inspector) quand le blend est actif. La piste Theme reste au niveau normal du ThemeMusicPlayer.")]
-        [SerializeField] private float dedicatedOverlayVolume = 0.24f;
+        [SerializeField] private float dedicatedOverlayVolume = 0.26f;
 
         [Tooltip(
             "Sans clip Inspector ni fichier Resources : joue un pad procédural léger par mode (deuxième couche audio). "
@@ -34,9 +34,9 @@ namespace CongoGames.Audio
 
         [Header("Optionnel — remplacer entièrement la BGM Theme")]
         [Tooltip(
-            "Désactivé (défaut) : garder Theme + overlay si blend. Activé : les clips Inspector remplacent "
-            + "Theme pour ce mode (comme avant) ; ignore le blend.")]
-        [SerializeField] private bool preferDedicatedBgm;
+            "Activé (défaut) : une piste Resources/Inspector par mode remplace la boucle Theme StreamingAssets — "
+            + "changement de mode = autre morceau. Désactiver pour revenir au mix Theme + surcouche.")]
+        [SerializeField] private bool preferDedicatedBgm = true;
 
         [Header("BGM — assigner des fichiers dans Assets/Audio/BGM")]
         [SerializeField] private AudioClip lobbyTheme;
@@ -67,6 +67,9 @@ namespace CongoGames.Audio
         [Range(0f, 1f)] [SerializeField] private float sfxVolume = 1f;
 
         private float broadcastDuckMul = 1f;
+        /// <summary>Atténuation BGM clips Inspector pendant TTS manuel (<see cref="DuckForRobot"/> / fichiers/claude).</summary>
+        private float robotDuckMul = 1f;
+        private Coroutine robotDuckCo;
 
         private static readonly float FadeQuiz = 2f;
         private static readonly float FadeBattle = 0.8f;
@@ -88,6 +91,7 @@ namespace CongoGames.Audio
         private Coroutine overlayFadeCo;
         private bool usingA = true;
         private bool inspectorBgmActive;
+        private readonly Dictionary<string, AudioClip> proceduralOverlayByMode = new Dictionary<string, AudioClip>(16);
 
         private void Awake()
         {
@@ -116,6 +120,51 @@ namespace CongoGames.Audio
             overlayBgm.priority = 80;
             sfxSrc.playOnAwake = false;
             sfxSrc.spatialBlend = 0f;
+
+            EnsureAudioClipsFromResources();
+        }
+
+        /// <summary>
+        /// Le bootstrap crée ce composant sans Inspector : charge les clips depuis <c>Resources/Audio/BGM</c> et <c>Resources/Audio/SFX</c>
+        /// (convention <c>files/README_AUDIO_INTEGRATION.md</c>) si les champs restent vides.
+        /// </summary>
+        private void EnsureAudioClipsFromResources()
+        {
+            TryLoad(ref lobbyTheme, "Audio/BGM/lobby_theme");
+            TryLoad(ref quizTheme, "Audio/BGM/quiz_theme");
+            TryLoad(ref battleTheme, "Audio/BGM/battle_theme");
+            TryLoad(ref speedChronoTheme, "Audio/BGM/speed_chrono_theme");
+            TryLoad(ref memoryTheme, "Audio/BGM/memory_theme");
+            TryLoad(ref wordScrambleTheme, "Audio/BGM/word_scramble_theme");
+            TryLoad(ref crosswordTheme, "Audio/BGM/crossword_theme");
+            TryLoad(ref mysteryWordTheme, "Audio/BGM/mystery_word_theme");
+            TryLoad(ref semanticTheme, "Audio/BGM/semantic_theme");
+            TryLoad(ref imageToWordTheme, "Audio/BGM/image_to_word_theme");
+            TryLoad(ref blindTestTheme, "Audio/BGM/blind_test_theme");
+
+            TryLoad(ref correctAnswer, "Audio/SFX/correct_answer");
+            TryLoad(ref wrongAnswer, "Audio/SFX/wrong_answer");
+            TryLoad(ref giftReceived, "Audio/SFX/gift_received");
+            TryLoad(ref newViewer, "Audio/SFX/new_viewer");
+            TryLoad(ref battleStart, "Audio/SFX/battle_start");
+            TryLoad(ref roundWin, "Audio/SFX/round_win");
+            TryLoad(ref timerTick, "Audio/SFX/timer_tick");
+            TryLoad(ref timerUrgent, "Audio/SFX/timer_urgent");
+            TryLoad(ref crowdCheer, "Audio/SFX/crowd_cheer");
+        }
+
+        private static void TryLoad(ref AudioClip slot, string resourcesPath)
+        {
+            if (slot != null || string.IsNullOrEmpty(resourcesPath))
+            {
+                return;
+            }
+
+            AudioClip c = Resources.Load<AudioClip>(resourcesPath);
+            if (c != null)
+            {
+                slot = c;
+            }
         }
 
         private void OnDestroy()
@@ -139,6 +188,23 @@ namespace CongoGames.Audio
         /// Appelé depuis <see cref="ThemeRuntime.NotifyModeStarted"/> avant <see cref="ThemeMusicPlayer.ApplyGameMode"/>.
         /// Retourne <c>true</c> si la BGM inspector remplace Theme (pas de chargement StreamingAssets pour ce mode).
         /// </summary>
+        /// <summary>Arrête la surcouche (Inspector / Resources / pad) sans attendre un fade — indispensable avant blind / changement de mode.</summary>
+        public void StopOverlayImmediately()
+        {
+            if (overlayFadeCo != null)
+            {
+                StopCoroutine(overlayFadeCo);
+                overlayFadeCo = null;
+            }
+
+            if (overlayBgm != null)
+            {
+                overlayBgm.Stop();
+                overlayBgm.clip = null;
+                overlayBgm.volume = 0f;
+            }
+        }
+
         public bool TryBeginModeBgm(string modeId)
         {
             string id = string.IsNullOrEmpty(modeId) ? "quiz" : modeId.Trim().ToLowerInvariant();
@@ -146,6 +212,7 @@ namespace CongoGames.Audio
             if (blendDedicatedClipsWithStreamingMusic && !preferDedicatedBgm)
             {
                 StopExclusiveInspectorBgmOnly(0.35f);
+                StopOverlayImmediately();
                 return false;
             }
 
@@ -194,7 +261,7 @@ namespace CongoGames.Audio
             if (string.Equals(id, "blind-test", System.StringComparison.Ordinal)
                 || string.Equals(id, "image-guess", System.StringComparison.Ordinal))
             {
-                StopOverlayBgm(0.35f);
+                StopOverlayImmediately();
                 return;
             }
 
@@ -310,7 +377,7 @@ namespace CongoGames.Audio
         {
             if (overlayBgm != null && overlayBgm.isPlaying)
             {
-                overlayBgm.volume = Mathf.Clamp01(dedicatedOverlayVolume) * broadcastDuckMul;
+                overlayBgm.volume = Mathf.Clamp01(dedicatedOverlayVolume) * broadcastDuckMul * robotDuckMul;
             }
         }
 
@@ -425,7 +492,59 @@ namespace CongoGames.Audio
             fadeCo = null;
         }
 
-        private float EffectiveBgmVolume => Mathf.Clamp01(bgmVolume) * broadcastDuckMul;
+        private float EffectiveBgmVolume => Mathf.Clamp01(bgmVolume) * broadcastDuckMul * robotDuckMul;
+
+        /// <summary>Réf. <c>files/README_AUDIO_INTEGRATION.md</c> et <c>AIHostManager_AudioPatch.cs</c> : baisse Theme + surcouche + SFX comme le coordinateur live.</summary>
+        public void DuckForRobot(float fadeDuration = 0.3f)
+        {
+            if (robotDuckCo != null)
+            {
+                StopCoroutine(robotDuckCo);
+            }
+
+            robotDuckCo = StartCoroutine(CoRobotDuckFade(fadeDuration, duck: true));
+        }
+
+        /// <summary>Rétablit les niveaux après TTS manuel (si tu utilises ces appels au lieu du seul <see cref="BroadcastAudioMixCoordinator"/>).</summary>
+        public void RestoreFromRobot(float fadeDuration = 0.6f)
+        {
+            if (robotDuckCo != null)
+            {
+                StopCoroutine(robotDuckCo);
+            }
+
+            robotDuckCo = StartCoroutine(CoRobotDuckFade(fadeDuration, duck: false));
+        }
+
+        private IEnumerator CoRobotDuckFade(float duration, bool duck)
+        {
+            float robotStart = robotDuckMul;
+            float robotEnd = duck ? 0.18f : 1f;
+            ThemeMusicPlayer tm = ThemeMusicPlayer.Instance;
+            GameSfxHub sfx = GameSfxHub.Instance;
+            float themeA = duck ? 1f : 0.12f;
+            float themeB = duck ? 0.12f : 1f;
+            float sfxA = duck ? 1f : 0.72f;
+            float sfxB = duck ? 0.72f : 1f;
+            duration = Mathf.Max(0.02f, duration);
+            float t = 0f;
+            while (t < duration)
+            {
+                t += Time.unscaledDeltaTime;
+                float k = Mathf.Clamp01(t / duration);
+                robotDuckMul = Mathf.Lerp(robotStart, robotEnd, k);
+                tm?.SetBroadcastDuckMultiplier(Mathf.Lerp(themeA, themeB, k));
+                sfx?.SetBroadcastDuckMultiplier(Mathf.Lerp(sfxA, sfxB, k));
+                ApplyImmediateBgmDuck();
+                yield return null;
+            }
+
+            robotDuckMul = robotEnd;
+            tm?.SetBroadcastDuckMultiplier(themeB);
+            sfx?.SetBroadcastDuckMultiplier(sfxB);
+            ApplyImmediateBgmDuck();
+            robotDuckCo = null;
+        }
 
         private void ApplyImmediateBgmDuck()
         {
@@ -504,6 +623,25 @@ namespace CongoGames.Audio
             }
         }
 
+        /// <summary>Alias (spec Claude / événements nommés « correct » / « wrong »).</summary>
+        public void OnCorrectAnswer() => OnLiveCorrectAnswer();
+
+        /// <summary>Alias (spec Claude / événements nommés « correct » / « wrong »).</summary>
+        public void OnWrongAnswer() => OnLiveWrongAnswer();
+
+        /// <summary>Entrée ou pulse dans le top 3 du classement (roulement léger si pas d’asset dédié).</summary>
+        public void OnLeaderboardSpotlight()
+        {
+            if (timerTick != null && sfxSrc != null)
+            {
+                sfxSrc.PlayOneShot(timerTick, sfxVolume * 0.55f);
+            }
+            else
+            {
+                GameSfxHub.Instance?.PlayUiPop(0.32f);
+            }
+        }
+
         public void OnGiftReceived()
         {
             if (giftReceived != null)
@@ -566,6 +704,55 @@ namespace CongoGames.Audio
             }
         }
 
+        /// <summary>
+        /// Messages WebSocket <c>type: "metric"</c> — même contrat que le backend Node (<c>protocol/messages.js</c>, champ <c>action</c>).
+        /// Ex. <c>like_burst</c>, <c>viewer_milestone</c>, <c>leaderboard</c>, <c>pulse</c> (défaut : tic discret).
+        /// </summary>
+        public void OnWsMetric(string metricAction, int metricValue)
+        {
+            string a = (metricAction ?? "").Trim().ToLowerInvariant();
+            if (a == "silent" || a == "none")
+            {
+                return;
+            }
+
+            switch (a)
+            {
+                case "like_burst":
+                case "tap_spike":
+                case "engagement":
+                    GameSfxHub.Instance?.PlayUiPop(0.22f);
+                    return;
+                case "viewer":
+                case "viewer_milestone":
+                case "new_viewer":
+                    OnNewViewer();
+                    return;
+                case "leaderboard":
+                case "rank_pulse":
+                case "score_surge":
+                    OnLeaderboardSpotlight();
+                    return;
+                case "gift_streak":
+                    OnGiftReceived();
+                    return;
+            }
+
+            if (metricValue <= 0 && a.Length > 0 && a != "pulse")
+            {
+                return;
+            }
+
+            if (timerTick != null && sfxSrc != null)
+            {
+                sfxSrc.PlayOneShot(timerTick, sfxVolume * 0.35f);
+            }
+            else
+            {
+                GameSfxHub.Instance?.PlayUiPop(0.18f);
+            }
+        }
+
         private void PlaySfxOrFallbackBattle()
         {
             if (battleStart != null)
@@ -593,7 +780,10 @@ namespace CongoGames.Audio
                 case "lobby":
                 case "menu":
                     return lobbyTheme;
-                default: return null;
+                case "default":
+                    return quizTheme != null ? quizTheme : lobbyTheme;
+                default:
+                    return null;
             }
         }
 

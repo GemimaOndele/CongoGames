@@ -8,6 +8,7 @@ using UnityEngine.InputSystem.Controls;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using CongoGames.AI;
+using CongoGames.Audio;
 using CongoGames.Core;
 using CongoGames.Network;
 using CongoGames.UI;
@@ -284,6 +285,8 @@ namespace CongoGames.Presentation
         private int chronoRoundInSession; // 1..ChronoRoundsPerSession
         private int chronoLastRoundPoints;
         private int chronoCountdownIndex;
+        private int chronoTimerAudioLastCeilSec = -1;
+        private bool chronoTimerUrgentPlayed;
 
         [Header("Grilles thématiques (mots mélangés / mots croisés)")]
         [Tooltip("Démo : 2 manches = 2 grilles thématiques (5–12 mots) avant le prochain mode ; en live, le chrono de la manche continue.")]
@@ -3249,6 +3252,9 @@ namespace CongoGames.Presentation
 
         private IEnumerator CoBlindListenThenQuestion(int musicSeed, MiniGameDemoBanks.BlindRound raw, float listen)
         {
+            GameAudioManager.Instance?.StopOverlayImmediately();
+            GameSfxHub.Instance?.SetBroadcastDuckMultiplier(1f);
+
             // Blind test: silence total du fond pendant l'écoute.
             ThemeMusicPlayer.Instance?.SetBroadcastDuckMultiplier(0f);
             ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(0f);
@@ -3301,6 +3307,7 @@ namespace CongoGames.Presentation
             GameSfxHub.Instance?.StopBlindDemoMusic();
             ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(1f);
             ThemeMusicPlayer.Instance?.SetBroadcastDuckMultiplier(1f);
+            GameSfxHub.Instance?.SetBroadcastDuckMultiplier(1f);
             blindInQuestionPhase = false;
             SetBlindChoicesInteractable(false);
             if (blindSub != null)
@@ -3740,6 +3747,19 @@ namespace CongoGames.Presentation
             else if (chronoPhase == 1)
             {
                 float tLeft = Mathf.Max(0f, chronoStateUntil - Time.unscaledTime);
+                int ceilSec = Mathf.CeilToInt(tLeft);
+                if (ceilSec != chronoTimerAudioLastCeilSec && ceilSec >= 0 && ceilSec < 120)
+                {
+                    chronoTimerAudioLastCeilSec = ceilSec;
+                    GameAudioManager.Instance?.OnTimerTick();
+                }
+
+                if (tLeft <= 0.48f && !chronoTimerUrgentPlayed)
+                {
+                    chronoTimerUrgentPlayed = true;
+                    GameAudioManager.Instance?.OnTimerUrgent();
+                }
+
                 chronoBig.text = string.Format("{0:0.0}", tLeft);
                 chronoSub.text = "Cible 1-4  ·  " + tLeft.ToString("0.0") + " s";
                 if (chronoInstruction != null)
@@ -4278,6 +4298,7 @@ namespace CongoGames.Presentation
             {
                 yield return CoPreMusicCountdown(preMusicCountdownSeconds);
                 int seed = (CurrentImageGuessRound.Hint ?? "image").GetHashCode();
+                GameAudioManager.Instance?.StopOverlayImmediately();
                 ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(0f);
                 GameSfxHub.Instance?.PlayBlindDemoMusic(seed, CurrentImageGuessRound.AudioFileBase, CurrentImageGuessRound.AudioUrl);
                 imageMusicHintCo = StartCoroutine(CoStopImageMusicHintAfter(ImageGuessMusicClueSec));

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using CongoGames.AI;
+using CongoGames.Audio;
 
 namespace CongoGames.Core
 {
@@ -26,6 +27,7 @@ namespace CongoGames.Core
             battleActive = true;
             playerA = p1;
             playerB = p2;
+            GameAudioManager.Instance?.OnBattleStart();
             Debug.Log($"Battle started: {p1} vs {p2}");
             string v = LiaPunchlineBank.PickViral();
             AIHostManager.Instance?.Speak(

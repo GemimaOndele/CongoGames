@@ -163,6 +163,28 @@ namespace CongoGames.Presentation
             StartCoroutine(LoadMusicForMode(id));
         }
 
+        /// <summary>
+        /// Arrête toute BGM chargée depuis StreamingAssets quand <see cref="CongoGames.Audio.GameAudioManager"/> joue des clips dédiés.
+        /// </summary>
+        public void SuppressStreamingBgmForExternalManager()
+        {
+            playlistRoutine = null;
+            StopAllCoroutines();
+            ClearPlaylistClips();
+            if (music != null)
+            {
+                if (music.isPlaying)
+                {
+                    music.Stop();
+                }
+
+                music.clip = null;
+            }
+
+            debugNowPlaying = "externe (GameAudioManager)";
+            debugSource = "external-bgm";
+        }
+
         public void SetAmbiencePreset(bool aggressive)
         {
             PlayerPrefs.SetInt(AmbiencePresetPrefKey, aggressive ? 1 : 0);
@@ -849,6 +871,22 @@ namespace CongoGames.Presentation
                 }
             }
 
+            for (int n = 1; n <= 36; n++)
+            {
+                string prefix = "track" + n.ToString("D2");
+                foreach (string ext in new[] { "mp3", "ogg", "wav" })
+                {
+                    string rel = "Theme/Gameplay/" + m + "/" + prefix + "." + ext;
+                    string u = StreamingAssetsUrl.UrlForRelativePath(rel);
+                    bool ok = false;
+                    yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => ok = b);
+                    if (ok)
+                    {
+                        trackPaths.Add(u);
+                    }
+                }
+            }
+
             if (string.Equals(m, "blind-test", StringComparison.OrdinalIgnoreCase))
             {
                 for (int n = 1; n <= 36; n++)
@@ -868,29 +906,33 @@ namespace CongoGames.Presentation
                 }
             }
 
-            // Même contenu que Congogame/playlist/ côté PC : copier les .mp3 dans StreamingAssets/Theme/playlist/ (track01…)
-            for (int n = 1; n <= 36; n++)
+            // Theme/playlist/ : réservé blind-test + image-guess uniquement (pas de fond général mini-jeux).
+            if (string.Equals(m, "blind-test", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(m, "image-guess", StringComparison.OrdinalIgnoreCase))
             {
-                string prefix = "track" + n.ToString("D2");
-                foreach (string ext in new[] { "mp3", "ogg", "wav" })
+                for (int n = 1; n <= 36; n++)
                 {
-                    string rel = "Theme/playlist/" + prefix + "." + ext;
-                    string u = StreamingAssetsUrl.UrlForRelativePath(rel);
-                    bool ok = false;
-                    yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => ok = b);
-                    if (ok)
+                    string prefix = "track" + n.ToString("D2");
+                    foreach (string ext in new[] { "mp3", "ogg", "wav" })
                     {
-                        trackPaths.Add(u);
+                        string rel = "Theme/playlist/" + prefix + "." + ext;
+                        string u = StreamingAssetsUrl.UrlForRelativePath(rel);
+                        bool ok = false;
+                        yield return WebGlStreamingPrewarm.CoHttpHeadOk(u, b => ok = b);
+                        if (ok)
+                        {
+                            trackPaths.Add(u);
+                        }
                     }
                 }
             }
 
-            var uq = new List<string>();
-            uq.AddRange(trackPaths);
-            uq = uq.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-            ShuffleStringListInPlace(uq);
-            trackPaths.Clear();
-            trackPaths.AddRange(uq);
+            if (trackPaths.Count == 0)
+            {
+                AppendOptimisticWebGlThemeAudioUrls(m, trackPaths);
+            }
+
+            DeduplicateAndRotateWebGlTrackList(m, trackPaths);
             if (trackPaths.Count > 0)
             {
                 yield break;
@@ -912,38 +954,59 @@ namespace CongoGames.Presentation
                 }
             }
 
-            uq = trackPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-            ShuffleStringListInPlace(uq);
+            if (trackPaths.Count == 0)
+            {
+                AppendOptimisticWebGlThemeAudioUrls(m, trackPaths);
+            }
+
+            DeduplicateAndRotateWebGlTrackList(m, trackPaths);
+        }
+
+        /// <summary>
+        /// WebGL : si HEAD a tout échoué, on injecte des chemins « canoniques » (même logique que l’éditeur) pour tenter le GET audio au chargement.
+        /// </summary>
+        private static void AppendOptimisticWebGlThemeAudioUrls(string modeId, List<string> trackPaths)
+        {
+            if (trackPaths == null)
+            {
+                return;
+            }
+
+            string m = (modeId ?? "quiz").Trim();
+            string[] rels =
+            {
+                "Theme/" + m + "/ambient_gameplay_02.wav",
+                "Theme/" + m + "/ambient_gameplay_01.wav",
+                "Theme/Gameplay/" + m + "/ambient_gameplay_02.wav",
+                "Theme/Gameplay/" + m + "/ambient_gameplay_01.wav",
+                "Theme/" + m + "/track01.ogg",
+                "Theme/" + m + "/track01.mp3",
+                "Theme/" + m + "/track02.ogg",
+                "Theme/" + m + "/track02.mp3",
+                "Theme/" + m + "/music.ogg",
+                "Theme/" + m + "/music.mp3"
+            };
+
+            for (int i = 0; i < rels.Length; i++)
+            {
+                trackPaths.Add(StreamingAssetsUrl.UrlForRelativePath(rels[i]));
+            }
+        }
+
+        /// <summary>
+        /// WebGL : pas de mélange aléatoire (casualise la détection Éditeur vs navigateur) ; rotation stable par mode.
+        /// </summary>
+        private static void DeduplicateAndRotateWebGlTrackList(string modeId, List<string> trackPaths)
+        {
+            if (trackPaths == null || trackPaths.Count == 0)
+            {
+                return;
+            }
+
+            List<string> uq = trackPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            RotateStringListForMode(modeId, uq);
             trackPaths.Clear();
             trackPaths.AddRange(uq);
-        }
-
-        private static void ShuffleStringListInPlace(List<string> list)
-        {
-            if (list == null || list.Count < 2)
-            {
-                return;
-            }
-
-            for (int i = list.Count - 1; i > 0; i--)
-            {
-                int j = UnityEngine.Random.Range(0, i + 1);
-                (list[i], list[j]) = (list[j], list[i]);
-            }
-        }
-
-        private static void ShuffleClipListInPlace(List<AudioClip> list)
-        {
-            if (list == null || list.Count < 2)
-            {
-                return;
-            }
-
-            for (int i = list.Count - 1; i > 0; i--)
-            {
-                int j = UnityEngine.Random.Range(0, i + 1);
-                (list[i], list[j]) = (list[j], list[i]);
-            }
         }
 
         /// <summary>

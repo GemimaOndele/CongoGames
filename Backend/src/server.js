@@ -226,7 +226,7 @@ code{background:#f0f0f0;padding:2px 6px;border-radius:4px}a{color:#0a6}</style><
 <li><a href="/health"><code>/health</code></a> — ports HTTP / WS + TTS</li>
 <li><a href="/tts/status"><code>/tts/status</code></a> — TTS (Edge gratuit, OpenAI, ElevenLabs)</li>
 <li><code>POST /tts</code> — formulaire <code>text=…</code> (Unity)</li>
-<li><code>POST /events/chat</code>, <code>POST /events/gift</code>, <code>POST /question/generate</code></li>
+<li><code>POST /events/chat</code>, <code>POST /events/gift</code>, <code>POST /events/metric</code>, <code>POST /question/generate</code></li>
 </ul>
 <p><strong>Ports actuels :</strong> HTTP <code>${boundHttpPort}</code>, WebSocket <code>${activeWsPort}</code></p>
 </body></html>`);
@@ -395,6 +395,19 @@ app.post("/events/chat", (req, res) => {
   res.json({ ok: true });
 });
 
+app.post("/events/metric", (req, res) => {
+  const action = typeof req.body?.action === "string" && req.body.action.trim() ? req.body.action.trim() : "pulse";
+  const value = Number(req.body?.value);
+  const payload = {
+    action,
+    value: Number.isFinite(value) ? value : 0,
+    source: typeof req.body?.source === "string" ? req.body.source.trim() : "http"
+  };
+  pushEvent(MessageType.METRIC, payload);
+  broadcast(MessageType.METRIC, payload);
+  res.json({ ok: true, payload });
+});
+
 app.post("/events/gift", (req, res) => {
   const { user, giftName } = req.body;
   if (!user || !giftName) return res.status(400).json({ ok: false, error: "user and giftName required" });
@@ -489,4 +502,10 @@ tiktokBridge.on("gift", (payload) => {
   };
   pushEvent(MessageType.GIFT, enriched);
   broadcast(MessageType.GIFT, enriched);
+});
+
+tiktokBridge.on("metric", (payload) => {
+  const body = payload && typeof payload === "object" ? payload : {};
+  pushEvent(MessageType.METRIC, body);
+  broadcast(MessageType.METRIC, body);
 });

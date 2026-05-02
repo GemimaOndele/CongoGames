@@ -390,8 +390,9 @@ namespace CongoGames.AI
         {
             yield return WebAudioGestureGate.CoWaitForUnlock();
 
+            // « speaking » = file active (IsSpeakingNow). Le duck broadcast ne doit pas couper la musique
+            // pendant l’attente HTTP/TTS — seulement pendant la lecture audio réelle (sinon la BGM reste à 0 trop longtemps).
             speaking = true;
-            SetSpeakingVisual(true);
             if (logHostLinesToConsole)
             {
                 Debug.Log("CongoGames TTS queue: démarrage");
@@ -420,10 +421,12 @@ namespace CongoGames.AI
                     string key = "tts:" + line.GetHashCode();
                     if (cache != null && cache.TryGetClip(key, out AudioClip cached))
                     {
+                        SetSpeakingVisual(true);
                         audioSource.clip = cached;
                         audioSource.Play();
                         playedAudio = true;
                         yield return new WaitWhile(() => audioSource.isPlaying);
+                        SetSpeakingVisual(false);
                     }
                     else
                     {
@@ -438,10 +441,12 @@ namespace CongoGames.AI
                                 cache.SetClip(key, loaded);
                             }
 
+                            SetSpeakingVisual(true);
                             audioSource.clip = loaded;
                             audioSource.Play();
                             playedAudio = true;
                             yield return new WaitWhile(() => audioSource.isPlaying);
+                            SetSpeakingVisual(false);
                         }
                         else if (!string.IsNullOrEmpty(err))
                         {
@@ -452,7 +457,9 @@ namespace CongoGames.AI
 
                 if (!playedAudio)
                 {
+                    SetSpeakingVisual(true);
                     yield return PlayFallbackBeep(line.Length);
+                    SetSpeakingVisual(false);
                 }
             }
 

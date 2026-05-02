@@ -22,6 +22,7 @@ namespace CongoGames.UI
         private string nameDraft = "";
         private bool soloDraft = true;
         private bool useVirtual3dDraft = true;
+        private bool mix3dWithVideoDraft;
         private string providerDraft = "invité";
         private string avatarUrlDraft = "";
         private bool adminDraft;
@@ -108,6 +109,7 @@ namespace CongoGames.UI
             oauthFacebookDraft = PlayerProfileStore.OAuthUrlFacebook;
             demoProviderIndex = ProviderIndexFromValue(providerDraft);
             useVirtual3dDraft = PlayerPrefs.GetInt(PresentationConfig.PrefsUseVirtual3D, 1) != 0;
+            mix3dWithVideoDraft = PlayerPrefs.GetInt(PresentationConfig.PrefsMix3DWithVideo, 1) != 0;
             StartCoroutine(CoLoadAuthProviders());
             GameModeManager gmm = GameModeManager.Instance;
             if (gmm != null)
@@ -239,12 +241,16 @@ namespace CongoGames.UI
             GUILayout.Space(12f);
             useVirtual3dDraft = GUILayout.Toggle(
                 useVirtual3dDraft,
-                "Fond 3D plateau TV (sinon vidéos Theme/).");
+                "Fond 3D plateau TV (si pas de vidéo Theme, ou en complément).");
+            mix3dWithVideoDraft = GUILayout.Toggle(
+                mix3dWithVideoDraft,
+                "Alterner 3D ↔ vidéos Theme (recommandé : tous les MP4 + variantes 3D défilent).");
             GUILayout.Label(
-                "Mix auto: alterne vidéo et 3D si les deux sont disponibles.");
-            if (GUILayout.Button("Appliquer affichage 3D", GUILayout.Height(UiButtonHeight)))
+                "Si désactivé : seules les vidéos Theme tournent ; le plateau 3D ne s’affiche pas tant qu’il y a des MP4.");
+            if (GUILayout.Button("Appliquer affichage 3D / vidéo", GUILayout.Height(UiButtonHeight)))
             {
                 PlayerPrefs.SetInt(PresentationConfig.PrefsUseVirtual3D, useVirtual3dDraft ? 1 : 0);
+                PlayerPrefs.SetInt(PresentationConfig.PrefsMix3DWithVideo, mix3dWithVideoDraft ? 1 : 0);
                 PlayerPrefs.Save();
                 PresentationConfig.UseVirtual3DShowStage = useVirtual3dDraft;
                 string modeId = "quiz";

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using CongoGames.Core;
 using CongoGames.AI;
+using CongoGames.Audio;
 using CongoGames.UI;
 
 namespace CongoGames.Network
@@ -72,9 +74,25 @@ namespace CongoGames.Network
         public long SessionLikeCount => sessionLikeCount;
         private long sessionLikeCount;
 
+        /// <summary>
+        /// Les callbacks async du <see cref="ClientWebSocket"/> peuvent s’exécuter hors du thread Unity ;
+        /// on met donc les JSON en file pour les traiter dans <see cref="Update"/> (évite GC handles invalides / états incohérents).
+        /// </summary>
+        private readonly ConcurrentQueue<string> wsMessageQueue = new ConcurrentQueue<string>();
+
+        private volatile bool wsShutdownRequested;
+
         public void BindQuestionUI(QuestionUI ui)
         {
             questionUI = ui;
+        }
+
+        /// <summary>
+        /// Fermeture immédiate (utilisé par l’éditeur avant recompilation / sortie du Play Mode pour éviter des GCHandle sur <see cref="ClientWebSocket"/>).
+        /// </summary>
+        public void ForceDisconnectBeforeScriptReload()
+        {
+            ShutdownSocketAndTokens();
         }
 
         private void Awake()
@@ -88,6 +106,7 @@ namespace CongoGames.Network
 
         private async void Start()
         {
+            wsShutdownRequested = false;
             cts = new CancellationTokenSource();
             if (questionUI == null) questionUI = FindAnyObjectByType<QuestionUI>();
             try
@@ -99,6 +118,35 @@ namespace CongoGames.Network
                 lastError = ex.Message;
                 Debug.LogError("LiveEventClient start failed: " + ex.Message);
             }
+        }
+
+        private void Update()
+        {
+            const int maxPerFrame = 96;
+            int n = 0;
+            while (n < maxPerFrame && wsMessageQueue.TryDequeue(out string json))
+            {
+                if (wsShutdownRequested || string.IsNullOrEmpty(json))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    HandleRawMessage(json);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
+
+                n++;
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            ShutdownSocketAndTokens();
         }
 
         private async Task ConnectAndListen(CancellationToken token)
@@ -115,9 +163,10 @@ namespace CongoGames.Network
             {
                 string target = targets[i];
                 lastTarget = target;
+                ClientWebSocket candidate = null;
                 try
                 {
-                    var candidate = new ClientWebSocket();
+                    candidate = new ClientWebSocket();
                     await candidate.ConnectAsync(new Uri(target), token);
                     if (logWsConnectionToConsole)
                     {
@@ -130,6 +179,23 @@ namespace CongoGames.Network
                 catch (Exception ex)
                 {
                     lastError = ex.Message;
+                    try
+                    {
+                        candidate?.Abort();
+                    }
+                    catch
+                    {
+                        // ignoré
+                    }
+
+                    try
+                    {
+                        candidate?.Dispose();
+                    }
+                    catch
+                    {
+                        // ignoré
+                    }
                 }
             }
 
@@ -205,7 +271,10 @@ namespace CongoGames.Network
                     WebSocketReceiveResult result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
                     if (result == null || result.Count <= 0) continue;
                     string json = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    HandleRawMessage(json);
+                    if (!wsShutdownRequested && json.Length > 0)
+                    {
+                        wsMessageQueue.Enqueue(json);
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -224,6 +293,11 @@ namespace CongoGames.Network
 
         private void HandleRawMessage(string json)
         {
+            if (!isActiveAndEnabled || wsShutdownRequested)
+            {
+                return;
+            }
+
             LiveMessage msg = JsonUtility.FromJson<LiveMessage>(json);
             if (msg == null || string.IsNullOrEmpty(msg.type)) return;
             lastEventType = msg.type;
@@ -258,6 +332,71 @@ namespace CongoGames.Network
             if (msg.type == "question")
             {
                 HandleQuestion(msg);
+                return;
+            }
+
+            if (string.Equals(msg.type, "battle", StringComparison.OrdinalIgnoreCase))
+            {
+                GameAudioManager.Instance?.OnBattleStart();
+                return;
+            }
+
+            if (string.Equals(msg.type, "metric", StringComparison.OrdinalIgnoreCase))
+            {
+                HandleMetric(msg);
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(msg.gameMode))
+            {
+                TryAudioHintForGameMode(msg.gameMode);
+            }
+        }
+
+        private static void HandleMetric(LiveMessage msg)
+        {
+            string action = msg.action ?? "";
+            GameAudioManager.Instance?.OnWsMetric(action, msg.value);
+        }
+
+        /// <summary>Rappels SFX quand le backend attache <see cref="LiveMessage.gameMode"/> à un message non classique (chat/gift/system).</summary>
+        private static void TryAudioHintForGameMode(string rawMode)
+        {
+            string m = (rawMode ?? "").Trim().ToLowerInvariant();
+            if (m.Length == 0)
+            {
+                return;
+            }
+
+            switch (m)
+            {
+                case "quiz":
+                    GameAudioManager.Instance?.OnQuizStart();
+                    break;
+                case "word-scramble":
+                    GameAudioManager.Instance?.OnWordScrambleStart();
+                    break;
+                case "crossword-lite":
+                    GameAudioManager.Instance?.OnCrosswordStart();
+                    break;
+                case "mystery-word":
+                    GameAudioManager.Instance?.OnMysteryWordStart();
+                    break;
+                case "memory":
+                    GameAudioManager.Instance?.OnMemoryStart();
+                    break;
+                case "speed-chrono":
+                    GameAudioManager.Instance?.OnSpeedChronoStart();
+                    break;
+                case "semantic":
+                    GameAudioManager.Instance?.OnSemanticStart();
+                    break;
+                case "image-guess":
+                    GameAudioManager.Instance?.OnImageToWordStart();
+                    break;
+                case "blind-test":
+                    GameAudioManager.Instance?.OnBlindTestRound();
+                    break;
             }
         }
 
@@ -280,7 +419,12 @@ namespace CongoGames.Network
 
             if (isCorrect)
             {
+                GameAudioManager.Instance?.OnLiveCorrectAnswer();
                 AIHostManager.Instance?.Speak(msg.user + " bonne reponse.");
+            }
+            else
+            {
+                GameAudioManager.Instance?.OnLiveWrongAnswer();
             }
         }
 
@@ -291,6 +435,8 @@ namespace CongoGames.Network
             {
                 ScoreManager.Instance.UpdatePlayerAvatar(msg.user, msg.avatarUrl ?? msg.profilePictureUrl ?? "");
             }
+
+            GameAudioManager.Instance?.OnGiftReceived();
 
             string modeFromGift = TikTokGiftModeRegistry.ResolveGameSwitchMode(msg);
             if (!string.IsNullOrEmpty(modeFromGift))
@@ -371,6 +517,11 @@ namespace CongoGames.Network
             {
                 AIHostManager.Instance.ApplyLiveServerHints(msg.httpApiBase, msg.httpPort);
             }
+
+            if (!string.IsNullOrEmpty(msg.gameMode))
+            {
+                TryAudioHintForGameMode(msg.gameMode);
+            }
         }
 
         private void OnDisable()
@@ -385,6 +536,9 @@ namespace CongoGames.Network
 
         private void ShutdownSocketAndTokens()
         {
+            wsShutdownRequested = true;
+            while (wsMessageQueue.TryDequeue(out _)) { }
+
             if (cts != null)
             {
                 try { cts.Cancel(); } catch { }

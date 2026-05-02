@@ -116,11 +116,27 @@ namespace CongoGames.Presentation
                 popSource.volume = volume * duckMultiplier;
             }
 
-            if (blindLoop != null)
+            ApplyBlindLoopVolume();
+        }
+
+        /// <summary>
+        /// L'extrait blind ne suit pas le duck broadcast (même bus que les SFX) : sinon la voix ou un état « speaking »
+        /// peut laisser le volume à ~5–72 % ou masquer l'écoute alors que le fond Theme est déjà coupé.
+        /// </summary>
+        private void ApplyBlindLoopVolume()
+        {
+            if (blindLoop == null)
             {
-                // Bus blind un peu plus présent (extrait 30–60 s à écouter).
-                blindLoop.volume = volume * 0.72f * duckMultiplier;
+                return;
             }
+
+            if (blindLoop.clip == null)
+            {
+                blindLoop.volume = 0f;
+                return;
+            }
+
+            blindLoop.volume = Mathf.Clamp01(volume) * 0.88f;
         }
 
         public void PlayTap()
@@ -185,14 +201,15 @@ namespace CongoGames.Presentation
                 Destroy(blindLoopClip);
                 blindLoopClip = null;
             }
+
+            RefreshSfxVolumes();
         }
 
         private IEnumerator CoLoadAndPlayBlindMusic(int seed, string streamingFileBase, string remoteUrl)
         {
-            // Garde-fou: la musique d'écoute blind (ou indice) ne démarre jamais pendant que l'host TTS parle.
-            // Le chargement démarre, mais on bloque le Play (et l'impression "débit superposé") jusqu'au silence host.
-            float blockUntil = Time.unscaledTime + 90f;
-            while (AIHostManager.Instance != null && AIHostManager.Instance.IsSpeakingNow && Time.unscaledTime < blockUntil)
+            // Ne pas bloquer sur IsSpeakingNow (reste souvent vrai : file TTS, flags). La phase écoute démarre après CoWaitHostSilence.
+            float cap = Time.unscaledTime + 0.45f;
+            while (AIHostManager.Instance != null && AIHostManager.Instance.IsSpeakingNow && Time.unscaledTime < cap)
             {
                 yield return null;
             }
@@ -344,15 +361,10 @@ namespace CongoGames.Presentation
                 loaded.name = "blind_fallback_or_loaded";
             }
 
-            blockUntil = Time.unscaledTime + 90f;
-            while (AIHostManager.Instance != null && AIHostManager.Instance.IsSpeakingNow && Time.unscaledTime < blockUntil)
-            {
-                yield return null;
-            }
-
             blindLoopClip = loaded;
             blindLoop.clip = blindLoopClip;
             blindLoop.Play();
+            RefreshSfxVolumes();
             blindMusicCo = null;
         }
 

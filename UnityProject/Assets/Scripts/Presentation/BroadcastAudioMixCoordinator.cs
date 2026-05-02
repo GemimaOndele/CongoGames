@@ -1,5 +1,6 @@
 using UnityEngine;
 using CongoGames.AI;
+using CongoGames.Audio;
 
 namespace CongoGames.Presentation
 {
@@ -10,6 +11,7 @@ namespace CongoGames.Presentation
     [DefaultExecutionOrder(-80)]
     public class BroadcastAudioMixCoordinator : MonoBehaviour
     {
+        [Tooltip("0 = silence total pendant la voix IA. Un léger niveau (ex. 0.08) garde une ambiance si besoin.")]
         [SerializeField] [Range(0f, 1f)] private float musicLevelWhileSpeaking = 0f;
         [SerializeField] [Range(0.05f, 1f)] private float sfxLevelWhileSpeaking = 0.72f;
 
@@ -29,6 +31,7 @@ namespace CongoGames.Presentation
             float m = speaking ? musicLevelWhileSpeaking : 1f;
             float s = speaking ? sfxLevelWhileSpeaking : 1f;
             ThemeMusicPlayer.Instance?.SetBroadcastDuckMultiplier(m);
+            GameAudioManager.Instance?.SetBroadcastDuckMultiplier(m);
             GameSfxHub.Instance?.SetBroadcastDuckMultiplier(s);
         }
     }

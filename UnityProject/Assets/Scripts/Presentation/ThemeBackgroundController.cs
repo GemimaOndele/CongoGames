@@ -115,34 +115,30 @@ namespace CongoGames.Presentation
 
             bool hasVideo = validCandidates.Count > 0;
             bool use3D = PresentationConfig.UseVirtual3DShowStage && virtual3D != null;
+            // Défaut 1 : alterner vidéos Theme + plateau 3D (sinon les seuls MP4 masquent le 3D — plainte fréquente).
+            bool mix3DWithVideo = PlayerPrefs.GetInt(PresentationConfig.PrefsMix3DWithVideo, 1) != 0;
 
-            // Comportement prod forcé : si fond 3D activé et vidéos présentes, on alterne automatiquement.
-            if (use3D && hasVideo)
-            {
-                debugPhase = "mix-3d-video";
-                alternateMixCo = StartCoroutine(CoAlternateVideoAndVirtual3D(id, validCandidates));
-                yield break;
-            }
-
-            if (use3D)
-            {
-                debugPhase = "3d-only";
-                yield return CoStartSyntheticOrSlides(id);
-                yield break;
-            }
-
+            // Priorité aux vidéos Theme / remote : avec mix=1 on enchaîne aussi le 3D (voir CoAlternateVideoAndVirtual3D).
             if (hasVideo)
             {
+                if (use3D && mix3DWithVideo)
+                {
+                    debugPhase = "mix-3d-video";
+                    alternateMixCo = StartCoroutine(CoAlternateVideoAndVirtual3D(id, validCandidates));
+                    yield break;
+                }
+
+                // Index de rotation géré uniquement dans CoCycleVideos (évite de sauter urls[0] au premier passage).
                 int idx = 0;
                 if (VideoCycleIndexByMode.TryGetValue(id, out int prev))
                 {
                     idx = prev % validCandidates.Count;
                 }
 
-                VideoCycleIndexByMode[id] = (idx + 1) % validCandidates.Count;
                 debugVideoIndex = idx;
                 if (validCandidates.Count == 1)
                 {
+                    VideoCycleIndexByMode[id] = (idx + 1) % validCandidates.Count;
                     debugPhase = "video-loop";
                     TryPlayVideoUrl(validCandidates[0], muteVideoSound, true);
                 }
@@ -152,6 +148,13 @@ namespace CongoGames.Presentation
                     videoCycleCo = StartCoroutine(CoCycleVideos(id, validCandidates));
                 }
 
+                yield break;
+            }
+
+            if (use3D)
+            {
+                debugPhase = "3d-only";
+                yield return CoStartSyntheticOrSlides(id);
                 yield break;
             }
 
@@ -175,8 +178,8 @@ namespace CongoGames.Presentation
                 }
             }
 
-            IReadOnlyList<string> candidates = ThemeModeCatalog.BuildLocalBackgroundCandidates(id);
-            foreach (string path in candidates)
+            IReadOnlyList<string> catalogPaths = ThemeModeCatalog.BuildLocalBackgroundCandidates(id);
+            foreach (string path in catalogPaths)
             {
                 if (StreamingAssetsUrl.IsWebGlData)
                 {
@@ -196,15 +199,39 @@ namespace CongoGames.Presentation
                     }
                 }
             }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // Beaucoup de serveurs de dev (npm, etc.) répondent mal à HEAD/Range : liste vide → on tente quand même les URLs du catalogue.
+            if (StreamingAssetsUrl.IsWebGlData && validCandidates.Count == 0)
+            {
+                foreach (string path in catalogPaths)
+                {
+                    string u = StreamingAssetsUrl.ToRequestUrl(path);
+                    if (!string.IsNullOrEmpty(u))
+                    {
+                        validCandidates.Add(u);
+                    }
+                }
+
+                List<string> uq = validCandidates.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                validCandidates.Clear();
+                validCandidates.AddRange(uq);
+            }
+#endif
         }
 
-        /// <summary>Plateau 3D pendant <see cref="virtualThemeCycleSeconds"/>, puis vidéo pendant <see cref="videoCycleSeconds"/>, en boucle.</summary>
+        /// <summary>
+        /// Alterne plateau 3D (variantes <c>mode</c> / <c>mode_alt</c>) et chaque vidéo Theme, en boucle.
+        /// </summary>
         private IEnumerator CoAlternateVideoAndVirtual3D(string modeId, List<string> urls)
         {
             if (urls == null || urls.Count == 0 || virtual3D == null || raw == null)
             {
                 yield break;
             }
+
+            TryGetVirtualThemeCycleIndices(modeId, out int self3dIdx, out int partner3dIdx);
+            bool alternate3DVariant = false;
 
             bool phase3D = true;
             while (!string.IsNullOrEmpty(activeModeId) && string.Equals(activeModeId, modeId, StringComparison.Ordinal))
@@ -214,7 +241,15 @@ namespace CongoGames.Presentation
                     debugPhase = "mix:3d";
                     ReleaseVideoPlayerAndRenderTexture();
                     synthetic?.Stop();
-                    virtual3D.RebuildForMode(modeId, raw);
+                    string mode3d = modeId;
+                    if (self3dIdx >= 0 && partner3dIdx >= 0 && self3dIdx != partner3dIdx)
+                    {
+                        int pick = alternate3DVariant ? partner3dIdx : self3dIdx;
+                        mode3d = VirtualCycleModes[pick];
+                        alternate3DVariant = !alternate3DVariant;
+                    }
+
+                    virtual3D.RebuildForMode(mode3d, raw);
                     float wait3d = Mathf.Max(minVirtualSwitchSeconds, virtualThemeCycleSeconds);
                     yield return new WaitForSecondsRealtime(wait3d);
                     if (!string.Equals(activeModeId, modeId, StringComparison.Ordinal))
@@ -435,7 +470,8 @@ namespace CongoGames.Presentation
                     idx = Mathf.Abs(known) % urls.Count;
                 }
 
-                TryPlayVideoUrl(urls[idx], muteVideoSound, false);
+                // Boucler chaque clip jusqu’au passage suivant (évite écran noir si la vidéo est plus courte que l’intervalle).
+                TryPlayVideoUrl(urls[idx], muteVideoSound, true);
                 VideoCycleIndexByMode[modeId] = (idx + 1) % urls.Count;
                 debugVideoIndex = idx;
                 debugPhase = "video-cycle";
@@ -465,16 +501,13 @@ namespace CongoGames.Presentation
 
         private IEnumerator CoCycleVirtualThemes(string modeId)
         {
-            int idx = 0;
-            for (int i = 0; i < VirtualCycleModes.Length; i++)
+            // Alterne uniquement ce mode et son voisin *_alt (pas toute la liste des mini-jeux).
+            if (!TryGetVirtualThemeCycleIndices(modeId, out int selfIdx, out int partnerIdx))
             {
-                if (string.Equals(VirtualCycleModes[i], modeId, StringComparison.OrdinalIgnoreCase))
-                {
-                    idx = i;
-                    break;
-                }
+                yield break;
             }
 
+            bool usePartner = false;
             while (!string.IsNullOrEmpty(activeModeId) && string.Equals(activeModeId, modeId, StringComparison.Ordinal))
             {
                 yield return new WaitForSecondsRealtime(Mathf.Max(10f, virtualThemeCycleSeconds));
@@ -483,9 +516,47 @@ namespace CongoGames.Presentation
                     yield break;
                 }
 
-                idx = (idx + 1) % VirtualCycleModes.Length;
-                virtual3D.RebuildForMode(VirtualCycleModes[idx], raw);
+                if (selfIdx == partnerIdx)
+                {
+                    continue;
+                }
+
+                usePartner = !usePartner;
+                int pick = usePartner ? partnerIdx : selfIdx;
+                virtual3D.RebuildForMode(VirtualCycleModes[pick], raw);
             }
+        }
+
+        /// <summary>Couple (mode, mode_alt) dans <see cref="VirtualCycleModes"/> ; sinon le même index deux fois.</summary>
+        private static bool TryGetVirtualThemeCycleIndices(string modeId, out int selfIdx, out int partnerIdx)
+        {
+            selfIdx = -1;
+            partnerIdx = -1;
+            for (int i = 0; i < VirtualCycleModes.Length; i++)
+            {
+                if (!string.Equals(VirtualCycleModes[i], modeId, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                selfIdx = i;
+                if (i % 2 == 0 && i + 1 < VirtualCycleModes.Length)
+                {
+                    partnerIdx = i + 1;
+                }
+                else if (i % 2 == 1)
+                {
+                    partnerIdx = i - 1;
+                }
+                else
+                {
+                    partnerIdx = i;
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         private void OnVideoPrepared(VideoPlayer source)

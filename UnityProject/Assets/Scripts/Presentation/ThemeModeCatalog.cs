@@ -47,6 +47,12 @@ namespace CongoGames.Presentation
                     list.Add(StreamingAssetsUrl.UrlForRelativePath("Theme/" + id + "/" + name));
                 }
 
+                // Même convention que l’éditeur : assets « gameplay » par mode (nouveaux fonds animés).
+                foreach (string name in BackgroundVideoFileNames)
+                {
+                    list.Add(StreamingAssetsUrl.UrlForRelativePath("Theme/Gameplay/" + id + "/" + name));
+                }
+
                 foreach (string name in BackgroundVideoFileNames)
                 {
                     list.Add(StreamingAssetsUrl.UrlForRelativePath("Theme/_dev_import/" + id + "/" + name));
@@ -92,6 +98,7 @@ namespace CongoGames.Presentation
 
             // Fallback intelligent desktop: accepte aussi toute vidéo du dossier (pas seulement background/loop/show).
             AddDynamicFolderVideos(list, Path.Combine(root, id));
+            AddDynamicFolderVideos(list, Path.Combine(root, "Gameplay", id));
             AddDynamicFolderVideos(list, devImport);
             AddDynamicFolderVideos(list, root);
             AddDynamicFolderVideos(list, globalFolder);

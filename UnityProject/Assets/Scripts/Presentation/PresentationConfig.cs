@@ -21,8 +21,11 @@ namespace CongoGames.Presentation
         public static PresentationQualityTier Tier { get; set; } = PresentationQualityTier.Cinematic;
 
         /// <summary>Scène 3D « plateau TV » (Render Texture → fond) au lieu du seul fond 2D / vidéo.</summary>
-        /// <remarks>Défaut aligné PlayerPrefs (1) : 3D actif ; avec des MP4 Theme/, alternance 3D ↔ vidéo.</remarks>
+        /// <remarks>Avec vidéos Theme + <see cref="PrefsMix3DWithVideo"/> à 1 (défaut), le fond alterne MP4 et plateau 3D.</remarks>
         public static bool UseVirtual3DShowStage { get; set; } = true;
+
+        /// <summary>PlayerPrefs « CongoMix3DWithVideo » : 1 = alterner plateau 3D et vidéos Theme quand les deux existent (défaut recommandé).</summary>
+        public const string PrefsMix3DWithVideo = "CongoMix3DWithVideo";
 
 
         public static int VirtualStageWidth => Tier switch
@@ -52,7 +55,13 @@ namespace CongoGames.Presentation
             int v = PlayerPrefs.GetInt(PrefsPresentQuality, (int)PresentationQualityTier.Cinematic);
             Tier = (PresentationQualityTier)Mathf.Clamp(v, 0, 2);
 
-            // Défaut 1 : plateau 3D actif ; si des vidéos Theme/ existent, ThemeBackgroundController alterne 3D et MP4.
+            // Première install : activer l’alternance vidéo ↔ 3D (anciennes builds sans clé utilisaient implicitement « vidéo seule »).
+            if (!PlayerPrefs.HasKey(PrefsMix3DWithVideo))
+            {
+                PlayerPrefs.SetInt(PrefsMix3DWithVideo, 1);
+                PlayerPrefs.Save();
+            }
+
             UseVirtual3DShowStage = PlayerPrefs.GetInt(PrefsUseVirtual3D, 1) != 0;
         }
     }

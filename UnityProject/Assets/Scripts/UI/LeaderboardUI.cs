@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using CongoGames.Audio;
 using CongoGames.Core;
 using CongoGames.Network;
 
@@ -312,6 +313,7 @@ namespace CongoGames.UI
                 if (!previousTop3.Contains(u) && i < rows.Count)
                 {
                     StartPulse(rows[i]);
+                    GameAudioManager.Instance?.OnLeaderboardSpotlight();
                 }
             }
 

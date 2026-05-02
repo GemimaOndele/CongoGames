@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using CongoGames.AI;
+using CongoGames.Audio;
 using CongoGames.Network;
 using CongoGames.Perf;
 using CongoGames.Presentation;
@@ -42,6 +43,7 @@ namespace CongoGames.Core
             GameObject musicHost = new GameObject("ThemeMusic");
             musicHost.transform.SetParent(services.transform, false);
             musicHost.AddComponent<ThemeMusicPlayer>();
+            musicHost.AddComponent<GameAudioManager>();
 
             services.AddComponent<GameSfxHub>();
 
@@ -401,6 +403,7 @@ namespace CongoGames.Core
 
             GameObject host = new GameObject("ThemeMusic");
             host.AddComponent<ThemeMusicPlayer>();
+            host.AddComponent<GameAudioManager>();
             if (Object.FindAnyObjectByType<AudioListener>() == null)
             {
                 new GameObject("CongoGames_AudioListener").AddComponent<AudioListener>();
