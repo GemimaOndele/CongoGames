@@ -322,14 +322,6 @@ namespace CongoGames.Audio
                 return false;
             }
 
-            if (string.Equals(id, "blind-test", System.StringComparison.Ordinal)
-                || string.Equals(id, "image-guess", System.StringComparison.Ordinal))
-            {
-                StopGlobalBgmCarousel();
-                StopInspectorBgm(0.35f);
-                StopOverlayBgm(0.35f);
-                return false;
-            }
 
             if (ThemeMusicPlayer.ShouldDeferDedicatedBgmForJeuxPlaylist())
             {
@@ -366,12 +358,6 @@ namespace CongoGames.Audio
             }
 
             string id = string.IsNullOrEmpty(modeId) ? "quiz" : modeId.Trim().ToLowerInvariant();
-            if (string.Equals(id, "blind-test", System.StringComparison.Ordinal)
-                || string.Equals(id, "image-guess", System.StringComparison.Ordinal))
-            {
-                StopOverlayImmediately();
-                return;
-            }
 
             if (overlayFadeCo != null)
             {
@@ -885,6 +871,7 @@ namespace CongoGames.Audio
                 case "mystery-word": return mysteryWordTheme;
                 case "memory": return memoryTheme;
                 case "speed-chrono": return speedChronoTheme;
+                case "blind-test": return blindTestTheme;
                 case "image-guess": return imageToWordTheme;
                 case "lobby":
                 case "menu":
@@ -946,3 +933,5 @@ namespace CongoGames.Audio
         }
     }
 }
+
+
