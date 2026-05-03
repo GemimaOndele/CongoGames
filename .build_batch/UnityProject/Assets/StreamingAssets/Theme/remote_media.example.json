@@ -1,0 +1,64 @@
+{
+  "entries": [
+    {
+      "modeId": "_global",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    },
+    {
+      "modeId": "quiz",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    },
+    {
+      "modeId": "semantic",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    },
+    {
+      "modeId": "word-scramble",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    },
+    {
+      "modeId": "crossword-lite",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    },
+    {
+      "modeId": "blind-test",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    },
+    {
+      "modeId": "mystery-word",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    },
+    {
+      "modeId": "memory",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    },
+    {
+      "modeId": "speed-chrono",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    },
+    {
+      "modeId": "image-guess",
+      "musicUrl": "",
+      "bottomVideoUrl": "",
+      "backgroundVideoUrl": ""
+    }
+  ]
+}

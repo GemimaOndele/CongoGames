@@ -1,0 +1,31 @@
+Devine l’image — photos réelles du Congo (PNG ou JPEG)
+=====================================================
+
+Dossier : UnityProject/Assets/StreamingAssets/Theme/ImageGuess/
+
+Import en lot (Wikimedia Commons + crédits) :
+  npm run dataset:image-guess
+  → lit scripts/data/image_guess_commons.manifest.json, télécharge les fichiers, remplit ATTRIBUTION.json et ATTRIBUTION.md.
+
+Vous pouvez aussi placer des fichiers manuellement ici :
+
+Noms attendus par la banque (sans extension ; le code essaie .png puis .jpg puis .jpeg) :
+
+  capitale          (vue de la capitale du pays sur le fleuve — photo libre de droits / source autorisée)
+  pointe_noire
+  fleuve_congo
+  gorille
+  drapeau
+  parc              (ex. parc / forêt du nord)
+  ocean             (côte ou océan, optionnel)
+  departement_pool  (carte ou symbole, optionnel)
+  likouala
+  sangha
+  ndombolo          (scène de fête / danse, droits OK)
+  kintele           (stade / aire des jeux — ex. Wikimedia sous licence)
+  aeroport          (aéroport international, ou bzv.png)
+
+Si un fichier manque : le jeu affiche un drapeau tricolore (vert-jaune-rouge) en attente — plus de paysage généré.
+Pour un vrai quiz visuel, ajoute des photos : sites touristiques, personnalités historiques, cartes, culture (licence et crédits respectés).
+
+Après ajout ou modification, relance le jeu (Play) pour recharger.

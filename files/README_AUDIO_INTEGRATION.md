@@ -2,6 +2,8 @@
 
 Ce fichier est le **résultat consolidé** de la spec audio (conversations Claude + alignement code). Les copies `files/GameAudioManager.cs` et `*_AudioPatch.cs` servent de **référence** ; l’exécution se fait via `UnityProject/Assets/Scripts/Audio/GameAudioManager.cs` (`CongoGames.Audio`).
 
+**Télécharger des pistes / vidéos libres et les placer dans Unity :** **`docs/AUDIO_VIDEO_DOWNLOAD_GUIDE.md`** (détail) ; variante courte + script batch **`newclaudeai/QUICK_START_DOWNLOAD.md`**. Vérifier les doublons : `pwsh -File tools/Verify-AudioFiles.ps1`. **`claudeai/`** renvoie vers `docs/` ; **`newclaudeai/`** = quick start + `download-and-organize-audio-video.bat`.
+
 ## État d’intégration (projet réel `UnityProject/`)
 
 Ces fichiers (`GameAudioManager.cs` à la racine de `files/`, patches `*_AudioPatch.cs`) sont une **référence** générée par Claude. **Ne remplacez pas** le script du dépôt par la copie `files/GameAudioManager.cs` (namespace global, API différente) : le code actif est :

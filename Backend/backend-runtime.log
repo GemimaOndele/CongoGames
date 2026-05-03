@@ -1,0 +1,10 @@
+
+> congogames-backend@0.1.0 start
+> node src/server.js
+
+(node:38076) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+HTTP server on http://localhost:3000
+WebSocket server on ws://localhost:8081
+Requested WS_PORT 8080 was busy, fallback to 8081.
+TikTok bridge disabled by TIKTOK_BRIDGE_ENABLED=false.

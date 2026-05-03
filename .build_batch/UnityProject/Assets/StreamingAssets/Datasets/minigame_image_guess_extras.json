@@ -1,0 +1,1464 @@
+{
+  "items": [
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 1 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "CARINE FLEUR EDOUARE",
+      "styleSeed": 6001,
+      "streamingFileBase": "kintele",
+      "altAnswerKey": "CARINE FLEUR EDOUARE",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 1. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: KIKONGO. Titre largement diffusé sur YouTube sous « KILOMBO CONGO - CARINE FLEUR EDOUARE »; artiste associée au répertoire chrétien congolais. Sources: YouTube(kCTQhEqIQl4), YouTube(sKKANow_vPg), Zenga Mambu(2016/06/27/carine-fleur-edouard-ba-mimbikudi) Sync meta: CARINE FLEUR EDOUARE - KILOMBO CONGO | type:artist | track:track01 [critical40:locked] [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 1 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "KILOMBO CONGO",
+      "styleSeed": 6002,
+      "streamingFileBase": "kintele",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 1. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: KIKONGO. Titre largement diffusé sur YouTube sous « KILOMBO CONGO - CARINE FLEUR EDOUARE »; artiste associée au répertoire chrétien congolais. Sources: YouTube(kCTQhEqIQl4), YouTube(sKKANow_vPg), Zenga Mambu(2016/06/27/carine-fleur-edouard-ba-mimbikudi) Sync meta: CARINE FLEUR EDOUARE - KILOMBO CONGO | type:title | track:track01 [critical40:locked] [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 1 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6003,
+      "streamingFileBase": "langues",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 1. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: KIKONGO. Titre largement diffusé sur YouTube sous « KILOMBO CONGO - CARINE FLEUR EDOUARE »; artiste associée au répertoire chrétien congolais. Sources: YouTube(kCTQhEqIQl4), YouTube(sKKANow_vPg), Zenga Mambu(2016/06/27/carine-fleur-edouard-ba-mimbikudi) Sync meta: CARINE FLEUR EDOUARE - KILOMBO CONGO | type:lang | track:track01 [critical40:locked] [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 1 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6004,
+      "streamingFileBase": "sapeurs",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 1. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: KIKONGO. Titre largement diffusé sur YouTube sous « KILOMBO CONGO - CARINE FLEUR EDOUARE »; artiste associée au répertoire chrétien congolais. Sources: YouTube(kCTQhEqIQl4), YouTube(sKKANow_vPg), Zenga Mambu(2016/06/27/carine-fleur-edouard-ba-mimbikudi) Sync meta: CARINE FLEUR EDOUARE - KILOMBO CONGO | type:collab | track:track01 [critical40:locked] [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 2 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "CASIMIR ZAO",
+      "styleSeed": 6011,
+      "streamingFileBase": "artist_track02",
+      "altAnswerKey": "CASIMIR ZAO",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 2. Piège subtil: ne confonds pas artiste principal et featuring. Repère année: 1984. Langue principale attendue: LINGALA. « Ancien Combattant » est documenté comme un classique de Zao (Casimir Zoba). Sources: Discogs(r2453633), AfricanGrooves(tag/casimir-zoba), AppleMusic(ancien-combattant) Sync meta: Casimir Zao - Ancien Combattant | type:artist | track:track02 [critical40:locked] [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track02",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 2 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "ANCIEN COMBATTANT",
+      "styleSeed": 6012,
+      "streamingFileBase": "artist_track02",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 2. Piège subtil: attention aux variantes live/remix dans les propositions. Repère année: 1984. Langue principale attendue: LINGALA. « Ancien Combattant » est documenté comme un classique de Zao (Casimir Zoba). Sources: Discogs(r2453633), AfricanGrooves(tag/casimir-zoba), AppleMusic(ancien-combattant) Sync meta: Casimir Zao - Ancien Combattant | type:title | track:track02 [critical40:locked] [artistImage:linked] [kind:title]",
+      "audioFileBase": "track02",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 2 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6013,
+      "streamingFileBase": "artist_track02",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 2. Piège subtil: distingue langue dominante et simples passages bilingues. Repère année: 1984. Langue principale attendue: LINGALA. « Ancien Combattant » est documenté comme un classique de Zao (Casimir Zoba). Sources: Discogs(r2453633), AfricanGrooves(tag/casimir-zoba), AppleMusic(ancien-combattant) Sync meta: Casimir Zao - Ancien Combattant | type:lang | track:track02 [critical40:locked] [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track02",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 2 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6014,
+      "streamingFileBase": "artist_track02",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 2. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Repère année: 1984. Langue principale attendue: LINGALA. « Ancien Combattant » est documenté comme un classique de Zao (Casimir Zoba). Sources: Discogs(r2453633), AfricanGrooves(tag/casimir-zoba), AppleMusic(ancien-combattant) Sync meta: Casimir Zao - Ancien Combattant | type:collab | track:track02 [critical40:locked] [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track02",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 3 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "CASIMIR ZAO",
+      "styleSeed": 6021,
+      "streamingFileBase": "artist_track03",
+      "altAnswerKey": "CASIMIR ZAO",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 3. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Titre du répertoire satirique de Zao; date officielle difficilement documentée sur source discographique ouverte. Sources: plateformes audio + discographies artiste (vérification partielle) Sync meta: Casimir Zao - Corbillard | type:artist | track:track03 [critical40:locked] [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track03",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 3 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "CORBILLARD",
+      "styleSeed": 6022,
+      "streamingFileBase": "artist_track03",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 3. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Titre du répertoire satirique de Zao; date officielle difficilement documentée sur source discographique ouverte. Sources: plateformes audio + discographies artiste (vérification partielle) Sync meta: Casimir Zao - Corbillard | type:title | track:track03 [critical40:locked] [artistImage:linked] [kind:title]",
+      "audioFileBase": "track03",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 3 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6023,
+      "streamingFileBase": "artist_track03",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 3. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Titre du répertoire satirique de Zao; date officielle difficilement documentée sur source discographique ouverte. Sources: plateformes audio + discographies artiste (vérification partielle) Sync meta: Casimir Zao - Corbillard | type:lang | track:track03 [critical40:locked] [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track03",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 3 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6024,
+      "streamingFileBase": "artist_track03",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 3. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Titre du répertoire satirique de Zao; date officielle difficilement documentée sur source discographique ouverte. Sources: plateformes audio + discographies artiste (vérification partielle) Sync meta: Casimir Zao - Corbillard | type:collab | track:track03 [critical40:locked] [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track03",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 4 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "CASIMIR ZAO",
+      "styleSeed": 6031,
+      "streamingFileBase": "artist_track04",
+      "altAnswerKey": "CASIMIR ZAO",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 4. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. « Soulard » existe en version originale Zao et en reprise/collab récente. Sources: YouTube(Iqz-qMquuuY), AppleMusic(soulard-feat-zao-casimir) Sync meta: Casimir Zao - Soulard | type:artist | track:track04 [critical40:locked] [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track04",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 4 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "SOULARD",
+      "styleSeed": 6032,
+      "streamingFileBase": "artist_track04",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 4. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. « Soulard » existe en version originale Zao et en reprise/collab récente. Sources: YouTube(Iqz-qMquuuY), AppleMusic(soulard-feat-zao-casimir) Sync meta: Casimir Zao - Soulard | type:title | track:track04 [critical40:locked] [artistImage:linked] [kind:title]",
+      "audioFileBase": "track04",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 4 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6033,
+      "streamingFileBase": "artist_track04",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 4. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. « Soulard » existe en version originale Zao et en reprise/collab récente. Sources: YouTube(Iqz-qMquuuY), AppleMusic(soulard-feat-zao-casimir) Sync meta: Casimir Zao - Soulard | type:lang | track:track04 [critical40:locked] [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track04",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 4 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6034,
+      "streamingFileBase": "artist_track04",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 4. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. « Soulard » existe en version originale Zao et en reprise/collab récente. Sources: YouTube(Iqz-qMquuuY), AppleMusic(soulard-feat-zao-casimir) Sync meta: Casimir Zao - Soulard | type:collab | track:track04 [critical40:locked] [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track04",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 5 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "CASIMIR ZAO",
+      "styleSeed": 6041,
+      "streamingFileBase": "artist_track05",
+      "altAnswerKey": "CASIMIR ZAO",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 5. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Titre listé dans la discographie étendue de Zao; métadonnées publiques limitées. Sources: discographies agrégées (vérification partielle) Sync meta: Casimir Zao - Wele | type:artist | track:track05 [critical40:locked] [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track05",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 5 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "WELE",
+      "styleSeed": 6042,
+      "streamingFileBase": "artist_track05",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 5. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Titre listé dans la discographie étendue de Zao; métadonnées publiques limitées. Sources: discographies agrégées (vérification partielle) Sync meta: Casimir Zao - Wele | type:title | track:track05 [critical40:locked] [artistImage:linked] [kind:title]",
+      "audioFileBase": "track05",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 5 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6043,
+      "streamingFileBase": "artist_track05",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 5. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Titre listé dans la discographie étendue de Zao; métadonnées publiques limitées. Sources: discographies agrégées (vérification partielle) Sync meta: Casimir Zao - Wele | type:lang | track:track05 [critical40:locked] [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track05",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 5 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6044,
+      "streamingFileBase": "artist_track05",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 5. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Titre listé dans la discographie étendue de Zao; métadonnées publiques limitées. Sources: discographies agrégées (vérification partielle) Sync meta: Casimir Zao - Wele | type:collab | track:track05 [critical40:locked] [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track05",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 6 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "CINO BLACK",
+      "styleSeed": 6051,
+      "streamingFileBase": "artist_track06",
+      "altAnswerKey": "CINO BLACK FEAT ZAPARO DE GUERRE",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 6. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Collaboration (feat) détectée via nom de piste; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Cino black feat Zaparo de guerre - Polémique | type:artist | track:track06 [critical40:locked] [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track06",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 6 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "POLÉMIQUE",
+      "styleSeed": 6052,
+      "streamingFileBase": "artist_track06",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 6. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Collaboration (feat) détectée via nom de piste; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Cino black feat Zaparo de guerre - Polémique | type:title | track:track06 [critical40:locked] [artistImage:linked] [kind:title]",
+      "audioFileBase": "track06",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 6 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6053,
+      "streamingFileBase": "artist_track06",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 6. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Collaboration (feat) détectée via nom de piste; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Cino black feat Zaparo de guerre - Polémique | type:lang | track:track06 [critical40:locked] [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track06",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 6 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "COLLABORATION",
+      "styleSeed": 6054,
+      "streamingFileBase": "artist_track06",
+      "altAnswerKey": "FEAT",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 6. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Collaboration (feat) détectée via nom de piste; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Cino black feat Zaparo de guerre - Polémique | type:collab | track:track06 [critical40:locked] [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track06",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 7 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "DAVY KASSA",
+      "styleSeed": 6061,
+      "streamingFileBase": "artist_track07",
+      "altAnswerKey": "DAVY KASSA FEAT ELVERONNE NDINGA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 7. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Collaboration (feat) détectée via nom de piste; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Davy Kassa feat Elveronne Ndinga - Cheri Beetho Kingoli Universel | type:artist | track:track07 [critical40:locked] [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track07",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 7 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "CHERI BEETHO KINGOLI UNIVERSEL",
+      "styleSeed": 6062,
+      "streamingFileBase": "artist_track07",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 7. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Collaboration (feat) détectée via nom de piste; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Davy Kassa feat Elveronne Ndinga - Cheri Beetho Kingoli Universel | type:title | track:track07 [critical40:locked] [artistImage:linked] [kind:title]",
+      "audioFileBase": "track07",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 7 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6063,
+      "streamingFileBase": "artist_track07",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 7. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Collaboration (feat) détectée via nom de piste; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Davy Kassa feat Elveronne Ndinga - Cheri Beetho Kingoli Universel | type:lang | track:track07 [critical40:locked] [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track07",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 7 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "COLLABORATION",
+      "styleSeed": 6064,
+      "streamingFileBase": "artist_track07",
+      "altAnswerKey": "FEAT",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 7. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Collaboration (feat) détectée via nom de piste; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Davy Kassa feat Elveronne Ndinga - Cheri Beetho Kingoli Universel | type:collab | track:track07 [critical40:locked] [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track07",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 8 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "FRANKLIN BOUKAKA",
+      "styleSeed": 6071,
+      "streamingFileBase": "artist_track08",
+      "altAnswerKey": "FRANKLIN BOUKAKA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 8. Piège subtil: ne confonds pas artiste principal et featuring. Repère année: 1974. Langue principale attendue: FRANCAIS. « Le bûcheron » est documenté comme titre engagé de Franklin Boukaka, souvent associé à Manu Dibango. Sources: YouTube(xZhmWltHCIY), Afrolegends(2023/07/28/le-bucheron-the-woodcutter), Spotify(le-bucheron-africa) Sync meta: Franklin Boukaka - Le bûcheron | type:artist | track:track08 [critical40:locked] [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track08",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 8 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "LE BÛCHERON",
+      "styleSeed": 6072,
+      "streamingFileBase": "artist_track08",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 8. Piège subtil: attention aux variantes live/remix dans les propositions. Repère année: 1974. Langue principale attendue: FRANCAIS. « Le bûcheron » est documenté comme titre engagé de Franklin Boukaka, souvent associé à Manu Dibango. Sources: YouTube(xZhmWltHCIY), Afrolegends(2023/07/28/le-bucheron-the-woodcutter), Spotify(le-bucheron-africa) Sync meta: Franklin Boukaka - Le bûcheron | type:title | track:track08 [critical40:locked] [artistImage:linked] [kind:title]",
+      "audioFileBase": "track08",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 8 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "FRANCAIS",
+      "styleSeed": 6073,
+      "streamingFileBase": "artist_track08",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 8. Piège subtil: distingue langue dominante et simples passages bilingues. Repère année: 1974. Langue principale attendue: FRANCAIS. « Le bûcheron » est documenté comme titre engagé de Franklin Boukaka, souvent associé à Manu Dibango. Sources: YouTube(xZhmWltHCIY), Afrolegends(2023/07/28/le-bucheron-the-woodcutter), Spotify(le-bucheron-africa) Sync meta: Franklin Boukaka - Le bûcheron | type:lang | track:track08 [critical40:locked] [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track08",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 8 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6074,
+      "streamingFileBase": "artist_track08",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 8. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Repère année: 1974. Langue principale attendue: FRANCAIS. « Le bûcheron » est documenté comme titre engagé de Franklin Boukaka, souvent associé à Manu Dibango. Sources: YouTube(xZhmWltHCIY), Afrolegends(2023/07/28/le-bucheron-the-woodcutter), Spotify(le-bucheron-africa) Sync meta: Franklin Boukaka - Le bûcheron | type:collab | track:track08 [critical40:locked] [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track08",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 9 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "GROUPE AVB",
+      "styleSeed": 6081,
+      "streamingFileBase": "artist_track09",
+      "altAnswerKey": "GROUPE AVB",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 9. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Collaboration avec Extra Musica Nouvel Horizon indiquée par le titre de piste. Source primaire: métadonnée playlist locale Sync meta: Groupe AVB - Mentalité | type:artist | track:track09 [critical40:locked] [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track09",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 9 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "MENTALITÉ",
+      "styleSeed": 6082,
+      "streamingFileBase": "artist_track09",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 9. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Collaboration avec Extra Musica Nouvel Horizon indiquée par le titre de piste. Source primaire: métadonnée playlist locale Sync meta: Groupe AVB - Mentalité | type:title | track:track09 [critical40:locked] [artistImage:linked] [kind:title]",
+      "audioFileBase": "track09",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 9 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6083,
+      "streamingFileBase": "artist_track09",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 9. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Collaboration avec Extra Musica Nouvel Horizon indiquée par le titre de piste. Source primaire: métadonnée playlist locale Sync meta: Groupe AVB - Mentalité | type:lang | track:track09 [critical40:locked] [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track09",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 9 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6084,
+      "streamingFileBase": "artist_track09",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 9. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Collaboration avec Extra Musica Nouvel Horizon indiquée par le titre de piste. Source primaire: métadonnée playlist locale Sync meta: Groupe AVB - Mentalité | type:collab | track:track09 [critical40:locked] [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track09",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 10 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "KEDJEVARA",
+      "styleSeed": 6091,
+      "streamingFileBase": "artist_track10",
+      "altAnswerKey": "KEDJEVARA FEAT EXTRA MUSICA NOUVEL HORIZON",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 10. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. « Makambo mibalé » documenté dans les catalogues discographiques du groupe. Sources: YouTube(pBi2SltjGjA), Discogs(13087302), AllMusic(mw0000922580) Sync meta: Kedjevara feat Extra Musica Nouvel Horizon - TIA LOKOLO | type:artist | track:track10 [critical40:locked] [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track10",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 10 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "TIA LOKOLO",
+      "styleSeed": 6092,
+      "streamingFileBase": "artist_track10",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 10. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. « Makambo mibalé » documenté dans les catalogues discographiques du groupe. Sources: YouTube(pBi2SltjGjA), Discogs(13087302), AllMusic(mw0000922580) Sync meta: Kedjevara feat Extra Musica Nouvel Horizon - TIA LOKOLO | type:title | track:track10 [critical40:locked] [artistImage:linked] [kind:title]",
+      "audioFileBase": "track10",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 10 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6093,
+      "streamingFileBase": "artist_track10",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 10. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. « Makambo mibalé » documenté dans les catalogues discographiques du groupe. Sources: YouTube(pBi2SltjGjA), Discogs(13087302), AllMusic(mw0000922580) Sync meta: Kedjevara feat Extra Musica Nouvel Horizon - TIA LOKOLO | type:lang | track:track10 [critical40:locked] [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track10",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 1/3 • Manche piste 10 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "COLLABORATION",
+      "styleSeed": 6094,
+      "streamingFileBase": "artist_track10",
+      "altAnswerKey": "FEAT",
+      "trivia": "[category:music_related] Édito TV: Niveau 1/3, focus piste 10. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. « Makambo mibalé » documenté dans les catalogues discographiques du groupe. Sources: YouTube(pBi2SltjGjA), Discogs(13087302), AllMusic(mw0000922580) Sync meta: Kedjevara feat Extra Musica Nouvel Horizon - TIA LOKOLO | type:collab | track:track10 [critical40:locked] [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track10",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 11 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "LES BANTOUS DE LA CAPITALE",
+      "styleSeed": 6101,
+      "streamingFileBase": "artist_track11",
+      "altAnswerKey": "LES BANTOUS DE LA CAPITALE",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 11. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Collaboration Louz Baby x Paterne Maestro documentée sur le clip officiel « MBONGO ». Sources: YouTube(AYY-5530IxQ), chaîne Louz Baby(UCwU8RjDYRpQR71s2fQlSlDA) Sync meta: Les Bantous de la Capitale - Makambo mibalé | type:artist | track:track11 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track11",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 11 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "MAKAMBO MIBALÉ",
+      "styleSeed": 6102,
+      "streamingFileBase": "artist_track11",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 11. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Collaboration Louz Baby x Paterne Maestro documentée sur le clip officiel « MBONGO ». Sources: YouTube(AYY-5530IxQ), chaîne Louz Baby(UCwU8RjDYRpQR71s2fQlSlDA) Sync meta: Les Bantous de la Capitale - Makambo mibalé | type:title | track:track11 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track11",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 11 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6103,
+      "streamingFileBase": "artist_track11",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 11. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Collaboration Louz Baby x Paterne Maestro documentée sur le clip officiel « MBONGO ». Sources: YouTube(AYY-5530IxQ), chaîne Louz Baby(UCwU8RjDYRpQR71s2fQlSlDA) Sync meta: Les Bantous de la Capitale - Makambo mibalé | type:lang | track:track11 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track11",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 11 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6104,
+      "streamingFileBase": "artist_track11",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 11. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Collaboration Louz Baby x Paterne Maestro documentée sur le clip officiel « MBONGO ». Sources: YouTube(AYY-5530IxQ), chaîne Louz Baby(UCwU8RjDYRpQR71s2fQlSlDA) Sync meta: Les Bantous de la Capitale - Makambo mibalé | type:collab | track:track11 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track11",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 12 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "LOUZ BABY",
+      "styleSeed": 6111,
+      "streamingFileBase": "artist_track12",
+      "altAnswerKey": "LOUZ BABY X PATERNE MAESTRO",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 12. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: FRANCAIS. Titre listé dans la playlist locale; informations publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Louz Baby x Paterne Maestro - MBONGO | type:artist | track:track12 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track12",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 12 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "MBONGO",
+      "styleSeed": 6112,
+      "streamingFileBase": "artist_track12",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 12. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: FRANCAIS. Titre listé dans la playlist locale; informations publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Louz Baby x Paterne Maestro - MBONGO | type:title | track:track12 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track12",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 12 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6113,
+      "streamingFileBase": "artist_track12",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 12. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: FRANCAIS. Titre listé dans la playlist locale; informations publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Louz Baby x Paterne Maestro - MBONGO | type:lang | track:track12 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track12",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 12 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "COLLABORATION",
+      "styleSeed": 6114,
+      "streamingFileBase": "artist_track12",
+      "altAnswerKey": "FEAT",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 12. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: FRANCAIS. Titre listé dans la playlist locale; informations publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Louz Baby x Paterne Maestro - MBONGO | type:collab | track:track12 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track12",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 13 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "MICHELLE MOUTOUARI",
+      "styleSeed": 6121,
+      "streamingFileBase": "artist_track13",
+      "altAnswerKey": "MICHELLE MOUTOUARI",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 13. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Titre orienté culture sape; vérification publique partielle. Source primaire: métadonnée playlist locale Sync meta: Michelle Moutouari - Heritage | type:artist | track:track13 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track13",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 13 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "HERITAGE",
+      "styleSeed": 6122,
+      "streamingFileBase": "artist_track13",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 13. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Titre orienté culture sape; vérification publique partielle. Source primaire: métadonnée playlist locale Sync meta: Michelle Moutouari - Heritage | type:title | track:track13 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track13",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 13 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6123,
+      "streamingFileBase": "artist_track13",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 13. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Titre orienté culture sape; vérification publique partielle. Source primaire: métadonnée playlist locale Sync meta: Michelle Moutouari - Heritage | type:lang | track:track13 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track13",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 13 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6124,
+      "streamingFileBase": "artist_track13",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 13. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Titre orienté culture sape; vérification publique partielle. Source primaire: métadonnée playlist locale Sync meta: Michelle Moutouari - Heritage | type:collab | track:track13 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track13",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 14 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "NORBAT DE PARIS",
+      "styleSeed": 6131,
+      "streamingFileBase": "artist_track14",
+      "altAnswerKey": "NORBAT DE PARIS",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 14. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Artiste classique congolais; titre confirmé dans les répertoires/compilations. Sources: discographies artiste (vérification partielle) Sync meta: Norbat de Paris - Ngoma ya la sape | type:artist | track:track14 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track14",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 14 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "NGOMA YA LA SAPE",
+      "styleSeed": 6132,
+      "streamingFileBase": "artist_track14",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 14. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Artiste classique congolais; titre confirmé dans les répertoires/compilations. Sources: discographies artiste (vérification partielle) Sync meta: Norbat de Paris - Ngoma ya la sape | type:title | track:track14 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track14",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 14 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6133,
+      "streamingFileBase": "artist_track14",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 14. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Artiste classique congolais; titre confirmé dans les répertoires/compilations. Sources: discographies artiste (vérification partielle) Sync meta: Norbat de Paris - Ngoma ya la sape | type:lang | track:track14 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track14",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 14 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6134,
+      "streamingFileBase": "artist_track14",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 14. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Artiste classique congolais; titre confirmé dans les répertoires/compilations. Sources: discographies artiste (vérification partielle) Sync meta: Norbat de Paris - Ngoma ya la sape | type:collab | track:track14 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track14",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 15 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "PAMELO MOUNKA",
+      "styleSeed": 6141,
+      "streamingFileBase": "artist_track15",
+      "altAnswerKey": "PAMELO MOUNKA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 15. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Titre de répertoire classique; métadonnées publiques partielles. Sources: discographies artiste (vérification partielle) Sync meta: Pamelo Mounka - Amour de Nombakélé | type:artist | track:track15 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track15",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 15 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "AMOUR DE NOMBAKÉLÉ",
+      "styleSeed": 6142,
+      "streamingFileBase": "artist_track15",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 15. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Titre de répertoire classique; métadonnées publiques partielles. Sources: discographies artiste (vérification partielle) Sync meta: Pamelo Mounka - Amour de Nombakélé | type:title | track:track15 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track15",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 15 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6143,
+      "streamingFileBase": "artist_track15",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 15. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Titre de répertoire classique; métadonnées publiques partielles. Sources: discographies artiste (vérification partielle) Sync meta: Pamelo Mounka - Amour de Nombakélé | type:lang | track:track15 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track15",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 15 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6144,
+      "streamingFileBase": "artist_track15",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 15. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Titre de répertoire classique; métadonnées publiques partielles. Sources: discographies artiste (vérification partielle) Sync meta: Pamelo Mounka - Amour de Nombakélé | type:collab | track:track15 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track15",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 16 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "PAMELO MOUNKA",
+      "styleSeed": 6151,
+      "streamingFileBase": "artist_track16",
+      "altAnswerKey": "PAMELO MOUNKA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 16. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: FRANCAIS. Titre francophone présent dans la playlist locale; vérification partielle. Source primaire: métadonnée playlist locale Sync meta: Pamelo Mounka - Buala yayi mambu | type:artist | track:track16 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track16",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 16 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "BUALA YAYI MAMBU",
+      "styleSeed": 6152,
+      "streamingFileBase": "artist_track16",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 16. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: FRANCAIS. Titre francophone présent dans la playlist locale; vérification partielle. Source primaire: métadonnée playlist locale Sync meta: Pamelo Mounka - Buala yayi mambu | type:title | track:track16 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track16",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 16 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6153,
+      "streamingFileBase": "artist_track16",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 16. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: FRANCAIS. Titre francophone présent dans la playlist locale; vérification partielle. Source primaire: métadonnée playlist locale Sync meta: Pamelo Mounka - Buala yayi mambu | type:lang | track:track16 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track16",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 16 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6154,
+      "streamingFileBase": "artist_track16",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 16. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: FRANCAIS. Titre francophone présent dans la playlist locale; vérification partielle. Source primaire: métadonnée playlist locale Sync meta: Pamelo Mounka - Buala yayi mambu | type:collab | track:track16 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track16",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 17 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "PAMELO MOUNKA",
+      "styleSeed": 6161,
+      "streamingFileBase": "artist_track17",
+      "altAnswerKey": "PAMELO MOUNKA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 17. Piège subtil: ne confonds pas artiste principal et featuring. Repère année: 2012. Langue principale attendue: LINGALA. « Missengue » documenté sur plateformes (album « Son 1er Disque D'or »). Sources: YouTube(mpNTT7JqSYc), Spotify(4MsI8EI8uuKCSsQWbyUTCo) Sync meta: Pamelo Mounka - L'argent appelle l'argent | type:artist | track:track17 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track17",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 17 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "L'ARGENT APPELLE L'ARGENT",
+      "styleSeed": 6162,
+      "streamingFileBase": "artist_track17",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 17. Piège subtil: attention aux variantes live/remix dans les propositions. Repère année: 2012. Langue principale attendue: LINGALA. « Missengue » documenté sur plateformes (album « Son 1er Disque D'or »). Sources: YouTube(mpNTT7JqSYc), Spotify(4MsI8EI8uuKCSsQWbyUTCo) Sync meta: Pamelo Mounka - L'argent appelle l'argent | type:title | track:track17 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track17",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 17 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6163,
+      "streamingFileBase": "artist_track17",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 17. Piège subtil: distingue langue dominante et simples passages bilingues. Repère année: 2012. Langue principale attendue: LINGALA. « Missengue » documenté sur plateformes (album « Son 1er Disque D'or »). Sources: YouTube(mpNTT7JqSYc), Spotify(4MsI8EI8uuKCSsQWbyUTCo) Sync meta: Pamelo Mounka - L'argent appelle l'argent | type:lang | track:track17 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track17",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 17 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6164,
+      "streamingFileBase": "artist_track17",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 17. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Repère année: 2012. Langue principale attendue: LINGALA. « Missengue » documenté sur plateformes (album « Son 1er Disque D'or »). Sources: YouTube(mpNTT7JqSYc), Spotify(4MsI8EI8uuKCSsQWbyUTCo) Sync meta: Pamelo Mounka - L'argent appelle l'argent | type:collab | track:track17 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track17",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 18 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "PIERRE MOUTOUARI",
+      "styleSeed": 6171,
+      "streamingFileBase": "artist_track18",
+      "altAnswerKey": "PIERRE MOUTOUARI",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 18. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: FRANCAIS. Titre présent dans le répertoire de Pierrette Adams; informations publiques limitées. Sources: playlists/catalogues artiste (vérification partielle) Sync meta: Pierre Moutouari - Missengue | type:artist | track:track18 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track18",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 18 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "MISSENGUE",
+      "styleSeed": 6172,
+      "streamingFileBase": "artist_track18",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 18. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: FRANCAIS. Titre présent dans le répertoire de Pierrette Adams; informations publiques limitées. Sources: playlists/catalogues artiste (vérification partielle) Sync meta: Pierre Moutouari - Missengue | type:title | track:track18 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track18",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 18 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6173,
+      "streamingFileBase": "artist_track18",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 18. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: FRANCAIS. Titre présent dans le répertoire de Pierrette Adams; informations publiques limitées. Sources: playlists/catalogues artiste (vérification partielle) Sync meta: Pierre Moutouari - Missengue | type:lang | track:track18 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track18",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 18 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6174,
+      "streamingFileBase": "artist_track18",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 18. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: FRANCAIS. Titre présent dans le répertoire de Pierrette Adams; informations publiques limitées. Sources: playlists/catalogues artiste (vérification partielle) Sync meta: Pierre Moutouari - Missengue | type:collab | track:track18 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track18",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 19 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "PIERRETTE ADAMS",
+      "styleSeed": 6181,
+      "streamingFileBase": "artist_track19",
+      "altAnswerKey": "PIERRETTE ADAMS",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 19. Piège subtil: ne confonds pas artiste principal et featuring. Repère année: 1994. Langue principale attendue: FRANCAIS. « Journal intime » documenté (album/cd répertorié). Sources: Discogs(15733400), YouTube(bqhADJmJSkc), Amazon(B07X9414VQ) Sync meta: Pierrette Adams - Caterpillars | type:artist | track:track19 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track19",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 19 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "CATERPILLARS",
+      "styleSeed": 6182,
+      "streamingFileBase": "artist_track19",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 19. Piège subtil: attention aux variantes live/remix dans les propositions. Repère année: 1994. Langue principale attendue: FRANCAIS. « Journal intime » documenté (album/cd répertorié). Sources: Discogs(15733400), YouTube(bqhADJmJSkc), Amazon(B07X9414VQ) Sync meta: Pierrette Adams - Caterpillars | type:title | track:track19 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track19",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 19 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6183,
+      "streamingFileBase": "artist_track19",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 19. Piège subtil: distingue langue dominante et simples passages bilingues. Repère année: 1994. Langue principale attendue: FRANCAIS. « Journal intime » documenté (album/cd répertorié). Sources: Discogs(15733400), YouTube(bqhADJmJSkc), Amazon(B07X9414VQ) Sync meta: Pierrette Adams - Caterpillars | type:lang | track:track19 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track19",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 19 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6184,
+      "streamingFileBase": "artist_track19",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 19. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Repère année: 1994. Langue principale attendue: FRANCAIS. « Journal intime » documenté (album/cd répertorié). Sources: Discogs(15733400), YouTube(bqhADJmJSkc), Amazon(B07X9414VQ) Sync meta: Pierrette Adams - Caterpillars | type:collab | track:track19 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track19",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 20 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "PIERRETTE ADAMS",
+      "styleSeed": 6191,
+      "streamingFileBase": "artist_track20",
+      "altAnswerKey": "PIERRETTE ADAMS",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 20. Piège subtil: ne confonds pas artiste principal et featuring. Repère année: 2021. Langue principale attendue: LINGALA. « Bokoko » documenté sur plateformes streaming et clip officiel. Sources: YouTube(9-ZuDPc3J64), Spotify(1DSdM1nslwDn8JlHElw6Yc) Sync meta: Pierrette Adams - Journal intime | type:artist | track:track20 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track20",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 20 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "JOURNAL INTIME",
+      "styleSeed": 6192,
+      "streamingFileBase": "artist_track20",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 20. Piège subtil: attention aux variantes live/remix dans les propositions. Repère année: 2021. Langue principale attendue: LINGALA. « Bokoko » documenté sur plateformes streaming et clip officiel. Sources: YouTube(9-ZuDPc3J64), Spotify(1DSdM1nslwDn8JlHElw6Yc) Sync meta: Pierrette Adams - Journal intime | type:title | track:track20 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track20",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 20 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "FRANCAIS",
+      "styleSeed": 6193,
+      "streamingFileBase": "artist_track20",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 20. Piège subtil: distingue langue dominante et simples passages bilingues. Repère année: 2021. Langue principale attendue: LINGALA. « Bokoko » documenté sur plateformes streaming et clip officiel. Sources: YouTube(9-ZuDPc3J64), Spotify(1DSdM1nslwDn8JlHElw6Yc) Sync meta: Pierrette Adams - Journal intime | type:lang | track:track20 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track20",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 2/3 • Manche piste 20 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6194,
+      "streamingFileBase": "artist_track20",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 2/3, focus piste 20. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Repère année: 2021. Langue principale attendue: LINGALA. « Bokoko » documenté sur plateformes streaming et clip officiel. Sources: YouTube(9-ZuDPc3J64), Spotify(1DSdM1nslwDn8JlHElw6Yc) Sync meta: Pierrette Adams - Journal intime | type:collab | track:track20 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track20",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 21 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "POZO CHARABIA",
+      "styleSeed": 6201,
+      "streamingFileBase": "artist_track21",
+      "altAnswerKey": "POZO CHARABIA FEAT MJ NADER (FREESTYLE PART 1 PAPA SASSOU & ADOU DANGA)",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 21. Piège subtil: ne confonds pas artiste principal et featuring. Repère année: 2015. Langue principale attendue: LINGALA. « Contentieux » documenté comme album/titre de Roga Roga. Sources: Spotify(album/3kSjIWPVcIk3Cy1CxKQcVY), YouTube(iYfAFDQm7O8) Sync meta: POZO CHARABIA Feat MJ NADER (Freestyle part 1 Papa SASSOU & ADOU DANGA) - — | type:artist | track:track21 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track21",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 21 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "TITRE NON PRECISE",
+      "styleSeed": 6202,
+      "streamingFileBase": "artist_track21",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 21. Piège subtil: attention aux variantes live/remix dans les propositions. Repère année: 2015. Langue principale attendue: LINGALA. « Contentieux » documenté comme album/titre de Roga Roga. Sources: Spotify(album/3kSjIWPVcIk3Cy1CxKQcVY), YouTube(iYfAFDQm7O8) Sync meta: POZO CHARABIA Feat MJ NADER (Freestyle part 1 Papa SASSOU & ADOU DANGA) - — | type:title | track:track21 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track21",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 21 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6203,
+      "streamingFileBase": "artist_track21",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 21. Piège subtil: distingue langue dominante et simples passages bilingues. Repère année: 2015. Langue principale attendue: LINGALA. « Contentieux » documenté comme album/titre de Roga Roga. Sources: Spotify(album/3kSjIWPVcIk3Cy1CxKQcVY), YouTube(iYfAFDQm7O8) Sync meta: POZO CHARABIA Feat MJ NADER (Freestyle part 1 Papa SASSOU & ADOU DANGA) - — | type:lang | track:track21 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track21",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 21 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "COLLABORATION",
+      "styleSeed": 6204,
+      "streamingFileBase": "artist_track21",
+      "altAnswerKey": "FEAT",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 21. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Repère année: 2015. Langue principale attendue: LINGALA. « Contentieux » documenté comme album/titre de Roga Roga. Sources: Spotify(album/3kSjIWPVcIk3Cy1CxKQcVY), YouTube(iYfAFDQm7O8) Sync meta: POZO CHARABIA Feat MJ NADER (Freestyle part 1 Papa SASSOU & ADOU DANGA) - — | type:collab | track:track21 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track21",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 22 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "ROGA ROGA",
+      "styleSeed": 6211,
+      "streamingFileBase": "artist_track22",
+      "altAnswerKey": "ROGA ROGA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 22. Piège subtil: ne confonds pas artiste principal et featuring. Repère année: 2025. Langue principale attendue: LINGALA. « Moselebende » documenté en single (feat Mixton & Spinho Stayze). Sources: AppleMusic(1820712861), YouTube(O4h6TKncKPw) Sync meta: Roga Roga - Nzoungou | type:artist | track:track22 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track22",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 22 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "NZOUNGOU",
+      "styleSeed": 6212,
+      "streamingFileBase": "artist_track22",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 22. Piège subtil: attention aux variantes live/remix dans les propositions. Repère année: 2025. Langue principale attendue: LINGALA. « Moselebende » documenté en single (feat Mixton & Spinho Stayze). Sources: AppleMusic(1820712861), YouTube(O4h6TKncKPw) Sync meta: Roga Roga - Nzoungou | type:title | track:track22 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track22",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 22 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6213,
+      "streamingFileBase": "artist_track22",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 22. Piège subtil: distingue langue dominante et simples passages bilingues. Repère année: 2025. Langue principale attendue: LINGALA. « Moselebende » documenté en single (feat Mixton & Spinho Stayze). Sources: AppleMusic(1820712861), YouTube(O4h6TKncKPw) Sync meta: Roga Roga - Nzoungou | type:lang | track:track22 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track22",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 22 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6214,
+      "streamingFileBase": "artist_track22",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 22. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Repère année: 2025. Langue principale attendue: LINGALA. « Moselebende » documenté en single (feat Mixton & Spinho Stayze). Sources: AppleMusic(1820712861), YouTube(O4h6TKncKPw) Sync meta: Roga Roga - Nzoungou | type:collab | track:track22 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track22",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 23 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "ROGA ROGA EXTRA MUSICA",
+      "styleSeed": 6221,
+      "streamingFileBase": "sapeurs",
+      "altAnswerKey": "ROGA ROGA EXTRA MUSICA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 23. Piège subtil: ne confonds pas artiste principal et featuring. Repère année: 2025. Langue principale attendue: LINGALA. « Ya Nga Bébé » documenté en collaboration Tidiane Mario / Tété Ketch / Vinny Baltazard. Sources: Spotify(1HELR67Mrl5CVBqDBI0RXi), AppleMusic(1822847795), Shazam(1822847799) Sync meta: Roga Roga Extra Musica - BOKOKO | type:artist | track:track23 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 23 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "BOKOKO",
+      "styleSeed": 6222,
+      "streamingFileBase": "sapeurs",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 23. Piège subtil: attention aux variantes live/remix dans les propositions. Repère année: 2025. Langue principale attendue: LINGALA. « Ya Nga Bébé » documenté en collaboration Tidiane Mario / Tété Ketch / Vinny Baltazard. Sources: Spotify(1HELR67Mrl5CVBqDBI0RXi), AppleMusic(1822847795), Shazam(1822847799) Sync meta: Roga Roga Extra Musica - BOKOKO | type:title | track:track23 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 23 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6223,
+      "streamingFileBase": "langues",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 23. Piège subtil: distingue langue dominante et simples passages bilingues. Repère année: 2025. Langue principale attendue: LINGALA. « Ya Nga Bébé » documenté en collaboration Tidiane Mario / Tété Ketch / Vinny Baltazard. Sources: Spotify(1HELR67Mrl5CVBqDBI0RXi), AppleMusic(1822847795), Shazam(1822847799) Sync meta: Roga Roga Extra Musica - BOKOKO | type:lang | track:track23 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 23 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6224,
+      "streamingFileBase": "sapeurs",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 23. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Repère année: 2025. Langue principale attendue: LINGALA. « Ya Nga Bébé » documenté en collaboration Tidiane Mario / Tété Ketch / Vinny Baltazard. Sources: Spotify(1HELR67Mrl5CVBqDBI0RXi), AppleMusic(1822847795), Shazam(1822847799) Sync meta: Roga Roga Extra Musica - BOKOKO | type:collab | track:track23 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 24 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "ROGA ROGA EXTRA MUSICA",
+      "styleSeed": 6231,
+      "streamingFileBase": "kintele",
+      "altAnswerKey": "ROGA ROGA EXTRA MUSICA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 24. Piège subtil: ne confonds pas artiste principal et featuring. Repère année: 2021. Langue principale attendue: LINGALA. « Soûlard remix » documenté en feat avec Zao Casimir. Sources: YouTube(nRDKxis65mo), AppleMusic(1578507286) Sync meta: ROGA ROGA EXTRA MUSICA - Contentieux | type:artist | track:track24 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 24 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "CONTENTIEUX",
+      "styleSeed": 6232,
+      "streamingFileBase": "ndombolo",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 24. Piège subtil: attention aux variantes live/remix dans les propositions. Repère année: 2021. Langue principale attendue: LINGALA. « Soûlard remix » documenté en feat avec Zao Casimir. Sources: YouTube(nRDKxis65mo), AppleMusic(1578507286) Sync meta: ROGA ROGA EXTRA MUSICA - Contentieux | type:title | track:track24 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 24 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "FRANCAIS",
+      "styleSeed": 6233,
+      "streamingFileBase": "langues",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 24. Piège subtil: distingue langue dominante et simples passages bilingues. Repère année: 2021. Langue principale attendue: LINGALA. « Soûlard remix » documenté en feat avec Zao Casimir. Sources: YouTube(nRDKxis65mo), AppleMusic(1578507286) Sync meta: ROGA ROGA EXTRA MUSICA - Contentieux | type:lang | track:track24 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 24 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6234,
+      "streamingFileBase": "sapeurs",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 24. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Repère année: 2021. Langue principale attendue: LINGALA. « Soûlard remix » documenté en feat avec Zao Casimir. Sources: YouTube(nRDKxis65mo), AppleMusic(1578507286) Sync meta: ROGA ROGA EXTRA MUSICA - Contentieux | type:collab | track:track24 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 25 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "TEDDY BENZO MIXTON",
+      "styleSeed": 6241,
+      "streamingFileBase": "sapeurs",
+      "altAnswerKey": "TEDDY BENZO MIXTON FEAT SPINHO",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 25. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Titre de répertoire classique/rumba congolaise. Sources: discographies artiste (vérification partielle) Sync meta: Teddy Benzo Mixton feat Spinho - Moselebende | type:artist | track:track25 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 25 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "MOSELEBENDE",
+      "styleSeed": 6242,
+      "streamingFileBase": "sapeurs",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 25. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Titre de répertoire classique/rumba congolaise. Sources: discographies artiste (vérification partielle) Sync meta: Teddy Benzo Mixton feat Spinho - Moselebende | type:title | track:track25 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 25 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6243,
+      "streamingFileBase": "langues",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 25. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Titre de répertoire classique/rumba congolaise. Sources: discographies artiste (vérification partielle) Sync meta: Teddy Benzo Mixton feat Spinho - Moselebende | type:lang | track:track25 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 25 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "COLLABORATION",
+      "styleSeed": 6244,
+      "streamingFileBase": "sapeurs",
+      "altAnswerKey": "FEAT",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 25. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Titre de répertoire classique/rumba congolaise. Sources: discographies artiste (vérification partielle) Sync meta: Teddy Benzo Mixton feat Spinho - Moselebende | type:collab | track:track25 [artistImage:missing_audio_muted]",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 26 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "TIDIANE MARIO",
+      "styleSeed": 6251,
+      "streamingFileBase": "artist_track26",
+      "altAnswerKey": "TIDIANE MARIO X TÉTÉ KETCH X VINNY BALTAZARD",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 26. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: LINGALA. Titre listé dans la playlist locale; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Tidiane Mario x Tété Ketch x Vinny Baltazard - Ya Nga Bébé | type:artist | track:track26 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track26",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 26 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "YA NGA BÉBÉ",
+      "styleSeed": 6252,
+      "streamingFileBase": "artist_track26",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 26. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: LINGALA. Titre listé dans la playlist locale; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Tidiane Mario x Tété Ketch x Vinny Baltazard - Ya Nga Bébé | type:title | track:track26 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track26",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 26 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6253,
+      "streamingFileBase": "artist_track26",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 26. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: LINGALA. Titre listé dans la playlist locale; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Tidiane Mario x Tété Ketch x Vinny Baltazard - Ya Nga Bébé | type:lang | track:track26 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track26",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 26 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "COLLABORATION",
+      "styleSeed": 6254,
+      "streamingFileBase": "artist_track26",
+      "altAnswerKey": "FEAT",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 26. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: LINGALA. Titre listé dans la playlist locale; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Tidiane Mario x Tété Ketch x Vinny Baltazard - Ya Nga Bébé | type:collab | track:track26 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track26",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 27 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "WAYÉ",
+      "styleSeed": 6261,
+      "streamingFileBase": "artist_track27",
+      "altAnswerKey": "WAYÉ FEAT CASIMIR ZAO",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 27. Piège subtil: ne confonds pas artiste principal et featuring. Langue principale attendue: FRANCAIS. Titre listé dans la playlist locale; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Wayé feat casimir Zao - Soûlard remix | type:artist | track:track27 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track27",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 27 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "SOÛLARD REMIX",
+      "styleSeed": 6262,
+      "streamingFileBase": "artist_track27",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 27. Piège subtil: attention aux variantes live/remix dans les propositions. Langue principale attendue: FRANCAIS. Titre listé dans la playlist locale; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Wayé feat casimir Zao - Soûlard remix | type:title | track:track27 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track27",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 27 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6263,
+      "streamingFileBase": "artist_track27",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 27. Piège subtil: distingue langue dominante et simples passages bilingues. Langue principale attendue: FRANCAIS. Titre listé dans la playlist locale; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Wayé feat casimir Zao - Soûlard remix | type:lang | track:track27 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track27",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 27 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "COLLABORATION",
+      "styleSeed": 6264,
+      "streamingFileBase": "artist_track27",
+      "altAnswerKey": "FEAT",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 27. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Langue principale attendue: FRANCAIS. Titre listé dans la playlist locale; données web publiques limitées. Source primaire: métadonnée playlist locale Sync meta: Wayé feat casimir Zao - Soûlard remix | type:collab | track:track27 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track27",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 28 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "YOULOU MABIALA",
+      "styleSeed": 6271,
+      "streamingFileBase": "artist_track28",
+      "altAnswerKey": "YOULOU MABIALA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 28. Piège subtil: ne confonds pas artiste principal et featuring. Piste track28 — YOULOU MABIALA - LOUFOULAKARI. Style estimé: CLASSIQUE. Réponse basée sur les métadonnées playlist. Question: artiste principal. Sync meta: YOULOU MABIALA - LOUFOULAKARI | type:artist | track:track28 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track28",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 28 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "LOUFOULAKARI",
+      "styleSeed": 6272,
+      "streamingFileBase": "artist_track28",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 28. Piège subtil: attention aux variantes live/remix dans les propositions. Piste track28 — YOULOU MABIALA - LOUFOULAKARI. Style estimé: CLASSIQUE. Réponse basée sur les métadonnées playlist. Question: titre exact. Sync meta: YOULOU MABIALA - LOUFOULAKARI | type:title | track:track28 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track28",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 28 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6273,
+      "streamingFileBase": "artist_track28",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 28. Piège subtil: distingue langue dominante et simples passages bilingues. Piste track28 — YOULOU MABIALA - LOUFOULAKARI. Style estimé: CLASSIQUE. Réponse basée sur les métadonnées playlist. Langue dominante estimée automatiquement. Sync meta: YOULOU MABIALA - LOUFOULAKARI | type:lang | track:track28 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track28",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 28 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6274,
+      "streamingFileBase": "artist_track28",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 28. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Piste track28 — YOULOU MABIALA - LOUFOULAKARI. Style estimé: CLASSIQUE. Réponse basée sur les métadonnées playlist. Détection via nom d'artiste (YOULOU MABIALA). Sync meta: YOULOU MABIALA - LOUFOULAKARI | type:collab | track:track28 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track28",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 29 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "YOULOU MABIALA",
+      "styleSeed": 6281,
+      "streamingFileBase": "artist_track29",
+      "altAnswerKey": "YOULOU MABIALA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 29. Piège subtil: ne confonds pas artiste principal et featuring. Piste track29 — youlou mabiala - mamou. Style estimé: CLASSIQUE. Réponse basée sur les métadonnées playlist. Question: artiste principal. Sync meta: youlou mabiala - mamou | type:artist | track:track29 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track29",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 29 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "MAMOU",
+      "styleSeed": 6282,
+      "streamingFileBase": "artist_track29",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 29. Piège subtil: attention aux variantes live/remix dans les propositions. Piste track29 — youlou mabiala - mamou. Style estimé: CLASSIQUE. Réponse basée sur les métadonnées playlist. Question: titre exact. Sync meta: youlou mabiala - mamou | type:title | track:track29 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track29",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 29 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6283,
+      "streamingFileBase": "artist_track29",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 29. Piège subtil: distingue langue dominante et simples passages bilingues. Piste track29 — youlou mabiala - mamou. Style estimé: CLASSIQUE. Réponse basée sur les métadonnées playlist. Langue dominante estimée automatiquement. Sync meta: youlou mabiala - mamou | type:lang | track:track29 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track29",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 29 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6284,
+      "streamingFileBase": "artist_track29",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 29. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Piste track29 — youlou mabiala - mamou. Style estimé: CLASSIQUE. Réponse basée sur les métadonnées playlist. Détection via nom d'artiste (youlou mabiala). Sync meta: youlou mabiala - mamou | type:collab | track:track29 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track29",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 30 — Qui est l'interprète principal entendu sur cet extrait ?",
+      "answerKey": "ZITANY NEIL",
+      "styleSeed": 6291,
+      "streamingFileBase": "artist_track30",
+      "altAnswerKey": "ZITANY NEIL",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 30. Piège subtil: ne confonds pas artiste principal et featuring. Piste track30 — Zitany Neil - Marcory Gasoil. Style estimé: FUSION. Réponse basée sur les métadonnées playlist. Question: artiste principal. Sync meta: Zitany Neil - Marcory Gasoil | type:artist | track:track30 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track30",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 30 — Quel est le titre exact de ce morceau ?",
+      "answerKey": "MARCORY GASOIL",
+      "styleSeed": 6292,
+      "streamingFileBase": "artist_track30",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 30. Piège subtil: attention aux variantes live/remix dans les propositions. Piste track30 — Zitany Neil - Marcory Gasoil. Style estimé: FUSION. Réponse basée sur les métadonnées playlist. Question: titre exact. Sync meta: Zitany Neil - Marcory Gasoil | type:title | track:track30 [artistImage:linked] [kind:title]",
+      "audioFileBase": "track30",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 30 — Quelle langue est dominante dans cette chanson ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 6293,
+      "streamingFileBase": "artist_track30",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 30. Piège subtil: distingue langue dominante et simples passages bilingues. Piste track30 — Zitany Neil - Marcory Gasoil. Style estimé: FUSION. Réponse basée sur les métadonnées playlist. Langue dominante estimée automatiquement. Sync meta: Zitany Neil - Marcory Gasoil | type:lang | track:track30 [artistImage:linked] [kind:lang]",
+      "audioFileBase": "track30",
+      "audioUrl": ""
+    },
+    {
+      "hint": "🎬 Niveau 3/3 • Manche piste 30 — Solo ou collaboration (feat/x/&), quel est le bon choix ?",
+      "answerKey": "SOLO",
+      "styleSeed": 6294,
+      "streamingFileBase": "artist_track30",
+      "altAnswerKey": "ARTISTE SEUL",
+      "trivia": "[category:music_related] Édito TV: Niveau 3/3, focus piste 30. Piège subtil: les séparateurs « feat », « x » et « & » indiquent souvent une collaboration. Piste track30 — Zitany Neil - Marcory Gasoil. Style estimé: FUSION. Réponse basée sur les métadonnées playlist. Détection via nom d'artiste (Zitany Neil). Sync meta: Zitany Neil - Marcory Gasoil | type:collab | track:track30 [artistImage:linked] [kind:collab]",
+      "audioFileBase": "track30",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image géographie : ce fleuve majeur est-il le fleuve Congo ?",
+      "answerKey": "CONGO",
+      "styleSeed": 9501,
+      "streamingFileBase": "fleuve_congo",
+      "altAnswerKey": "FLEUVE CONGO",
+      "trivia": "[category:geo] Le fleuve Congo traverse l'Afrique centrale et borde la capitale du Congo.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image géographie : quel département du Congo est montré ici ?",
+      "answerKey": "POOL",
+      "styleSeed": 9502,
+      "streamingFileBase": "departement_pool",
+      "altAnswerKey": "",
+      "trivia": "[category:geo] Le Pool est un département du sud du Congo, autour de la capitale.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image ville : reconnais-tu la capitale du Congo ?",
+      "answerKey": "BRAZZAVILLE",
+      "styleSeed": 9503,
+      "streamingFileBase": "capitale",
+      "altAnswerKey": "CAPITALE",
+      "trivia": "[category:geo] Brazzaville est la capitale politique du Congo.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image ville côtière : quel port du Congo vois-tu ?",
+      "answerKey": "POINTE NOIRE",
+      "styleSeed": 9504,
+      "streamingFileBase": "pointe_noire",
+      "altAnswerKey": "POINTENOIRE",
+      "trivia": "[category:geo] Pointe-Noire est la grande ville portuaire du Congo.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image nature : ce parc national est-il Odzala ?",
+      "answerKey": "ODZALA",
+      "styleSeed": 9510,
+      "streamingFileBase": "odzala",
+      "altAnswerKey": "ODZALA KOKOUA",
+      "trivia": "[category:tourisme] Odzala-Kokoua est un parc emblématique du Congo.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image faune : quel grand primate emblématique du Congo vois-tu ?",
+      "answerKey": "GORILLE",
+      "styleSeed": 9511,
+      "streamingFileBase": "gorille",
+      "altAnswerKey": "",
+      "trivia": "[category:culture] Le gorille est une espèce iconique des forêts d'Afrique centrale.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image côte : cet espace maritime borde-t-il le Congo ?",
+      "answerKey": "OCEAN ATLANTIQUE",
+      "styleSeed": 9512,
+      "streamingFileBase": "ocean",
+      "altAnswerKey": "ATLANTIQUE",
+      "trivia": "[category:culture] Le Congo possède une façade sur l'océan Atlantique.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image drapeau : de quel pays s'agit-il ?",
+      "answerKey": "CONGO",
+      "styleSeed": 9513,
+      "streamingFileBase": "drapeau",
+      "altAnswerKey": "REPUBLIQUE DU CONGO",
+      "trivia": "[category:culture] Drapeau national du Congo, adopté avec ses couleurs vert-jaune-rouge.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image culturelle : ce style vestimentaire est associé à quel mouvement congolais ?",
+      "answerKey": "SAPE",
+      "styleSeed": 9514,
+      "streamingFileBase": "sapeurs",
+      "altAnswerKey": "SAPEURS",
+      "trivia": "[category:culture] La SAPE est un mouvement culturel de l'élégance vestimentaire.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image langue : parmi ces langues, laquelle est nationale au Congo ?",
+      "answerKey": "LINGALA",
+      "styleSeed": 9515,
+      "streamingFileBase": "langues",
+      "altAnswerKey": "KITUBA",
+      "trivia": "[category:culture] Le lingala et le kituba sont deux langues nationales du Congo.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image histoire : quel président du Congo est souvent associé à la longue période contemporaine ?",
+      "answerKey": "DENIS SASSOU NGUESSO",
+      "styleSeed": 9520,
+      "streamingFileBase": "capitale",
+      "altAnswerKey": "SASSOU NGUESSO",
+      "trivia": "[category:histoire] Question d'histoire politique du Congo contemporain.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image histoire : qui fut le premier président du Congo indépendant ?",
+      "answerKey": "FULBERT YOULOU",
+      "styleSeed": 9521,
+      "streamingFileBase": "drapeau",
+      "altAnswerKey": "YOULOU",
+      "trivia": "[category:histoire] Fulbert Youlou est une figure de l'indépendance politique du Congo.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image histoire : quel personnage est lié à l'hymne et à l'engagement culturel congolais ?",
+      "answerKey": "JACQUES OPANGAULT",
+      "styleSeed": 9522,
+      "streamingFileBase": "capitale",
+      "altAnswerKey": "",
+      "trivia": "[category:histoire] Manche de culture politique congolaise.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image littérature : ce livre est d'un auteur congolais. Donne un nom d'écrivain majeur.",
+      "answerKey": "ALAIN MABANCKOU",
+      "styleSeed": 9530,
+      "streamingFileBase": "kintele",
+      "altAnswerKey": "MABANCKOU",
+      "trivia": "[category:personnalite] Alain Mabanckou est un écrivain congolais reconnu à l'international.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image littérature : quel écrivain congolais est connu pour une oeuvre historique et romanesque ?",
+      "answerKey": "EMMANUEL DONGALA",
+      "styleSeed": 9531,
+      "streamingFileBase": "capitale",
+      "altAnswerKey": "DONGALA",
+      "trivia": "[category:personnalite] Emmanuel Dongala est un auteur important du Congo.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image gastronomie : ce plat traditionnel à base de manioc est appelé comment ?",
+      "answerKey": "FOUFOU",
+      "styleSeed": 9540,
+      "streamingFileBase": "parc",
+      "altAnswerKey": "FUFU",
+      "trivia": "[category:gastronomie] Le foufou est un aliment central en Afrique centrale.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image gastronomie : quelle préparation de feuilles est très connue au Congo ?",
+      "answerKey": "PONDU",
+      "styleSeed": 9541,
+      "streamingFileBase": "likouala",
+      "altAnswerKey": "SAKA SAKA",
+      "trivia": "[category:culture] Le pondu est un classique de la cuisine congolaise.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image tourisme : ce lieu naturel du nord du Congo appartient à quelle zone ?",
+      "answerKey": "SANGHA",
+      "styleSeed": 9550,
+      "streamingFileBase": "sangha",
+      "altAnswerKey": "",
+      "trivia": "[category:culture] La Sangha est une zone forestière et écologique majeure.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image voisins : parmi ces pays, lequel est voisin du Congo à l'ouest ?",
+      "answerKey": "GABON",
+      "styleSeed": 9560,
+      "streamingFileBase": "drapeau",
+      "altAnswerKey": "",
+      "trivia": "[category:culture] Le Congo partage une frontière avec le Gabon à l'ouest.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image voisins : quel pays est voisin du Congo au nord-est ?",
+      "answerKey": "CENTRAFRIQUE",
+      "styleSeed": 9561,
+      "streamingFileBase": "departement_pool",
+      "altAnswerKey": "REPUBLIQUE CENTRAFRICAINE",
+      "trivia": "[category:culture] Le Congo est frontalier de la République centrafricaine.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image culture : ce style musical urbain populaire au Congo, c'est quoi ?",
+      "answerKey": "NDOMBOLO",
+      "styleSeed": 9570,
+      "streamingFileBase": "artist_track09",
+      "altAnswerKey": "",
+      "trivia": "[category:music_related] Le ndombolo est un style majeur de la scène congolaise. Sync meta: Groupe AVB - Mentalité | type:generic | track:track09 [artistImage:linked] [kind:generic]",
+      "audioFileBase": "track09",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image artiste : reconnais-tu cet univers rumba/congolais ? Donne l'artiste principal.",
+      "answerKey": "ROGA ROGA",
+      "styleSeed": 9571,
+      "streamingFileBase": "artist_track22",
+      "altAnswerKey": "ROGA ROGA",
+      "trivia": "[category:music_related] Manche artiste/musique liée au blind. Sync meta: Roga Roga - Nzoungou | type:artist | track:track22 [artistImage:linked] [kind:artist]",
+      "audioFileBase": "track22",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image personnalité : cet auteur congolais est aussi connu comme professeur et essayiste. Qui est-ce ?",
+      "answerKey": "ALAIN MABANCKOU",
+      "styleSeed": 9523,
+      "streamingFileBase": "capitale",
+      "altAnswerKey": "MABANCKOU",
+      "trivia": "[category:personnalite] Personnalité culturelle congolaise reconnue internationalement.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image personnalité politique : quel nom est associé aux grandes institutions de l'époque post-indépendance ?",
+      "answerKey": "MARIEN NGOUABI",
+      "styleSeed": 9524,
+      "streamingFileBase": "drapeau",
+      "altAnswerKey": "NGOUABI",
+      "trivia": "[category:personnalite] Personnalité politique majeure de l'histoire du Congo.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image histoire : ce personnage est évoqué parmi les figures de résistance et d'engagement national. Quel nom proposes-tu ?",
+      "answerKey": "ANDRE GRENIER",
+      "styleSeed": 9551,
+      "streamingFileBase": "drapeau",
+      "altAnswerKey": "",
+      "trivia": "[category:histoire] Manche de culture générale sur les figures de résistance et d'engagement au Congo.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    },
+    {
+      "hint": "Image résistance : quel concept décrit le mieux ces figures historiques congolaises ?",
+      "answerKey": "RESISTANCE",
+      "styleSeed": 9552,
+      "streamingFileBase": "capitale",
+      "altAnswerKey": "COMBATTANTS",
+      "trivia": "[category:culture] Les combattants et résistants appartiennent à la mémoire historique du Congo.",
+      "audioFileBase": "",
+      "audioUrl": ""
+    }
+  ]
+}

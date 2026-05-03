@@ -1,0 +1,60 @@
+{
+  "items": [
+    {
+      "fileBase": "track01",
+      "releaseYear": 0,
+      "language": "LARI + FRANÇAIS",
+      "inspiration": "",
+      "verified": true
+    },
+    {
+      "fileBase": "track02",
+      "releaseYear": 1984,
+      "language": "LARI + FRANÇAIS",
+      "inspiration": "",
+      "verified": true
+    },
+    {
+      "fileBase": "track09",
+      "releaseYear": 0,
+      "language": "MBOCHI + LINGALA",
+      "inspiration": "",
+      "verified": true
+    },
+    {
+      "fileBase": "track21",
+      "releaseYear": 2015,
+      "language": "LINGALA + FRANÇAIS",
+      "inspiration": "",
+      "verified": true
+    },
+    {
+      "fileBase": "track22",
+      "releaseYear": 2025,
+      "language": "LINGALA + FRANÇAIS + ANGLAIS",
+      "inspiration": "Référence revendiquée à Bokoko (héritage/tradition).",
+      "verified": true
+    },
+    {
+      "fileBase": "track23",
+      "releaseYear": 2024,
+      "language": "LINGALA + FRANÇAIS + ANGLAIS",
+      "inspiration": "Thème tradition/bokoko; fort impact viral.",
+      "verified": true
+    },
+    {
+      "fileBase": "track24",
+      "releaseYear": 2025,
+      "language": "LINGALA + FRANÇAIS + ANGLAIS",
+      "inspiration": "",
+      "verified": true
+    },
+    {
+      "fileBase": "Sam SamouraÏ - HRB (Hommage à Rapha BOUNZEKI)",
+      "releaseYear": 2021,
+      "language": "LARI + FRANÇAIS",
+      "inspiration": "Hommage à Rapha Bounzéki et inspiration du titre « Départ pour l'école ».",
+      "verified": true
+    }
+  ]
+}

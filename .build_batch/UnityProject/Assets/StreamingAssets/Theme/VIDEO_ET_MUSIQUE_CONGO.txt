@@ -1,0 +1,14 @@
+Fond vidéo par mini-jeu (prioritaire sur l’animation procédurale)
+-----------------------------------------------------------------
+Place un fichier dans le dossier du mode (même nom que le ModeId) :
+  Theme/quiz/background.mp4
+  Theme/word-scramble/background.webm
+  …
+Ou un seul fichier global :
+  Theme/background.mp4
+
+Formats : .mp4 ou .webm (Unity + plateforme cible). Boucle automatique.
+
+Musique « République du Congo »
+-------------------------------
+Les fichiers track01/track02 fournis sont des percussions / grooves d’Afrique centrale et de la diaspora (voir ATTRIBUTION.md). Pour coller au plus près aux artistes et styles du Congo-Brazzaville, remplace les pistes dans Theme/ par tes propres fichiers légaux (producteurs locaux, labels, banques CC0 / licences claires). Nomme-les track01.ogg, track02.ogg, etc.

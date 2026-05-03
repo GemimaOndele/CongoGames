@@ -1,0 +1,14 @@
+Fond d'écran — mode : blind-test
+
+Placez ici UNE de ces vidéos en boucle (H.264 .mp4 ou .webm) :
+  - background.mp4
+  - background.webm
+  - loop.mp4
+  - loop.webm
+  - theatre.mp4
+  - theatre.webm
+  - show.mp4
+  - show.webm
+
+Priorité : URL remote_media.json > ce fichier > plateau 3D (VirtualShowStage) > bandes 2D.
+Détails : docs/THEME_BACKGROUNDS.md

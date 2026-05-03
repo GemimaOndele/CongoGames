@@ -1,0 +1,76 @@
+{
+  "items": [
+    {
+      "prompt": "Pamelo Mounka incarne surtout quel courant musical auprès du public congolais ?",
+      "a": "Rumba, chanson populaire et scène des clubs (Congo / RDC)",
+      "b": "Opera italien du XIXe siècle",
+      "c": "Punk rock londonien",
+      "d": "Techno minimal berlinoise pure",
+      "correctIndex": 0,
+      "subLine": "Indice : voix et orchestre — cherchez le style, pas une date de single au pif.",
+      "audioFileBase": "track01",
+      "audioUrl": "",
+      "categoryLabel": "Artiste / courant"
+    },
+    {
+      "prompt": "Le « TP OK Jazz » de Franco est surtout lié à …",
+      "a": "Orchestre et rumba zaïroise / congolaise emblématique",
+      "b": "Jazz manouche parisien",
+      "c": "Fanfare militaire russe",
+      "d": "Bluegrass américain",
+      "correctIndex": 0,
+      "subLine": "Indice : de part et d’autre du fleuve, échanges musicaux historiques (Kinshasa, capitale RDC, et côté Congo).",
+      "audioFileBase": "track02",
+      "audioUrl": "",
+      "categoryLabel": "Groupe / époque"
+    },
+    {
+      "prompt": "En fête, le « sebene » désigne surtout …",
+      "a": "Le solo de guitare entraînant la danse après le couplet",
+      "b": "Un type de tambour en bronze",
+      "c": "Une messe religieuse",
+      "d": "Un logiciel de mixage",
+      "correctIndex": 0,
+      "subLine": "Indice : passage instrumental qui « lève » la salle.",
+      "audioFileBase": "track01",
+      "audioUrl": "",
+      "categoryLabel": "Vocabulaire musique"
+    },
+    {
+      "prompt": "L’« atalaku » (animation vocale) sert surtout à …",
+      "a": "Pousser le public, crier des slogans rythmés, enflammer le show",
+      "b": "Accorder la batterie",
+      "c": "Lire les paroles sur prompteur",
+      "d": "Couper le son des micros",
+      "correctIndex": 0,
+      "subLine": "Indice : rôle scénique très visible dans les concerts congolais.",
+      "audioFileBase": "track02",
+      "audioUrl": "",
+      "categoryLabel": "Rôle scénique"
+    },
+    {
+      "prompt": "La musique « congolaise » du Congo (pays) partage souvent des racines avec celle de …",
+      "a": "Kinshasa (RDC), échanges historiques sur le fleuve",
+      "b": "Oslo",
+      "c": "Tokyo",
+      "d": "Reykjavik",
+      "correctIndex": 0,
+      "subLine": "Indice : deux capitales sur le Congo.",
+      "audioFileBase": "track01",
+      "audioUrl": "",
+      "categoryLabel": "Histoire / géo"
+    },
+    {
+      "prompt": "Un « générique » TV congolais type années 80–90 évoque plutôt …",
+      "a": "Synthé, mélodie courte, souvenir d’antenne",
+      "b": "Symphonie de 40 minutes",
+      "c": "Silence radio 5 min",
+      "d": "Bruit de cuisine",
+      "correctIndex": 0,
+      "subLine": "Indice : habillage d’émission, pas le film entier.",
+      "audioFileBase": "track02",
+      "audioUrl": "",
+      "categoryLabel": "Média / mémoire"
+    }
+  ]
+}

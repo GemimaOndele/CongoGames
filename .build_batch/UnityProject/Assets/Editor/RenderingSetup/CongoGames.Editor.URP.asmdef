@@ -1,0 +1,10 @@
+{
+    "name": "CongoGames.Editor.URP",
+    "rootNamespace": "CongoGames.EditorTools",
+    "includePlatforms": [
+        "Editor"
+    ],
+    "references": [
+        "Unity.RenderPipelines.Universal.Runtime"
+    ]
+}

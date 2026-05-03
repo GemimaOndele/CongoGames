@@ -1,0 +1,228 @@
+# Lia – bonnes (c), mauvaises (w), battle (b), transitions (t), viral (v), CTA (cta). Emojis retirés à la TTS côté code.
+
+<c>
+🔥 Là tu m'as surpris !
+💥 Très très propre !
+👑 On a un champion ici !
+😏 Ok… toi tu connais !
+🎯 Précis comme jamais !
+🔥 Masterclass !
+💪 Niveau expert validé !
+👀 Je t'ai vu faire ça… incroyable
+🎉 Bravo ça passe crème !
+⚡ Trop rapide !
+😮 Ah ouais… respect !
+🔥 Tu joues sérieux toi
+💥 Clean !
+👑 Le boss se révèle
+🎯 Parfait !
+🔥 Là tu cuisines !
+💪 Solide !
+😏 Tu m'impressionnes
+🎉 Validé !
+⚡ Ultra rapide !
+👀 Je note ça
+🔥 Très fort !
+💥 Rien à dire !
+👑 Leader confirmé !
+🎯 C'est carré !
+🔥 Top niveau !
+💪 Tu gères !
+😮 Incroyable !
+🎉 Bien joué !
+⚡ Parfait timing !
+👀 Tu connais le terrain
+🔥 C'est du lourd !
+💥 Validé direct !
+👑 Tu prends la tête !
+🎯 Excellent !
+🔥 Rien à redire
+💪 Fort !
+😏 Ok champion
+🎉 Magnifique !
+⚡ Impressionnant !
+👀 Très propre
+🔥 Tu domines !
+💥 Top !
+👑 Boss mode activé
+🎯 Nickel !
+🔥 Ultra clean
+💪 Bien vu !
+😮 Sérieux… wow
+🎉 Validé
+⚡ Tu es chaud !
+
+<w>
+😅 Aïe… ça pique
+😂 On va oublier ça…
+😏 Mauvais choix…
+💡 Presque… mais non
+😬 Raté…
+😂 Même moi j'ai mal
+😏 T'as tenté…
+💡 Revois ça
+😅 Oups
+😂 C'était pas ça…
+😏 Pas aujourd'hui
+💡 Essaie encore
+😬 Ça passe pas
+😂 Dommage !
+😏 Pas loin… mais loin quand même
+💡 Réveille-toi
+😅 Mauvais move
+😂 On va faire comme si j'ai rien vu
+😏 Nope
+💡 Pas bon
+😬 Aïe
+😂 Ça fait mal
+😏 Mauvaise piste
+💡 Recalé
+😅 Dommage
+😂 Tu peux mieux faire
+😏 Pas ça
+💡 Presque
+😬 Ouch
+😂 Raté
+😏 Mauvais timing
+💡 Essaie encore
+😅 Non
+😂 Pas du tout
+😏 Faux
+💡 Mauvais
+😬 Nope
+😂 On recommence
+😏 Pas bon
+💡 Pas ça
+😅 Oups
+😂 Raté
+😏 Mauvaise réponse
+💡 Essaye mieux
+😬 Dommage
+😂 Pas cette fois
+😏 Non validé
+💡 Revois ça
+😅 Aïe
+😂 Ça ne passe pas
+
+<b>
+⚔️ Ça chauffe !!
+🔥 Duel en cours !!
+💥 Qui va gagner ?!
+👀 Suspense total
+⚡ C'est serré !
+🔥 Combat intense !
+💪 Donne tout !
+👑 Duel de boss
+⚔️ Attention !!
+🔥 Ça s'accélère
+💥 Qui domine ?
+👀 Je regarde ça
+⚡ Très serré
+🔥 Duel chaud !
+💪 Continue !
+👑 Bataille royale
+⚔️ Focus !
+🔥 Ça joue sérieux
+💥 Duel intense
+👀 Ça va tomber
+⚡ Moment critique
+🔥 Pression maximale
+💪 Ça fight !
+👑 Duel épique
+⚔️ Qui gagne ?
+🔥 Ça monte !
+💥 Attention !
+👀 Suspense !
+⚡ Duel !
+🔥 Showdown !
+
+<t>
+🎮 Nouveau jeu !
+🔥 On enchaîne !
+⚡ Next challenge !
+💥 Prépare-toi !
+👀 Ça arrive !
+🎯 Focus !
+🔥 Nouveau round !
+⚡ Go !
+💥 Let's go !
+👀 Attention !
+🎮 Next !
+🔥 Encore !
+⚡ On continue !
+💥 Ready ?
+👀 Regarde bien
+🎯 C'est parti
+🔥 Nouveau défi
+⚡ Prépare-toi
+💥 Action !
+👀 Ça démarre
+🎮 On change !
+🔥 Go suivant !
+⚡ Next round
+💥 Nouveau niveau
+👀 Attention !
+🎯 Challenge !
+🔥 Enchaînement !
+⚡ Next game
+💥 Prêt ?
+👀 Go !
+
+<v>
+😏 Tu joues ou tu observes ?
+🔥 Ici c'est pas pour les faibles
+😂 Même ma grand-mère aurait trouvé
+👀 Je vois tout
+💥 Ça chauffe ici
+😏 Fais pas semblant
+🔥 Donne tout !
+😂 Réveille-toi !
+👀 Je surveille
+💥 Ça devient sérieux
+😏 Focus !
+🔥 Montre ton niveau
+😂 Tu peux mieux faire
+👀 Attention !
+💥 Ça part vite
+😏 Concentration
+🔥 C'est chaud
+😂 Sérieux ?
+👀 Regarde ça
+💥 Boom !
+😏 Continue
+🔥 Ça monte !
+😂 Ah ouais…
+👀 Suspense
+💥 Intense !
+😏 On te regarde
+🔥 Vas-y !
+😂 Oups !
+👀 Ça bouge
+💥 Incroyable
+😏 Encore
+🔥 Go !
+😂 Non…
+👀 Hmm
+💥 Wow
+😏 Sérieux
+🔥 Ça joue
+😂 Dommage
+👀 Intéressant
+💥 Continue
+😏 Encore un effort
+🔥 Ici c'est le live !
+😂 T'inquiète on continue !
+👀 Tout le monde te voit !
+💥 C'est le moment !
+🔥 T'inquiète !
+😂 Garde l'énergie !
+👀 Ici c'est l'arène !
+💥 C'est chaud, reste !
+🔥 Ici t'es au CongoGames !
+
+<cta>
+Pense à t'abonner, à partager et à republier le live, ça soutient vraiment la chaîne !
+Si t'aimes l'énergie, envoie un cadeau, abonne-toi, et dis à tes amis de nous rejoindre !
+N'oublie pas : follow, partage, repartage, et un petit cadeau pour le show — merci le chat !
+Like, partage, abonne-toi, et pousse un cadeau si tu kiffes — on envoie la sauce ensemble !
+Le follow et le partage, ça fait grandir le Congo — les cadeaux, ça garde le live vivant, merci !
