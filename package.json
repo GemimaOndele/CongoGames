@@ -31,6 +31,7 @@
     "theme:validate": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/validate-theme-videos.ps1",
     "unity:copy-playlist": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/copy-playlist-to-streamingassets.ps1",
     "unity:copy-jeux-playlist": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/copy-jeux-playlist-to-streamingassets.ps1",
+    "release:windows:smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/pre-release-windows.ps1",
     "webgl:vercel": "npx --yes vercel@latest deploy --prod",
     "backend:vercel": "node scripts/vercel-backend.mjs",
     "backend:vercel:env": "node scripts/vercel-env-from-dotenv.mjs",
