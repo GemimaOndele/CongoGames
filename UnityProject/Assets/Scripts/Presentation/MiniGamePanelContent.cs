@@ -4273,7 +4273,8 @@ namespace CongoGames.Presentation
         private IEnumerator CoImageHostThenRevealAndMusic()
         {
             string hint = CurrentImageGuessRound.Hint ?? "";
-            bool playLinkedAudio = ShouldPlayImageGuessAudio(CurrentImageGuessRound) && !currentImageVisualUnusable;
+            string resolvedAudioFileBase = ResolveImageGuessAudioFileBase(CurrentImageGuessRound);
+            bool playLinkedAudio = ShouldPlayImageGuessAudio(CurrentImageGuessRound);
             if (orchestrateHostForBlindAndImage)
             {
                 ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(1f);
@@ -4300,7 +4301,7 @@ namespace CongoGames.Presentation
                 int seed = (CurrentImageGuessRound.Hint ?? "image").GetHashCode();
                 GameAudioManager.Instance?.StopOverlayImmediately();
                 ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(0f);
-                GameSfxHub.Instance?.PlayBlindDemoMusic(seed, CurrentImageGuessRound.AudioFileBase, CurrentImageGuessRound.AudioUrl);
+                GameSfxHub.Instance?.PlayBlindDemoMusic(seed, resolvedAudioFileBase, CurrentImageGuessRound.AudioUrl);
                 imageMusicHintCo = StartCoroutine(CoStopImageMusicHintAfter(ImageGuessMusicClueSec));
             }
             else
@@ -4332,38 +4333,38 @@ namespace CongoGames.Presentation
 
         private static bool ShouldPlayImageGuessAudio(MiniGameDemoBanks.ImageGuessRound round)
         {
-            if (string.IsNullOrWhiteSpace(round.AudioFileBase) && string.IsNullOrWhiteSpace(round.AudioUrl))
+            // Une manche "image-guess" est considérée "liée à un extrait"
+            // dès qu'un fichier audio local ou une URL audio est explicitement fourni.
+            return !string.IsNullOrWhiteSpace(ResolveImageGuessAudioFileBase(round))
+                || !string.IsNullOrWhiteSpace(round.AudioUrl);
+        }
+
+        private static string ResolveImageGuessAudioFileBase(MiniGameDemoBanks.ImageGuessRound round)
+        {
+            if (!string.IsNullOrWhiteSpace(round.AudioFileBase))
             {
-                return false;
+                return round.AudioFileBase.Trim();
             }
 
+            // Repli dataset: certaines entrées portent uniquement [track:trackNN]
+            // dans le champ Trivia.
             string trivia = round.Trivia ?? "";
-            string triviaLower = trivia.ToLowerInvariant();
-            if (triviaLower.Contains("[category:"))
+            const string marker = "[track:";
+            int start = trivia.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+            if (start < 0)
             {
-                // Si une catégorie explicite existe, on applique la règle stricte.
-                return triviaLower.Contains("[category:music_related]");
+                return null;
             }
 
-            string corpus = ((round.Hint ?? "") + " " + trivia + " " + (round.AnswerKey ?? "") + " " + (round.StreamingFileBase ?? ""))
-                .ToLowerInvariant();
-            if (string.IsNullOrWhiteSpace(corpus)) return false;
-
-            string[] positive =
+            int valueStart = start + marker.Length;
+            int end = trivia.IndexOf(']', valueStart);
+            if (end <= valueStart)
             {
-                "chanteur", "chanteuse", "artiste", "groupe", "musique", "chanson",
-                "titre", "album", "feat", "featuring", "compositeur", "producteur",
-                "interpr", "audio", "clip", "rumba", "ndombolo", "orchestre"
-            };
-            foreach (string k in positive)
-            {
-                if (corpus.Contains(k))
-                {
-                    return true;
-                }
+                return null;
             }
 
-            return false;
+            string baseName = trivia.Substring(valueStart, end - valueStart).Trim();
+            return string.IsNullOrWhiteSpace(baseName) ? null : baseName;
         }
 
         private IEnumerator CoPreMusicCountdown(float seconds)

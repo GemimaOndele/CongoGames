@@ -322,7 +322,6 @@ namespace CongoGames.Audio
                 return false;
             }
 
-
             if (ThemeMusicPlayer.ShouldDeferDedicatedBgmForJeuxPlaylist())
             {
                 StopInspectorBgm(0.35f);
@@ -358,7 +357,6 @@ namespace CongoGames.Audio
             }
 
             string id = string.IsNullOrEmpty(modeId) ? "quiz" : modeId.Trim().ToLowerInvariant();
-
             if (overlayFadeCo != null)
             {
                 StopCoroutine(overlayFadeCo);

@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Networking;
@@ -38,6 +41,7 @@ namespace CongoGames.Presentation
         private AudioClip chronoTickClip;
         public bool IsBlindMusicPlaying => blindLoop != null && blindLoop.isPlaying && blindLoop.clip != null;
         public bool IsBlindMusicLoading => blindMusicCo != null;
+        private static Dictionary<string, string> blindTrackAliasCache;
 
         private void Awake()
         {
@@ -258,36 +262,44 @@ namespace CongoGames.Presentation
 
             if (loaded == null && !string.IsNullOrWhiteSpace(streamingFileBase))
             {
-                string baseClean = streamingFileBase.Trim();
+                string[] baseCandidates = BuildBlindFileBaseCandidates(streamingFileBase);
                 string[] exts = { ".ogg", ".mp3", ".wav" };
                 if (StreamingAssetsUrl.IsWebGlData)
                 {
                     string[] relRoots = { "Theme/BlindTest", "Theme/playlist", "Theme" };
                     foreach (string r in relRoots)
                     {
-                        foreach (string ext in exts)
+                        foreach (string baseClean in baseCandidates)
                         {
-                            string u = StreamingAssetsUrl.UrlForRelativePath(r + "/" + baseClean + ext);
-                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
-                            using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(u, at))
+                            foreach (string ext in exts)
                             {
-                                yield return uwr.SendWebRequest();
-                                if (uwr.result == UnityWebRequest.Result.Success)
+                                string u = StreamingAssetsUrl.UrlForRelativePath(r + "/" + baseClean + ext);
+                                AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
+                                using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(u, at))
                                 {
-                                    if (TryExtractDownloadedClip(uwr, out AudioClip c, out string reason))
+                                    yield return uwr.SendWebRequest();
+                                    if (uwr.result == UnityWebRequest.Result.Success)
                                     {
-                                        loaded = c;
-                                        break;
+                                        if (TryExtractDownloadedClip(uwr, out AudioClip c, out string reason))
+                                        {
+                                            loaded = c;
+                                            break;
+                                        }
+                                        lastRejectedSource = u;
+                                        lastRejectedReason = reason;
+                                        Debug.LogWarning("[BlindTest] Fichier webgl rejeté: " + u + " | " + reason);
                                     }
-                                    lastRejectedSource = u;
-                                    lastRejectedReason = reason;
-                                    Debug.LogWarning("[BlindTest] Fichier webgl rejeté: " + u + " | " + reason);
+                                    else
+                                    {
+                                        lastRejectedSource = u;
+                                        lastRejectedReason = "Erreur réseau: " + uwr.error;
+                                    }
                                 }
-                                else
-                                {
-                                    lastRejectedSource = u;
-                                    lastRejectedReason = "Erreur réseau: " + uwr.error;
-                                }
+                            }
+
+                            if (loaded != null)
+                            {
+                                break;
                             }
                         }
 
@@ -307,35 +319,54 @@ namespace CongoGames.Presentation
                     };
                     foreach (string root in rootFolders)
                     {
-                        foreach (string ext in exts)
+                        foreach (string baseClean in baseCandidates)
                         {
-                            string full = Path.Combine(root, baseClean + ext);
-                            if (!File.Exists(full))
+                            foreach (string ext in exts)
                             {
-                                continue;
-                            }
-
-                            AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
-                            string uri = StreamingAssetsUrl.ToRequestUrl(full);
-                            using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(uri, at))
-                            {
-                                yield return uwr.SendWebRequest();
-                                if (uwr.result == UnityWebRequest.Result.Success)
+                                string full = Path.Combine(root, baseClean + ext);
+                                if (!File.Exists(full))
                                 {
-                                    if (TryExtractDownloadedClip(uwr, out AudioClip c, out string reason))
+                                    continue;
+                                }
+
+                                AudioType at = ext == ".ogg" ? AudioType.OGGVORBIS : ext == ".mp3" ? AudioType.MPEG : AudioType.WAV;
+                                string uri = StreamingAssetsUrl.ToRequestUrl(full);
+                                using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(uri, at))
+                                {
+                                    yield return uwr.SendWebRequest();
+                                    if (uwr.result == UnityWebRequest.Result.Success)
                                     {
-                                        loaded = c;
+                                        if (TryExtractDownloadedClip(uwr, out AudioClip c, out string reason))
+                                        {
+                                            loaded = c;
+                                            break;
+                                        }
+                                        lastRejectedSource = full;
+                                        lastRejectedReason = reason;
+                                        Debug.LogWarning("[BlindTest] Fichier local rejeté (FMOD): " + full + " | " + reason);
+                                    }
+                                    else
+                                    {
+                                        lastRejectedSource = full;
+                                        lastRejectedReason = "Erreur réseau locale: " + uwr.error;
+                                    }
+                                }
+
+                                // Repli identique ThemeMusicPlayer : FMOD refuse souvent MP3/OGG sous Windows — WAV natif ou ffmpeg.
+                                if (loaded == null && File.Exists(full))
+                                {
+                                    AudioClip bypass = TryLoadBlindTrackBypassingFmod(full);
+                                    if (bypass != null)
+                                    {
+                                        loaded = bypass;
                                         break;
                                     }
-                                    lastRejectedSource = full;
-                                    lastRejectedReason = reason;
-                                    Debug.LogWarning("[BlindTest] Fichier local rejeté: " + full + " | " + reason);
                                 }
-                                else
-                                {
-                                    lastRejectedSource = full;
-                                    lastRejectedReason = "Erreur réseau locale: " + uwr.error;
-                                }
+                            }
+
+                            if (loaded != null)
+                            {
+                                break;
                             }
                         }
 
@@ -375,6 +406,276 @@ namespace CongoGames.Presentation
             if (u.Contains(".wav")) return AudioType.WAV;
             if (u.Contains(".mp3")) return AudioType.MPEG;
             return AudioType.UNKNOWN;
+        }
+
+        private static string[] BuildBlindFileBaseCandidates(string streamingFileBase)
+        {
+            string baseClean = (streamingFileBase ?? "").Trim();
+            if (string.IsNullOrWhiteSpace(baseClean))
+            {
+                return Array.Empty<string>();
+            }
+
+            var candidates = new List<string>(2) { baseClean };
+            if (TryResolveTrackAlias(baseClean, out string alias) && !string.Equals(alias, baseClean, StringComparison.OrdinalIgnoreCase))
+            {
+                candidates.Add(alias);
+            }
+
+            return candidates.ToArray();
+        }
+
+        private static bool TryResolveTrackAlias(string trackBase, out string resolvedBase)
+        {
+            resolvedBase = null;
+            if (string.IsNullOrWhiteSpace(trackBase))
+            {
+                return false;
+            }
+
+            string key = trackBase.Trim();
+            if (!IsTrackKey(key))
+            {
+                return false;
+            }
+
+            if (blindTrackAliasCache == null)
+            {
+                blindTrackAliasCache = BuildBlindTrackAliasCache();
+            }
+
+            if (blindTrackAliasCache != null && blindTrackAliasCache.TryGetValue(key, out string alias) && !string.IsNullOrWhiteSpace(alias))
+            {
+                resolvedBase = alias;
+                return true;
+            }
+
+            // Dernier repli: garantir une piste jouable même si la métadonnée
+            // ne peut pas être associée exactement au fichier.
+            string byIndex = ResolveTrackAliasByIndex(key);
+            if (!string.IsNullOrWhiteSpace(byIndex))
+            {
+                resolvedBase = byIndex;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsTrackKey(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return false;
+            }
+
+            string t = text.Trim().ToLowerInvariant();
+            if (!t.StartsWith("track", StringComparison.Ordinal) || t.Length <= 5)
+            {
+                return false;
+            }
+
+            for (int i = 5; i < t.Length; i++)
+            {
+                if (!char.IsDigit(t[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool TryParseTrackNumber(string trackKey, out int trackNumber)
+        {
+            trackNumber = 0;
+            if (!IsTrackKey(trackKey))
+            {
+                return false;
+            }
+
+            string t = trackKey.Trim().Substring(5);
+            return int.TryParse(t, out trackNumber) && trackNumber > 0;
+        }
+
+        private static Dictionary<string, string> BuildBlindTrackAliasCache()
+        {
+            var cache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                string metaPath = Path.Combine(Application.streamingAssetsPath, "Datasets", "blind_playlist_meta.json");
+                string playlistDir = Path.Combine(Application.streamingAssetsPath, "Theme", "playlist");
+                if (!File.Exists(metaPath) || !Directory.Exists(playlistDir))
+                {
+                    return cache;
+                }
+
+                string json = File.ReadAllText(metaPath);
+                BlindMetaFileForAlias meta = JsonUtility.FromJson<BlindMetaFileForAlias>(json);
+                if (meta?.items == null || meta.items.Length == 0)
+                {
+                    return cache;
+                }
+
+                string[] files = Directory.GetFiles(playlistDir);
+                foreach (BlindMetaItemForAlias item in meta.items)
+                {
+                    if (item == null || string.IsNullOrWhiteSpace(item.fileBase) || !IsTrackKey(item.fileBase))
+                    {
+                        continue;
+                    }
+
+                    string alias = FindBestPlaylistFileBase(files, item.artist, item.title);
+                    if (!string.IsNullOrWhiteSpace(alias))
+                    {
+                        cache[item.fileBase.Trim()] = alias;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Ne pas casser le flux blind test si la résolution d'alias échoue.
+            }
+
+            return cache;
+        }
+
+        private static string ResolveTrackAliasByIndex(string trackKey)
+        {
+            if (!TryParseTrackNumber(trackKey, out int trackNumber))
+            {
+                return null;
+            }
+
+            try
+            {
+                string playlistDir = Path.Combine(Application.streamingAssetsPath, "Theme", "playlist");
+                if (!Directory.Exists(playlistDir))
+                {
+                    return null;
+                }
+
+                string[] files = Directory.GetFiles(playlistDir);
+                var audio = new List<string>();
+                for (int i = 0; i < files.Length; i++)
+                {
+                    string ext = Path.GetExtension(files[i]);
+                    if (ext.Equals(".ogg", StringComparison.OrdinalIgnoreCase)
+                        || ext.Equals(".mp3", StringComparison.OrdinalIgnoreCase)
+                        || ext.Equals(".wav", StringComparison.OrdinalIgnoreCase))
+                    {
+                        audio.Add(files[i]);
+                    }
+                }
+
+                if (audio.Count == 0)
+                {
+                    return null;
+                }
+
+                audio.Sort(StringComparer.OrdinalIgnoreCase);
+                int idx = (trackNumber - 1) % audio.Count;
+                if (idx < 0 || idx >= audio.Count)
+                {
+                    return null;
+                }
+
+                return Path.GetFileNameWithoutExtension(audio[idx]);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static string FindBestPlaylistFileBase(string[] files, string artist, string title)
+        {
+            if (files == null || files.Length == 0)
+            {
+                return null;
+            }
+
+            string artistN = NormalizeForMatch(artist);
+            string titleN = NormalizeForMatch(title);
+            int bestScore = -1;
+            string bestBase = null;
+
+            foreach (string f in files)
+            {
+                string ext = Path.GetExtension(f);
+                if (!ext.Equals(".ogg", StringComparison.OrdinalIgnoreCase)
+                    && !ext.Equals(".mp3", StringComparison.OrdinalIgnoreCase)
+                    && !ext.Equals(".wav", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                string stem = Path.GetFileNameWithoutExtension(f);
+                string stemN = NormalizeForMatch(stem);
+                int score = 0;
+                if (!string.IsNullOrWhiteSpace(titleN) && stemN.Contains(titleN))
+                {
+                    score += 3;
+                }
+
+                if (!string.IsNullOrWhiteSpace(artistN) && stemN.Contains(artistN))
+                {
+                    score += 2;
+                }
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestBase = stem;
+                }
+            }
+
+            return bestScore >= 2 ? bestBase : null;
+        }
+
+        private static string NormalizeForMatch(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return string.Empty;
+            }
+
+            string decomposed = raw.ToLowerInvariant().Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder(decomposed.Length);
+            for (int i = 0; i < decomposed.Length; i++)
+            {
+                char c = decomposed[i];
+                UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (cat == UnicodeCategory.NonSpacingMark)
+                {
+                    continue;
+                }
+
+                if (char.IsLetterOrDigit(c))
+                {
+                    sb.Append(c);
+                }
+                else
+                {
+                    sb.Append(' ');
+                }
+            }
+
+            return sb.ToString().Trim();
+        }
+
+        [Serializable]
+        private sealed class BlindMetaFileForAlias
+        {
+            public BlindMetaItemForAlias[] items;
+        }
+
+        [Serializable]
+        private sealed class BlindMetaItemForAlias
+        {
+            public string fileBase;
+            public string artist;
+            public string title;
         }
 
         private static bool TryExtractDownloadedClip(UnityWebRequest uwr, out AudioClip clip, out string reason)
@@ -458,6 +759,35 @@ namespace CongoGames.Presentation
                 source.PlayOneShot(badClip, 1.05f);
                 FeedbackVfxController.Instance?.PlayWrong();
             }
+        }
+
+        /// <summary>Même stratégie que <see cref="ThemeMusicPlayer"/> : éviter FMOD sur fichier local.</summary>
+        private static AudioClip TryLoadBlindTrackBypassingFmod(string fullPath)
+        {
+            if (string.IsNullOrEmpty(fullPath) || !File.Exists(fullPath))
+            {
+                return null;
+            }
+
+            string ext = Path.GetExtension(fullPath);
+            if (ext.Equals(".wav", StringComparison.OrdinalIgnoreCase))
+            {
+                if (ThemeMusicPlayer.TryLoadPcmWavFileIntoClip(fullPath, out AudioClip w) && w != null)
+                {
+                    return w;
+                }
+            }
+
+            string wavTmp = ThemeMusicPlayer.TryTranscodeLocalAudioWithFfmpeg(fullPath);
+            if (!string.IsNullOrEmpty(wavTmp) && File.Exists(wavTmp))
+            {
+                if (ThemeMusicPlayer.TryLoadPcmWavFileIntoClip(wavTmp, out AudioClip pcm) && pcm != null)
+                {
+                    return pcm;
+                }
+            }
+
+            return null;
         }
 
         private void OnDestroy()

@@ -522,11 +522,63 @@ namespace CongoGames.Presentation
                 || (jeuxSegmentScheduleActive && trackPaths.Count >= 1);
             if (loadPlaylist && trackPaths.Count > 0)
             {
+                var loadedPairs = new List<(string path, AudioClip clip)>(trackPaths.Count);
                 foreach (string path in trackPaths)
                 {
                     AudioClip clip = null;
                     yield return DownloadClip(path, Path.GetFileName(path), c => clip = c);
                     if (clip != null)
+                    {
+                        loadedPairs.Add((path, clip));
+                    }
+                }
+
+                const string jeuxMarker = "Jeux_musique_playlist";
+                if (jeuxSegmentScheduleActive && loadedPairs.Count > 0)
+                {
+                    var themeClips = new List<AudioClip>();
+                    var jeuxClips = new List<AudioClip>();
+                    foreach ((string path, AudioClip clip) in loadedPairs)
+                    {
+                        if (path.IndexOf(jeuxMarker, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            jeuxClips.Add(clip);
+                        }
+                        else
+                        {
+                            themeClips.Add(clip);
+                        }
+                    }
+
+                    if (themeClips.Count > 0 && jeuxClips.Count > 0)
+                    {
+                        foreach (AudioClip c in MergeJeuxAndThemePlayOrder(themeClips, jeuxClips))
+                        {
+                            playlistClips.Add(c);
+                        }
+                    }
+                    else
+                    {
+                        foreach ((_, AudioClip clip) in loadedPairs)
+                        {
+                            playlistClips.Add(clip);
+                        }
+                    }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    int pathsHorsJeux = trackPaths.Count(p => p.IndexOf(jeuxMarker, StringComparison.OrdinalIgnoreCase) < 0);
+                    if (pathsHorsJeux > 0 && themeClips.Count == 0 && jeuxClips.Count > 0)
+                    {
+                        Debug.LogWarning(
+                            "ThemeMusicPlayer : aucune ambiance Theme chargée ("
+                            + pathsHorsJeux
+                            + " fichiers hors Jeux ont échoué au décodage). Sur l’EXE Windows, place ffmpeg sur le PATH système ou à côté du jeu ; les .wav/.ogg Theme passent souvent par ffmpeg si FMOD refuse le fichier.");
+                    }
+#endif
+                }
+                else
+                {
+                    foreach ((_, AudioClip clip) in loadedPairs)
                     {
                         playlistClips.Add(clip);
                     }
@@ -991,6 +1043,49 @@ namespace CongoGames.Presentation
                     list[j] = tmp;
                 }
             }
+        }
+
+        /// <summary>
+        /// Mélange Theme et Jeux puis entrelace (évite d’enchaîner surtout des titres Jeux si les deux pools sont chargés).
+        /// </summary>
+        private static List<AudioClip> MergeJeuxAndThemePlayOrder(List<AudioClip> themeClips, List<AudioClip> jeuxClips)
+        {
+            var result = new List<AudioClip>();
+            if (themeClips == null || jeuxClips == null)
+            {
+                return result;
+            }
+
+            var ta = new List<AudioClip>(themeClips);
+            var jb = new List<AudioClip>(jeuxClips);
+            ShuffleAudioClipListCryptographic(ta);
+            ShuffleAudioClipListCryptographic(jb);
+            int i = 0;
+            int j = 0;
+            bool takeTheme = UnityEngine.Random.Range(0, 2) == 0;
+            while (i < ta.Count || j < jb.Count)
+            {
+                if (takeTheme && i < ta.Count)
+                {
+                    result.Add(ta[i++]);
+                }
+                else if (!takeTheme && j < jb.Count)
+                {
+                    result.Add(jb[j++]);
+                }
+                else if (i < ta.Count)
+                {
+                    result.Add(ta[i++]);
+                }
+                else if (j < jb.Count)
+                {
+                    result.Add(jb[j++]);
+                }
+
+                takeTheme = !takeTheme;
+            }
+
+            return result;
         }
 
         /// <summary>Évite de redémarrer sur la même 1ʳᵉ piste qu’au lancement précédent (PlayerPrefs).</summary>
@@ -1544,7 +1639,8 @@ namespace CongoGames.Presentation
         /// <summary>
         /// ffmpeg doit être disponible sur le PATH (Windows : winget install ffmpeg / choco install ffmpeg).
         /// </summary>
-        private static string TryTranscodeLocalAudioWithFfmpeg(string sourcePath)
+        /// <summary>Utilisable par <see cref="GameSfxHub"/> (blind / image guess) pour le même repli que la BGM Theme.</summary>
+        public static string TryTranscodeLocalAudioWithFfmpeg(string sourcePath)
         {
             try
             {
@@ -1626,7 +1722,8 @@ namespace CongoGames.Presentation
         /// <summary>
         /// Charge un WAV PCM 16 bits little-endian sans passer par UnityWebRequest / FMOD (évite les erreurs GetContent sur certains flux).
         /// </summary>
-        private static bool TryLoadPcmWavFileIntoClip(string wavPath, out AudioClip clip)
+        /// <summary>Utilisable par <see cref="GameSfxHub"/> pour lire un WAV sans FMOD.</summary>
+        public static bool TryLoadPcmWavFileIntoClip(string wavPath, out AudioClip clip)
         {
             clip = null;
 
