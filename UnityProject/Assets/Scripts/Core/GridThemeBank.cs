@@ -7,6 +7,7 @@ namespace CongoGames.Core
 {
     /// <summary>
     /// Thèmes pour mots mélangés / mots croisés : listes de mots liés au Congo (pas RDC) — mélange et tirage 5–15 mots.
+    /// Référentiel de validation scolaire: docs/grid-theme-bank-validation-fr.md
     /// </summary>
     public static class GridThemeBank
     {
@@ -29,6 +30,22 @@ namespace CongoGames.Core
             new Theme("geo", "Géo & lieux (Congo)", new[]
             {
                 "KINTELE", "POINTE", "CUVETTE", "LIKOUALA", "SANGHA", "POOL", "LEFINI", "NIARI", "LOANGO", "OUESSO", "BETOU", "IMPFON", "BANIO", "MAYOMB", "ESTUA", "BASSA", "MFOUA", "LOUBO", "KINKA", "NOIRE"
+            }),
+            new Theme("departements", "Départements du Congo", new[]
+            {
+                "BOUENZA", "BRAZZAVILLE", "CUVETTE", "CUVETTEOUEST", "KOUILOU", "LEKOUMOU",
+                "LIKOUALA", "NIARI", "PLATEAUX", "POINTENOIRE", "POOL", "SANGHA"
+            }),
+            new Theme("affluents", "Affluents & rivières (Congo)", new[]
+            {
+                "ALIMA", "LIKOUALA", "MOSSAKA", "SANGHA", "NGOKO", "LEFINI",
+                "DJOUE", "FOULAKARI", "LOUFIKA", "BOUENZA", "NIARI", "KOUILOU",
+                "MPASSA", "LOUBILIKA", "MOTABA", "FAYA", "LIKOUALAUX"
+            }),
+            new Theme("villes", "Villes & préfectures (Congo)", new[]
+            {
+                "BRAZZAVILLE", "POINTENOIRE", "DOLISIE", "SIBITI", "MADINGOU", "OWANDO",
+                "EWO", "IMPFONDO", "DJAMBALA", "KINKALA", "OUESSO", "LOANGO"
             }),
             new Theme("nature", "Forêts, fleuve, faune", new[]
             {
@@ -186,6 +203,24 @@ namespace CongoGames.Core
                 || s.IndexOf("lieux", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 return "Indice : cartes, fleuves, villes et régions du Congo.";
+            }
+
+            if (s.IndexOf("Départements", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : divisions administratives de la République du Congo.";
+            }
+
+            if (s.IndexOf("Affluents", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("rivières", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : rivières et affluents du bassin du Congo (côté Congo).";
+            }
+
+            if (s.IndexOf("Villes", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("préfectures", StringComparison.OrdinalIgnoreCase) >= 0
+                || s.IndexOf("prefectures", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "Indice : villes congolaises et chefs-lieux départementaux.";
             }
 
             if (s.IndexOf("Forêt", StringComparison.OrdinalIgnoreCase) >= 0
