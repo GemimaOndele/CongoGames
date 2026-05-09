@@ -3881,7 +3881,10 @@ namespace CongoGames.Presentation
             string word = MiniGameDemoBanks.NextMysteryWord();
             word = GridThemeBank.SanitizeForGrid(word ?? "");
             if (string.IsNullOrEmpty(word)) word = "CONGO";
-            int count = Mathf.Clamp(word.Length, 6, memoryCards != null ? memoryCards.Length : 8);
+            int maxCards = memoryCards != null ? memoryCards.Length : 12;
+            // Ne jamais réclamer plus de lettres que word n'en contient (Substring plante sinon).
+            int targetCells = Mathf.Clamp(word.Length, 6, maxCards);
+            int count = Mathf.Min(word.Length, targetCells);
             memoryComposedWord = word.Substring(0, count);
             memorySequence = new MemoryCellDescriptor[count];
             System.Random rng = new System.Random(UnityEngine.Random.Range(0, int.MaxValue));
