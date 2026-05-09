@@ -463,7 +463,8 @@ namespace CongoGames.Network
             {
                 GameAudioManager.Instance?.OnLiveCorrectAnswer();
                 AIHostManager.Instance?.Speak(user + " bonne reponse.");
-                MiniGamePanelContent.Instance?.RequestAdditionalAnnouncementDelay(Mathf.Max(0f, qcmVoteDisplaySeconds));
+                MiniGamePanelContent.Instance?.RequestAdditionalAnnouncementDelay(
+                    Mathf.Max(0f, qcmVoteDisplaySeconds + qcmScoreAfterVoteGapSeconds));
                 if (pendingCorrectToastCo != null)
                 {
                     StopCoroutine(pendingCorrectToastCo);
@@ -693,17 +694,8 @@ namespace CongoGames.Network
             socket = null;
             if (s != null)
             {
-                try
-                {
-                    if (s.State == WebSocketState.Open || s.State == WebSocketState.CloseReceived)
-                    {
-                        using var closeCts = new CancellationTokenSource(180);
-                        s.CloseAsync(WebSocketCloseStatus.NormalClosure, "shutdown", closeCts.Token)
-                            .GetAwaiter()
-                            .GetResult();
-                    }
-                }
-                catch { }
+                // Ne pas appeler CloseAsync en synchrone ici : avec le reload de domaine Unity / Play Mode,
+                // GetAwaiter().GetResult() laisse souvent des callbacks natifs et déclenche « invalid GC handle ».
                 try
                 {
                     s.Abort();
