@@ -16,11 +16,15 @@ const __dirname = path.dirname(__filename);
 
 const DEFAULT_PRONUNCIATION_OVERRIDES = [
   ["chat", "tchat"],
+  ["chater", "tchater"],
+  ["chatter", "tchatter"],
   ["te", "té"],
   ["mbote", "mboté"],
   ["nzele", "nzèlè"],
   ["mwasi", "mwassi"],
   ["moasi", "mwassi"],
+  ["lingala", "lingála"],
+  ["kituba", "kitouba"],
   ["nana", "nana"],
   ["momi", "momí"],
   ["momí", "momí"],

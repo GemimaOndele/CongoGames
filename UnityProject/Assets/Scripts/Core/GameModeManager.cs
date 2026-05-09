@@ -395,6 +395,14 @@ namespace CongoGames.Core
             float keepTimer = Mathf.Max(0.01f, timer);
             float keepDisplayed = Mathf.Max(0.01f, displayedRoundDuration);
 
+            float toastWaitUntil = Time.unscaledTime + 8f;
+            while (MiniGamePanelContent.Instance != null
+                && MiniGamePanelContent.Instance.IsScorePauseOverlayVisible
+                && Time.unscaledTime < toastWaitUntil)
+            {
+                yield return null;
+            }
+
             HostTransitionOverlay.Instance?.ShowQuestionIncoming();
             AIHostManager.Instance?.InterruptSpeech();
             AIHostManager.Instance?.Speak(LiaPunchlineBank.BuildNextQuestionLine(modeId));
@@ -420,6 +428,14 @@ namespace CongoGames.Core
 
         private IEnumerator CoStartModeAfterAnnouncement(string fromId, string toId, IGameMode mode)
         {
+            float toastWaitUntil = Time.unscaledTime + 8f;
+            while (MiniGamePanelContent.Instance != null
+                && MiniGamePanelContent.Instance.IsScorePauseOverlayVisible
+                && Time.unscaledTime < toastWaitUntil)
+            {
+                yield return null;
+            }
+
             HostTransitionOverlay.Instance?.ShowNewGameIncoming(GetModeDisplayName(toId));
             AIHostManager.Instance?.InterruptSpeech();
             string liaLine = LiaPunchlineBank.BuildTransitionWithRules(fromId, toId);

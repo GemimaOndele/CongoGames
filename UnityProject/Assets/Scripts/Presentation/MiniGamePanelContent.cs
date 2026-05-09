@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -23,6 +24,8 @@ namespace CongoGames.Presentation
     public class MiniGamePanelContent : MonoBehaviour
     {
         public static MiniGamePanelContent Instance { get; private set; }
+        public bool IsScorePauseOverlayVisible => gridFoundToastRoot != null && gridFoundToastRoot.gameObject.activeSelf;
+        private static readonly Regex ChatChoiceRegex = new Regex(@"(?:^|[^A-Z0-9])([ABCD]|[1-4])(?:[^A-Z0-9]|$)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private const int CrosswordCols = 10;
         private const int CrosswordTotalCells = CrosswordCols * CrosswordCols;
@@ -1105,6 +1108,13 @@ namespace CongoGames.Presentation
                 return;
             }
 
+            if (string.Equals(mode, "speed-chrono", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!TryParseChoiceFromChat(msg, out int pick)) return;
+                OnChronoInput(pick);
+                return;
+            }
+
             if (!string.Equals(mode, "semantic", StringComparison.OrdinalIgnoreCase) || semanticRoundResolved) return;
 
             string w = GridThemeBank.SanitizeForGrid(msg);
@@ -1129,16 +1139,17 @@ namespace CongoGames.Presentation
             index = -1;
             if (string.IsNullOrWhiteSpace(raw)) return false;
             string t = raw.Trim().ToUpperInvariant();
-            if (t.Length > 1)
+            Match m = ChatChoiceRegex.Match(t);
+            if (!m.Success)
             {
-                // garde la première lettre utile (ex: "A.", "A)", "A ")
-                t = t[0].ToString();
+                return false;
             }
 
-            if (t == "A" || t == "1") { index = 0; return true; }
-            if (t == "B" || t == "2") { index = 1; return true; }
-            if (t == "C" || t == "3") { index = 2; return true; }
-            if (t == "D" || t == "4") { index = 3; return true; }
+            string token = m.Groups[1].Value;
+            if (token == "A" || token == "1") { index = 0; return true; }
+            if (token == "B" || token == "2") { index = 1; return true; }
+            if (token == "C" || token == "3") { index = 2; return true; }
+            if (token == "D" || token == "4") { index = 3; return true; }
             return false;
         }
 
@@ -3440,11 +3451,12 @@ namespace CongoGames.Presentation
         {
             GameAudioManager.Instance?.StopOverlayImmediately();
             GameSfxHub.Instance?.SetBroadcastDuckMultiplier(1f);
+            string blindContext = (raw.Prompt ?? "") + " " + (raw.CategoryLabel ?? "") + " " + (raw.SubLine ?? "");
 
             // Blind test: silence total du fond pendant l'écoute.
             ThemeMusicPlayer.Instance?.SetBroadcastDuckMultiplier(0f);
             ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(0f);
-            GameSfxHub.Instance?.PlayBlindDemoMusic(musicSeed, raw.AudioFileBase, raw.AudioUrl);
+            GameSfxHub.Instance?.PlayBlindDemoMusic(musicSeed, raw.AudioFileBase, raw.AudioUrl, blindContext);
             // On laisse la piste liée à la question finir de charger avant fallback.
             float warmupEnd = Time.unscaledTime + 6f;
             while (GameSfxHub.Instance != null
@@ -3458,7 +3470,7 @@ namespace CongoGames.Presentation
             {
                 // Si la piste fournie n'est pas lisible, on force immédiatement un stub audible
                 // pour conserver le rythme "écoute -> chrono -> réponses".
-                GameSfxHub.Instance.PlayBlindDemoMusic(musicSeed, null, null);
+                GameSfxHub.Instance.PlayBlindDemoMusic(musicSeed, null, null, blindContext);
                 float fallbackWarmupEnd = Time.unscaledTime + 0.8f;
                 while (GameSfxHub.Instance != null
                     && !GameSfxHub.Instance.IsBlindMusicPlaying
@@ -3471,11 +3483,30 @@ namespace CongoGames.Presentation
             blindListenWindowSec = wait;
             blindListenEndUnscaled = Time.unscaledTime + wait;
             int total = Mathf.Clamp(Mathf.RoundToInt(wait), 1, 180);
+            int watchdogRetries = 0;
+            float watchdogNextRetryAt = Time.unscaledTime + 1.25f;
             while (Time.unscaledTime < blindListenEndUnscaled)
             {
                 // Ré-applique le mute en continu pour éviter tout retour fond (events externes / autres scripts).
                 ThemeMusicPlayer.Instance?.SetBroadcastDuckMultiplier(0f);
                 ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(0f);
+                if (GameSfxHub.Instance != null
+                    && !GameSfxHub.Instance.IsBlindMusicPlaying
+                    && !GameSfxHub.Instance.IsBlindMusicLoading
+                    && watchdogRetries < 3
+                    && Time.unscaledTime >= watchdogNextRetryAt)
+                {
+                    // Watchdog anti-silence: si la piste s'arrête/échoue en plein chrono,
+                    // on relance une source audible sans casser la manche.
+                    watchdogRetries++;
+                    bool tryPrimary = watchdogRetries == 1;
+                    GameSfxHub.Instance.PlayBlindDemoMusic(
+                        musicSeed + (watchdogRetries * 17),
+                        tryPrimary ? raw.AudioFileBase : null,
+                        tryPrimary ? raw.AudioUrl : null,
+                        blindContext);
+                    watchdogNextRetryAt = Time.unscaledTime + 1.5f;
+                }
                 float rem = Mathf.Max(0f, blindListenEndUnscaled - Time.unscaledTime);
                 int secLeft = Mathf.Max(0, Mathf.CeilToInt(rem));
                 if (blindSub != null)
@@ -4529,7 +4560,8 @@ namespace CongoGames.Presentation
                 int seed = (CurrentImageGuessRound.Hint ?? "image").GetHashCode();
                 GameAudioManager.Instance?.StopOverlayImmediately();
                 ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(0f);
-                GameSfxHub.Instance?.PlayBlindDemoMusic(seed, resolvedAudioFileBase, CurrentImageGuessRound.AudioUrl);
+                string imageContext = (CurrentImageGuessRound.Hint ?? "") + " " + (CurrentImageGuessRound.Trivia ?? "");
+                GameSfxHub.Instance?.PlayBlindDemoMusic(seed, resolvedAudioFileBase, CurrentImageGuessRound.AudioUrl, imageContext);
                 imageMusicHintCo = StartCoroutine(CoStopImageMusicHintAfter(ImageGuessMusicClueSec));
             }
             else

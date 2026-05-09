@@ -43,6 +43,12 @@ namespace CongoGames.Presentation
         public bool IsBlindMusicLoading => blindMusicCo != null;
         private static Dictionary<string, string> blindTrackAliasCache;
         private static Dictionary<string, string> blindLooseBaseCache;
+        private static BlindStartRule[] blindStartRules;
+        private static bool blindStartRulesLoaded;
+        private static float blindDefaultStartPercent = 0.5f;
+        private readonly Dictionary<string, float> blindPlaybackCursorByKey = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
+        private string blindCurrentPlaybackKey;
+        private string blindPendingQuestionContext;
 
         private void Awake()
         {
@@ -179,8 +185,9 @@ namespace CongoGames.Presentation
             Destroy(drum, 2f);
         }
 
-        public void PlayBlindDemoMusic(int seed, string streamingFileBase = null, string remoteUrl = null)
+        public void PlayBlindDemoMusic(int seed, string streamingFileBase = null, string remoteUrl = null, string questionContext = null)
         {
+            blindPendingQuestionContext = questionContext ?? "";
             StopBlindDemoMusic();
             if (blindLoop == null) return;
             blindLoop.loop = true;
@@ -189,6 +196,7 @@ namespace CongoGames.Presentation
 
         public void StopBlindDemoMusic()
         {
+            SaveBlindPlaybackCursor();
             if (blindMusicCo != null)
             {
                 StopCoroutine(blindMusicCo);
@@ -206,6 +214,7 @@ namespace CongoGames.Presentation
                 Destroy(blindLoopClip);
                 blindLoopClip = null;
             }
+            blindCurrentPlaybackKey = null;
 
             RefreshSfxVolumes();
         }
@@ -394,10 +403,250 @@ namespace CongoGames.Presentation
             }
 
             blindLoopClip = loaded;
+            string playbackKey = BuildBlindPlaybackKey(streamingFileBase, remoteUrl, loaded);
+            blindCurrentPlaybackKey = playbackKey;
             blindLoop.clip = blindLoopClip;
+            float startAt = ResolveBlindPlaybackStartSeconds(playbackKey, loaded.length, blindPendingQuestionContext);
+            if (!string.IsNullOrWhiteSpace(playbackKey)
+                && blindPlaybackCursorByKey.TryGetValue(playbackKey, out float saved)
+                && saved > 0.05f
+                && saved < Mathf.Max(0.1f, loaded.length - 0.1f))
+            {
+                startAt = saved;
+            }
+
+            if (loaded.length > 0.1f)
+            {
+                blindLoop.time = Mathf.Clamp(startAt, 0f, Mathf.Max(0f, loaded.length - 0.02f));
+            }
             blindLoop.Play();
             RefreshSfxVolumes();
             blindMusicCo = null;
+        }
+
+        private void SaveBlindPlaybackCursor()
+        {
+            if (blindLoop == null || blindLoop.clip == null || string.IsNullOrWhiteSpace(blindCurrentPlaybackKey))
+            {
+                return;
+            }
+
+            float len = blindLoop.clip.length;
+            if (len <= 0.1f)
+            {
+                return;
+            }
+
+            float pos = Mathf.Clamp(blindLoop.time, 0f, len - 0.01f);
+            if (pos < 0.05f)
+            {
+                return;
+            }
+
+            blindPlaybackCursorByKey[blindCurrentPlaybackKey] = pos;
+        }
+
+        private static string BuildBlindPlaybackKey(string streamingFileBase, string remoteUrl, AudioClip clip)
+        {
+            string url = (remoteUrl ?? "").Trim();
+            if (!string.IsNullOrWhiteSpace(url))
+            {
+                return "url:" + url.ToLowerInvariant();
+            }
+
+            string baseName = (streamingFileBase ?? "").Trim();
+            if (!string.IsNullOrWhiteSpace(baseName))
+            {
+                if (TryResolveTrackAlias(baseName, out string alias) && !string.IsNullOrWhiteSpace(alias))
+                {
+                    return "base:" + NormalizeForMatch(alias);
+                }
+                return "base:" + NormalizeForMatch(baseName);
+            }
+
+            if (clip != null && !string.IsNullOrWhiteSpace(clip.name))
+            {
+                return "clip:" + NormalizeForMatch(clip.name);
+            }
+
+            return "";
+        }
+
+        private static float ResolveBlindPlaybackStartSeconds(string playbackKey, float clipLength, string questionContext)
+        {
+            if (clipLength <= 0.2f)
+            {
+                return 0f;
+            }
+
+            string keyN = NormalizeForMatch(playbackKey);
+            string ctxN = NormalizeForMatch(questionContext);
+
+            if (TryResolveBlindStartFromOverrides(keyN, ctxN, clipLength, out float fromOverrides))
+            {
+                return fromOverrides;
+            }
+
+            bool isBlemixDelinquant = keyN.Contains("blemix") && keyN.Contains("delinquant");
+            if (isBlemixDelinquant)
+            {
+                return Mathf.Clamp(10f, 0f, Mathf.Max(0f, clipLength - 0.2f));
+            }
+
+            bool isSiboyMobali = keyN.Contains("siboy") && keyN.Contains("mobali");
+            bool artistQuestion = IsArtistQuestionContext(ctxN);
+            bool titleQuestion = IsTitleQuestionContext(ctxN);
+            if (isSiboyMobali)
+            {
+                if (artistQuestion)
+                {
+                    return 0f;
+                }
+
+                if (titleQuestion)
+                {
+                    return Mathf.Clamp(clipLength * 0.72f, 0f, Mathf.Max(0f, clipLength - 0.2f));
+                }
+
+                return Mathf.Clamp(clipLength * 0.58f, 0f, Mathf.Max(0f, clipLength - 0.2f));
+            }
+
+            // Règle générale demandée: éviter les toutes premières secondes.
+            return Mathf.Clamp(clipLength * 0.5f, 0f, Mathf.Max(0f, clipLength - 0.2f));
+        }
+
+        private static bool TryResolveBlindStartFromOverrides(string normalizedPlaybackKey, string normalizedQuestionContext, float clipLength, out float startSec)
+        {
+            startSec = 0f;
+            LoadBlindStartRulesOnce();
+            if (blindStartRules == null || blindStartRules.Length == 0)
+            {
+                return false;
+            }
+
+            bool artistQuestion = IsArtistQuestionContext(normalizedQuestionContext);
+            bool titleQuestion = IsTitleQuestionContext(normalizedQuestionContext);
+            foreach (BlindStartRule rule in blindStartRules)
+            {
+                if (rule == null || string.IsNullOrWhiteSpace(rule.match))
+                {
+                    continue;
+                }
+
+                if (!IsLooseRuleMatch(normalizedPlaybackKey, NormalizeForMatch(rule.match)))
+                {
+                    continue;
+                }
+
+                string scope = (rule.questionScope ?? "any").Trim().ToLowerInvariant();
+                if (scope == "artist" && !artistQuestion) continue;
+                if (scope == "title" && !titleQuestion) continue;
+
+                startSec = ComputeStartFromRule(rule.mode, rule.value, clipLength);
+                return true;
+            }
+
+            // Même sans règle matchée: fallback configurable JSON.
+            startSec = Mathf.Clamp(clipLength * Mathf.Clamp01(blindDefaultStartPercent), 0f, Mathf.Max(0f, clipLength - 0.2f));
+            return true;
+        }
+
+        private static float ComputeStartFromRule(string mode, float value, float clipLength)
+        {
+            string m = (mode ?? "").Trim().ToLowerInvariant();
+            switch (m)
+            {
+                case "start":
+                    return 0f;
+                case "seconds":
+                    return Mathf.Clamp(value, 0f, Mathf.Max(0f, clipLength - 0.2f));
+                case "percent":
+                    return Mathf.Clamp(clipLength * Mathf.Clamp01(value), 0f, Mathf.Max(0f, clipLength - 0.2f));
+                default:
+                    return Mathf.Clamp(clipLength * 0.5f, 0f, Mathf.Max(0f, clipLength - 0.2f));
+            }
+        }
+
+        private static bool IsLooseRuleMatch(string normalizedText, string normalizedRule)
+        {
+            if (string.IsNullOrWhiteSpace(normalizedText) || string.IsNullOrWhiteSpace(normalizedRule))
+            {
+                return false;
+            }
+
+            string[] tokens = normalizedRule.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                string t = tokens[i];
+                if (t.Length <= 1) continue;
+                if (normalizedText.IndexOf(t, StringComparison.Ordinal) < 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static void LoadBlindStartRulesOnce()
+        {
+            if (blindStartRulesLoaded)
+            {
+                return;
+            }
+
+            blindStartRulesLoaded = true;
+            try
+            {
+                TextAsset ta = Resources.Load<TextAsset>("Datasets/audio_playback_start_overrides");
+                if (ta == null || string.IsNullOrWhiteSpace(ta.text))
+                {
+                    blindStartRules = Array.Empty<BlindStartRule>();
+                    return;
+                }
+
+                AudioPlaybackStartOverridesFile parsed = JsonUtility.FromJson<AudioPlaybackStartOverridesFile>(ta.text);
+                blindStartRules = parsed?.blindRules ?? Array.Empty<BlindStartRule>();
+                if (parsed != null)
+                {
+                    blindDefaultStartPercent = Mathf.Clamp01(parsed.blindDefaultStartPercent);
+                }
+            }
+            catch
+            {
+                blindStartRules = Array.Empty<BlindStartRule>();
+            }
+        }
+
+        private static bool IsArtistQuestionContext(string normalizedContext)
+        {
+            if (string.IsNullOrWhiteSpace(normalizedContext))
+            {
+                return false;
+            }
+
+            return normalizedContext.Contains("artiste")
+                || normalizedContext.Contains("chanteur")
+                || normalizedContext.Contains("interprete")
+                || normalizedContext.Contains("type artist")
+                || normalizedContext.Contains("qui interprete");
+        }
+
+        private static bool IsTitleQuestionContext(string normalizedContext)
+        {
+            if (string.IsNullOrWhiteSpace(normalizedContext))
+            {
+                return false;
+            }
+
+            return normalizedContext.Contains("titre")
+                || normalizedContext.Contains("type title")
+                || normalizedContext.Contains("nom du titre");
         }
 
         private static AudioType GuessAudioTypeFromUrl(string urlLower)
@@ -876,6 +1125,22 @@ namespace CongoGames.Presentation
             public string fileBase;
             public string artist;
             public string title;
+        }
+
+        [Serializable]
+        private sealed class AudioPlaybackStartOverridesFile
+        {
+            public float blindDefaultStartPercent = 0.5f;
+            public BlindStartRule[] blindRules;
+        }
+
+        [Serializable]
+        private sealed class BlindStartRule
+        {
+            public string match;
+            public string mode;
+            public float value;
+            public string questionScope;
         }
 
         private static bool TryExtractDownloadedClip(UnityWebRequest uwr, out AudioClip clip, out string reason)

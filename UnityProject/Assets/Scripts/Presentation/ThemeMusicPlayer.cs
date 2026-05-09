@@ -40,6 +40,11 @@ namespace CongoGames.Presentation
         private bool jeuxSegmentScheduleActive;
         private float activeSegmentStartTime;
         private float activeSegmentDuration;
+        private AudioClip activeSegmentClip;
+        private readonly Dictionary<string, float> jeuxPlaybackCursorByClip = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
+        private static JeuxStartRule[] jeuxStartRules;
+        private static bool jeuxStartRulesLoaded;
+        private static float jeuxDefaultStartPercent = 0.5f;
         /// <summary>UnityEngine.Random est souvent peu « mélangé » au 1er tirage ; on utilise System.Random re-grainé.</summary>
         private System.Random playlistRng = new System.Random();
         private static readonly Dictionary<string, int> PlaylistStartIndexByMode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -302,6 +307,7 @@ namespace CongoGames.Presentation
             jeuxSegmentScheduleActive = false;
             activeSegmentStartTime = 0f;
             activeSegmentDuration = 0f;
+            SaveCurrentJeuxCursorIfAny();
             ReseedPlaylistRandom();
             playlistRoutine = null;
             StopAllCoroutines();
@@ -321,6 +327,7 @@ namespace CongoGames.Presentation
         /// </summary>
         public void SuppressStreamingBgmForExternalManager()
         {
+            SaveCurrentJeuxCursorIfAny();
             playlistRoutine = null;
             StopAllCoroutines();
             ClearPlaylistClips();
@@ -1264,19 +1271,6 @@ namespace CongoGames.Presentation
         {
             music.loop = false;
             ReseedPlaylistRandom();
-            int maxRounds = 1;
-            foreach (AudioClip c in playlistClips)
-            {
-                if (c == null || c.length < 0.05f)
-                {
-                    continue;
-                }
-
-                int r = Mathf.CeilToInt(c.length / PlaylistSegmentMaxSeconds);
-                maxRounds = Mathf.Max(maxRounds, Mathf.Max(1, r));
-            }
-
-            int roundIndex = 0;
             bool needIntro = true;
             AudioClip lastPlayedInPreviousScan = null;
             bool applyRandomStartOffsetOnce = true;
@@ -1309,13 +1303,15 @@ namespace CongoGames.Presentation
                         continue;
                     }
 
-                    float startTime = roundIndex * PlaylistSegmentMaxSeconds;
-                    if (startTime >= total - 0.02f)
+                    float startTime = ResolveJeuxClipStartTime(c, total);
+                    float dur = Mathf.Min(PlaylistSegmentMaxSeconds, total - startTime);
+                    if (dur < 0.05f)
                     {
-                        continue;
+                        float fallbackStart = ResolveDefaultStartForJeuxClip(c, total);
+                        startTime = Mathf.Clamp(fallbackStart, 0f, Mathf.Max(0f, total - 0.02f));
+                        dur = Mathf.Min(PlaylistSegmentMaxSeconds, total - startTime);
                     }
 
-                    float dur = Mathf.Min(PlaylistSegmentMaxSeconds, total - startTime);
                     if (dur < 0.05f)
                     {
                         continue;
@@ -1335,19 +1331,19 @@ namespace CongoGames.Presentation
                     {
                         yield return CoPlaySegment(c, startTime, dur);
                     }
+
+                    float next = Mathf.Repeat(startTime + dur, total);
+                    if (next < 0.05f && total > 0.1f)
+                    {
+                        next = Mathf.Clamp(ResolveDefaultStartForJeuxClip(c, total), 0f, Mathf.Max(0f, total - 0.02f));
+                    }
+                    jeuxPlaybackCursorByClip[c.name ?? ""] = next;
                 }
 
                 lastPlayedInPreviousScan = lastPlayedThisScan;
 
-                roundIndex++;
-                if (roundIndex >= maxRounds)
-                {
-                    roundIndex = 0;
-                }
-
                 if (!playedAnyThisRound)
                 {
-                    roundIndex = 0;
                     yield return null;
                 }
             }
@@ -1366,11 +1362,13 @@ namespace CongoGames.Presentation
             music.time = st;
             activeSegmentStartTime = st;
             activeSegmentDuration = duration;
+            activeSegmentClip = c;
             RefreshMusicVolume();
             music.Play();
             yield return new WaitForSeconds(duration * 0.995f);
             music.Stop();
             activeSegmentDuration = 0f;
+            activeSegmentClip = null;
         }
 
         private IEnumerator CoPlaySegmentWithIntro(AudioClip c, float startTime, float duration)
@@ -1389,6 +1387,212 @@ namespace CongoGames.Presentation
             yield return new WaitWhile(() => music.isPlaying);
             Destroy(intro);
             yield return CoPlaySegment(c, startTime, duration);
+        }
+
+        private void SaveCurrentJeuxCursorIfAny()
+        {
+            if (!jeuxSegmentScheduleActive || music == null || activeSegmentClip == null || activeSegmentClip.length <= 0.1f)
+            {
+                return;
+            }
+
+            float pos = Mathf.Clamp(music.time, 0f, Mathf.Max(0f, activeSegmentClip.length - 0.01f));
+            if (pos < 0.05f)
+            {
+                return;
+            }
+
+            string key = activeSegmentClip.name ?? "";
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return;
+            }
+
+            jeuxPlaybackCursorByClip[key] = pos;
+        }
+
+        private float ResolveJeuxClipStartTime(AudioClip clip, float totalSeconds)
+        {
+            if (clip == null || totalSeconds <= 0.1f)
+            {
+                return 0f;
+            }
+
+            string key = clip.name ?? "";
+            if (!string.IsNullOrWhiteSpace(key)
+                && jeuxPlaybackCursorByClip.TryGetValue(key, out float saved)
+                && saved >= 0f
+                && saved < totalSeconds - 0.01f)
+            {
+                return saved;
+            }
+
+            float fromPolicy = ResolveDefaultStartForJeuxClip(clip, totalSeconds);
+            return Mathf.Clamp(fromPolicy, 0f, Mathf.Max(0f, totalSeconds - 0.02f));
+        }
+
+        private static float ResolveDefaultStartForJeuxClip(AudioClip clip, float totalSeconds)
+        {
+            if (clip == null || totalSeconds <= 0.1f)
+            {
+                return 0f;
+            }
+
+            string n = NormalizeTrackName(clip.name);
+            if (TryResolveJeuxStartFromOverrides(n, totalSeconds, out float fromOverrides))
+            {
+                return fromOverrides;
+            }
+
+            // Par défaut: éviter le début pour ne pas exposer nom artiste/titre.
+            return Mathf.Clamp(totalSeconds * 0.5f, 0f, Mathf.Max(0f, totalSeconds - 0.2f));
+        }
+
+        private static bool TryResolveJeuxStartFromOverrides(string normalizedTrackName, float clipLength, out float startSec)
+        {
+            startSec = 0f;
+            LoadJeuxStartRulesOnce();
+            if (jeuxStartRules == null || jeuxStartRules.Length == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < jeuxStartRules.Length; i++)
+            {
+                JeuxStartRule rule = jeuxStartRules[i];
+                if (rule == null || string.IsNullOrWhiteSpace(rule.match))
+                {
+                    continue;
+                }
+
+                if (!IsLooseRuleMatch(normalizedTrackName, NormalizeTrackName(rule.match)))
+                {
+                    continue;
+                }
+
+                startSec = ComputeStartFromRule(rule.mode, rule.value, clipLength);
+                return true;
+            }
+
+            startSec = Mathf.Clamp(clipLength * Mathf.Clamp01(jeuxDefaultStartPercent), 0f, Mathf.Max(0f, clipLength - 0.2f));
+            return true;
+        }
+
+        private static void LoadJeuxStartRulesOnce()
+        {
+            if (jeuxStartRulesLoaded)
+            {
+                return;
+            }
+
+            jeuxStartRulesLoaded = true;
+            try
+            {
+                TextAsset ta = Resources.Load<TextAsset>("Datasets/audio_playback_start_overrides");
+                if (ta == null || string.IsNullOrWhiteSpace(ta.text))
+                {
+                    jeuxStartRules = Array.Empty<JeuxStartRule>();
+                    return;
+                }
+
+                AudioPlaybackStartOverridesFile parsed = JsonUtility.FromJson<AudioPlaybackStartOverridesFile>(ta.text);
+                jeuxStartRules = parsed?.jeuxRules ?? Array.Empty<JeuxStartRule>();
+                if (parsed != null)
+                {
+                    jeuxDefaultStartPercent = Mathf.Clamp01(parsed.jeuxDefaultStartPercent);
+                }
+            }
+            catch
+            {
+                jeuxStartRules = Array.Empty<JeuxStartRule>();
+            }
+        }
+
+        private static bool IsLooseRuleMatch(string normalizedText, string normalizedRule)
+        {
+            if (string.IsNullOrWhiteSpace(normalizedText) || string.IsNullOrWhiteSpace(normalizedRule))
+            {
+                return false;
+            }
+
+            string[] tokens = normalizedRule.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                string t = tokens[i];
+                if (t.Length <= 1) continue;
+                if (normalizedText.IndexOf(t, StringComparison.Ordinal) < 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static float ComputeStartFromRule(string mode, float value, float clipLength)
+        {
+            string m = (mode ?? "").Trim().ToLowerInvariant();
+            switch (m)
+            {
+                case "start":
+                    return 0f;
+                case "seconds":
+                    return Mathf.Clamp(value, 0f, Mathf.Max(0f, clipLength - 0.2f));
+                case "percent":
+                    return Mathf.Clamp(clipLength * Mathf.Clamp01(value), 0f, Mathf.Max(0f, clipLength - 0.2f));
+                default:
+                    return Mathf.Clamp(clipLength * 0.5f, 0f, Mathf.Max(0f, clipLength - 0.2f));
+            }
+        }
+
+        private static string NormalizeTrackName(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return "";
+            }
+
+            string src = raw.ToLowerInvariant().Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder(src.Length);
+            for (int i = 0; i < src.Length; i++)
+            {
+                char c = src[i];
+                if (char.GetUnicodeCategory(c) == System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    continue;
+                }
+
+                if (char.IsLetterOrDigit(c))
+                {
+                    sb.Append(c);
+                }
+                else
+                {
+                    sb.Append(' ');
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        [Serializable]
+        private sealed class AudioPlaybackStartOverridesFile
+        {
+            public float jeuxDefaultStartPercent = 0.5f;
+            public JeuxStartRule[] jeuxRules;
+        }
+
+        [Serializable]
+        private sealed class JeuxStartRule
+        {
+            public string match;
+            public string mode;
+            public float value;
         }
 
         private IEnumerator DownloadClip(string fullPathOrUrl, string fileName, Action<AudioClip> assign)

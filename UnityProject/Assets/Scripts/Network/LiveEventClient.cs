@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -77,6 +78,7 @@ namespace CongoGames.Network
         private readonly Dictionary<string, string> quizVoteByUser = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> quizAnsweredUsers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly int[] quizVoteCounts = new int[4];
+        private static readonly Regex QuizChoiceRegex = new Regex(@"(?:^|[^A-Z0-9])([ABCD]|[1-4])(?:[^A-Z0-9]|$)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
         /// Les callbacks async du <see cref="ClientWebSocket"/> peuvent s’exécuter hors du thread Unity ;
@@ -415,8 +417,10 @@ namespace CongoGames.Network
             {
                 OnChatPulse?.Invoke(msg.user ?? "", raw, msg.avatarUrl ?? msg.profilePictureUrl ?? "");
             }
-            string answer = (msg.message ?? msg.text ?? string.Empty).Trim().ToUpperInvariant();
-            if (answer != "A" && answer != "B" && answer != "C" && answer != "D") return;
+            if (!TryParseQuizAnswerFromChat(raw, out string answer))
+            {
+                return;
+            }
 
             string user = string.IsNullOrWhiteSpace(msg.user) ? "joueur" : msg.user.Trim();
             RegisterQuizVote(user, answer);
@@ -563,6 +567,44 @@ namespace CongoGames.Network
                 case "C": return 2;
                 case "D": return 3;
                 default: return -1;
+            }
+        }
+
+        private static bool TryParseQuizAnswerFromChat(string raw, out string answer)
+        {
+            answer = null;
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return false;
+            }
+
+            Match m = QuizChoiceRegex.Match(raw.Trim().ToUpperInvariant());
+            if (!m.Success)
+            {
+                return false;
+            }
+
+            string token = m.Groups[1].Value;
+            switch (token)
+            {
+                case "A":
+                case "1":
+                    answer = "A";
+                    return true;
+                case "B":
+                case "2":
+                    answer = "B";
+                    return true;
+                case "C":
+                case "3":
+                    answer = "C";
+                    return true;
+                case "D":
+                case "4":
+                    answer = "D";
+                    return true;
+                default:
+                    return false;
             }
         }
 

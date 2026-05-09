@@ -103,16 +103,25 @@ namespace CongoGames.GameModes
             ui.AnswerChosen -= OnAnswerChosen;
             bool correct = !string.IsNullOrEmpty(pendingPick) &&
                            string.Equals(pendingPick?.Trim(), q.correctAnswer?.Trim(), System.StringComparison.OrdinalIgnoreCase);
+            string who = PlayerProfileStore.ScoreUsernameForLocalPlay() ?? LocalPlayer;
+            int awarded = 0;
             if (ScoreManager.Instance != null && !PlayerProfileStore.IsLiveTiktokSession())
             {
-                string who = PlayerProfileStore.ScoreUsernameForLocalPlay() ?? LocalPlayer;
-                ScoreManager.Instance.RegisterAnswer(who, correct, false);
+                awarded = ScoreManager.Instance.RegisterAnswer(who, correct, false);
             }
 
             ui.ShowQuizOutcome(correct, pendingPick, q);
             if (correct)
             {
                 ui.SetBanner("Bravo — bonne réponse !");
+                int ix = ((q.correctAnswer ?? "").Trim().ToUpperInvariant().Length == 1)
+                    ? (q.correctAnswer.Trim().ToUpperInvariant()[0] - 'A')
+                    : -1;
+                string solvedText = ix >= 0 && q.options != null && ix < q.options.Length
+                    ? q.options[ix]
+                    : (pendingPick ?? "Bonne réponse");
+                int toastPoints = awarded > 0 ? awarded : 10;
+                MiniGamePanelContent.Instance?.ShowExternalCorrectAnswerToast(who, "", solvedText, toastPoints);
             }
             else if (string.IsNullOrEmpty(pendingPick))
             {
@@ -133,7 +142,7 @@ namespace CongoGames.GameModes
 
             GameSfxHub.Instance?.PlayResult(correct);
 
-            yield return new WaitForSeconds(resultShowSeconds);
+            yield return new WaitForSeconds(Mathf.Max(0.1f, resultShowSeconds));
             ui.ClearFeedbackVisuals();
         }
 

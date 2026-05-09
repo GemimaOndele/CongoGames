@@ -1,11 +1,15 @@
 {
   "replacements": [
     { "from": "chat", "to": "tchat" },
+    { "from": "chater", "to": "tchater" },
+    { "from": "chatter", "to": "tchatter" },
     { "from": "te", "to": "té" },
     { "from": "mbote", "to": "mboté" },
     { "from": "nzele", "to": "nzèlè" },
     { "from": "mwasi", "to": "mwassi" },
     { "from": "moasi", "to": "mwassi" },
+    { "from": "lingala", "to": "lingála" },
+    { "from": "kituba", "to": "kitouba" },
     { "from": "nana", "to": "nana" },
     { "from": "momi", "to": "momí" },
     { "from": "momí", "to": "momí" },

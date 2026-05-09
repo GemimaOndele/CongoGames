@@ -1,0 +1,53 @@
+{
+  "blindDefaultStartPercent": 0.5,
+  "jeuxDefaultStartPercent": 0.5,
+  "blindRules": [
+    {
+      "match": "blemix kb le roi delinquant",
+      "mode": "seconds",
+      "value": 10.0,
+      "questionScope": "any"
+    },
+    {
+      "match": "junior vall bon anniversaire",
+      "mode": "seconds",
+      "value": 15.0,
+      "questionScope": "any"
+    },
+    {
+      "match": "bana poto poto ma gaby",
+      "mode": "percent",
+      "value": 0.5,
+      "questionScope": "any"
+    },
+    {
+      "match": "siboy benash mobali",
+      "mode": "start",
+      "value": 0.0,
+      "questionScope": "artist"
+    },
+    {
+      "match": "siboy benash mobali",
+      "mode": "percent",
+      "value": 0.72,
+      "questionScope": "title"
+    }
+  ],
+  "jeuxRules": [
+    {
+      "match": "blemix kb le roi delinquant",
+      "mode": "seconds",
+      "value": 10.0
+    },
+    {
+      "match": "junior vall bon anniversaire",
+      "mode": "seconds",
+      "value": 12.0
+    },
+    {
+      "match": "oskido s candy tsa mandebele kids",
+      "mode": "percent",
+      "value": 0.5
+    }
+  ]
+}
