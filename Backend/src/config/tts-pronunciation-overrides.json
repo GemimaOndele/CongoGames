@@ -3,6 +3,7 @@
     { "from": "chat", "to": "tchat" },
     { "from": "chater", "to": "tchater" },
     { "from": "chatter", "to": "tchatter" },
+    { "from": "liboso", "to": "libosso" },
     { "from": "te", "to": "té" },
     { "from": "mbote", "to": "mboté" },
     { "from": "nzele", "to": "nzèlè" },

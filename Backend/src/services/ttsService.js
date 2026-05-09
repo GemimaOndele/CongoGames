@@ -18,6 +18,7 @@ const DEFAULT_PRONUNCIATION_OVERRIDES = [
   ["chat", "tchat"],
   ["chater", "tchater"],
   ["chatter", "tchatter"],
+  ["liboso", "libosso"],
   ["te", "té"],
   ["mbote", "mboté"],
   ["nzele", "nzèlè"],
@@ -62,9 +63,16 @@ function applyFrenchPronunciationOverrides(text) {
   const src = String(text || "");
   if (!src) return src;
 
-  let out = src;
+  let out = src
+    .replace(/<[^>]+>/g, " ")
+    .replace(/#[0-9a-f]{6,8}/gi, " ")
+    .replace(/\[/g, " ")
+    .replace(/\]/g, " ");
   for (const [rx, repl] of PRONUNCIATION_OVERRIDES) {
     out = out.replace(rx, repl);
+  }
+  if (/\b(lingala|kituba|liboso|mwasi|mbote)\b/i.test(out)) {
+    out = out.replace(/([aeiouyàâäéèêëîïôöùûü])s([aeiouyàâäéèêëîïôöùûü])/gi, "$1ss$2");
   }
   return out;
 }

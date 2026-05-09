@@ -39,6 +39,7 @@ app.use((req, res, next) => {
 
 const PORT = Number(process.env.PORT || 3000);
 const WS_PORT = Number(process.env.WS_PORT || 8080);
+const WS_PORT_MAX_ATTEMPTS = Math.max(1, Number(process.env.WS_PORT_MAX_ATTEMPTS || 41));
 const WS_SINGLE_PORT = String(process.env.WS_SINGLE_PORT || "false").toLowerCase() === "true";
 const TIKTOK_BRIDGE_ENABLED = String(process.env.TIKTOK_BRIDGE_ENABLED ?? "true").toLowerCase() === "true";
 const tiktokUsernames = [
@@ -191,7 +192,7 @@ if (WS_SINGLE_PORT || WS_PORT === PORT || WS_PORT === boundHttpPort) {
   activeWss = new WebSocketServer({ server: httpServer });
   activeWsPort = boundHttpPort;
 } else {
-  const { wsServer, port } = await startWebSocketServer(WS_PORT);
+  const { wsServer, port } = await startWebSocketServer(WS_PORT, WS_PORT_MAX_ATTEMPTS);
   activeWss = wsServer;
   activeWsPort = port;
 }

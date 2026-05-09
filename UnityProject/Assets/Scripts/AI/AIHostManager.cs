@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -278,6 +279,11 @@ namespace CongoGames.AI
             if (string.IsNullOrWhiteSpace(input)) return "";
             string s = input.Trim();
 
+            // Nettoie les balises RichText / codes couleur Unity qui n'ont aucun sens à l'oral.
+            s = Regex.Replace(s, "<[^>]+>", " ");
+            s = Regex.Replace(s, @"#[0-9A-Fa-f]{6,8}", " ");
+            s = s.Replace("[", " ").Replace("]", " ");
+
             // Connecteurs fréquents dans les titres/artistes pour une prononciation plus naturelle.
             s = s.Replace(" feat. ", " featuring ");
             s = s.Replace(" feat ", " featuring ");
@@ -304,11 +310,35 @@ namespace CongoGames.AI
             s = ReplaceWholeWordInsensitive(s, "chat", "tchat");
             s = ReplaceWholeWordInsensitive(s, "chater", "tchater");
             s = ReplaceWholeWordInsensitive(s, "chatter", "tchatter");
+            s = ReplaceWholeWordInsensitive(s, "liboso", "libosso");
 
             // Mini dictionnaire local: prononciation plus stable des noms propres congolais.
             s = ApplySpeechDictionary(s);
 
+            // En contexte Lingala/Kituba, force un "s" dur entre voyelles (évite la lecture en "z").
+            if (ContainsLingalaKitubaContext(s))
+            {
+                s = Regex.Replace(
+                    s,
+                    "(?<=[aeiouyAEIOUYàâäéèêëîïôöùûüÀÂÄÉÈÊËÎÏÔÖÙÛÜ])s(?=[aeiouyAEIOUYàâäéèêëîïôöùûüÀÂÄÉÈÊËÎÏÔÖÙÛÜ])",
+                    "ss");
+            }
+
             return s.Trim();
+        }
+
+        private static bool ContainsLingalaKitubaContext(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return false;
+            }
+
+            return text.IndexOf("lingala", StringComparison.OrdinalIgnoreCase) >= 0
+                || text.IndexOf("kituba", StringComparison.OrdinalIgnoreCase) >= 0
+                || text.IndexOf("liboso", StringComparison.OrdinalIgnoreCase) >= 0
+                || text.IndexOf("mwasi", StringComparison.OrdinalIgnoreCase) >= 0
+                || text.IndexOf("mbote", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private static string ReplaceWholeWordInsensitive(string input, string find, string replace)

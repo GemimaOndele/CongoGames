@@ -240,6 +240,7 @@ namespace CongoGames.Presentation
         private float blindQuestionEndUnscaled;
         private readonly int[] blindLiveVoteCounts = new int[4];
         private readonly Dictionary<string, int> blindLiveVoteByUser = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        private int blindKeyboardSelection = -1;
         private Image imageGuessVeil;
         [SerializeField] private float imageGuessRevealSec = 15f;
         private const float ImageGuessMusicClueSec = 20f;
@@ -300,8 +301,10 @@ namespace CongoGames.Presentation
         [Tooltip("Démo : 2 manches = 2 grilles thématiques (5–21 mots) avant le prochain mode ; en live, le chrono de la manche continue.")]
         [SerializeField] private int gridSessionsPerThematicBlock = 2;
         [SerializeField] private int gridThematicWordCount = 15;
-        [Tooltip("Pause globale (en secondes, temps réel) après mot trouvé dans les modes grilles.")]
+        [Tooltip("Durée d'affichage du score (secondes réelles) pour tous les modes qui montrent le toast score.")]
         [SerializeField] private float gridFoundPauseSeconds = 5f;
+        [Tooltip("Délai global (secondes réelles) après feedback (étoiles/croix) avant d'afficher le score, tous modes.")]
+        [SerializeField] private float scoreToastDelayAfterFeedbackSeconds = 2f;
         [SerializeField] private bool pauseGameplayOnGridFound = true;
         private int gridMotsJeuSessionIndex; // 1 = premier mot, …
         private int gridThematicBlockRound; // 0 = non initialisé, 1 = 1re grille, 2 = 2e…
@@ -437,7 +440,8 @@ namespace CongoGames.Presentation
 
             if (gridFoundToastWord != null)
             {
-                gridFoundToastWord.text = GridThemeBank.ToUiDisplayWord(foundWord);
+                string display = GridThemeBank.ToUiDisplayWord(foundWord);
+                gridFoundToastWord.text = FormatFoundAnswerForToast(display);
             }
 
             if (gridFoundToastPoints != null)
@@ -534,6 +538,15 @@ namespace CongoGames.Presentation
             ShowGridFoundToast(foundWord, Mathf.Max(1, pointsDelta), user, avatarUrl);
         }
 
+        private static string FormatFoundAnswerForToast(string raw)
+        {
+            string s = (raw ?? "").Trim();
+            if (s.Length == 0) return "réponse valide";
+            s = s.ToLowerInvariant();
+            s = s.Replace("  ", " ").Replace("  ", " ");
+            return s;
+        }
+
         private string ResolveCurrentGridPlayerName()
         {
             LiveEventClient live = FindAnyObjectByType<LiveEventClient>();
@@ -615,12 +628,17 @@ namespace CongoGames.Presentation
         private IEnumerator CoShowGridFoundToast()
         {
             if (gridFoundToastRoot == null) yield break;
+            float delayBeforeToast = Mathf.Clamp(scoreToastDelayAfterFeedbackSeconds, 0f, 5f);
+            if (delayBeforeToast > 0.01f)
+            {
+                yield return new WaitForSecondsRealtime(delayBeforeToast);
+            }
             gridFoundToastRoot.gameObject.SetActive(true);
             CanvasGroup cg = gridFoundToastRoot.GetComponent<CanvasGroup>();
             if (cg != null) cg.alpha = 0f;
 
-            Vector2 basePos = new Vector2(0f, -24f);
-            Vector2 startPos = new Vector2(220f, -24f);
+            Vector2 basePos = new Vector2(-420f, -120f);
+            Vector2 startPos = new Vector2(-220f, -120f);
             gridFoundToastRoot.anchoredPosition = startPos;
             gridFoundToastRoot.localScale = new Vector3(0.95f, 0.95f, 1f);
 
@@ -688,7 +706,7 @@ namespace CongoGames.Presentation
                 t += Time.unscaledDeltaTime;
                 float p = Mathf.Clamp01(t / outDur);
                 if (cg != null) cg.alpha = 1f - p;
-                gridFoundToastRoot.anchoredPosition = Vector2.LerpUnclamped(basePos, new Vector2(-180f, -24f), p);
+                gridFoundToastRoot.anchoredPosition = Vector2.LerpUnclamped(basePos, new Vector2(-560f, -120f), p);
                 gridFoundToastRoot.localScale = Vector3.LerpUnclamped(Vector3.one, new Vector3(0.97f, 0.97f, 1f), p);
                 yield return null;
             }
@@ -790,6 +808,11 @@ namespace CongoGames.Presentation
                 ? 0.05f
                 : Mathf.Clamp(postAnswerHoldSeconds, 1f, 30f);
             skipNextPostAnswerHold = false;
+            float waitToastUntil = Time.unscaledTime + 9f;
+            while (IsScorePauseOverlayVisible && Time.unscaledTime < waitToastUntil)
+            {
+                yield return null;
+            }
             yield return new WaitForSecondsRealtime(hold);
             postAnswerAdvanceCo = null;
             GameModeManager.Instance?.AdvanceRoundOrNextMode();
@@ -1156,10 +1179,10 @@ namespace CongoGames.Presentation
         private void RegisterBlindLiveVote(string username, int pick)
         {
             pick = Mathf.Clamp(pick, 0, 3);
-            if (blindLiveVoteByUser.TryGetValue(username, out int old))
+            if (blindLiveVoteByUser.ContainsKey(username))
             {
-                old = Mathf.Clamp(old, 0, 3);
-                blindLiveVoteCounts[old] = Mathf.Max(0, blindLiveVoteCounts[old] - 1);
+                // Première réponse seulement par utilisateur pour la manche en cours.
+                return;
             }
 
             blindLiveVoteByUser[username] = pick;
@@ -3335,7 +3358,10 @@ namespace CongoGames.Presentation
                 blindEmojiPulseCo = StartCoroutine(CoPulseBlindEmoji());
             }
             string[] letters = { "A", "B", "C", "D" };
-            blindMaskedChoiceIndex = displayChoices != null && displayChoices.Length >= 4 ? UnityEngine.Random.Range(0, 4) : -1;
+            // "Autre" correspond à la bonne réponse cachée pour éviter les cas ambigus.
+            blindMaskedChoiceIndex = displayChoices != null && displayChoices.Length >= 4
+                ? Mathf.Clamp(lastBlindCorrectDisplayIndex, 0, 3)
+                : -1;
             blindMaskedChoiceValue = blindMaskedChoiceIndex >= 0 && blindMaskedChoiceIndex < displayChoices.Length
                 ? (displayChoices[blindMaskedChoiceIndex] ?? "")
                 : "";
@@ -3377,12 +3403,19 @@ namespace CongoGames.Presentation
                     row.color = BlindRowIdle;
                 }
             }
+            if (!on)
+            {
+                blindKeyboardSelection = -1;
+            }
+            RefreshBlindKeyboardSelectionVisual();
         }
 
         private void BeginBlindQuestionPhase()
         {
             blindInQuestionPhase = true;
             SetBlindChoicesInteractable(true);
+            blindKeyboardSelection = -1;
+            RefreshBlindKeyboardSelectionVisual();
             blindQuestionEndUnscaled = 0f;
             if (liveLikeSource != null && liveLikeSource.IsConnected)
             {
@@ -3583,6 +3616,7 @@ namespace CongoGames.Presentation
             {
                 return;
             }
+            blindKeyboardSelection = -1;
 
             if (blindListenCo != null)
             {
@@ -4113,6 +4147,7 @@ namespace CongoGames.Presentation
         private void Update()
         {
             TickLiveKeyboardDraft();
+            HandleBlindKeyboardInput();
             TickBlindLiveVoteWindow();
             SemanticTick();
             if (GameInput.DigitKeyDown1To9(1)) OnChronoInput(0);
@@ -4143,6 +4178,45 @@ namespace CongoGames.Presentation
 
             blindQuestionEndUnscaled = 0f;
             NotifyBlindPick(bestIndex);
+        }
+
+        private void HandleBlindKeyboardInput()
+        {
+            if (!blindInQuestionPhase || blindChoiceButtons == null) return;
+            Keyboard kb = Keyboard.current;
+            if (kb == null) return;
+
+            int picked = -1;
+            if (kb.aKey.wasPressedThisFrame || kb.digit1Key.wasPressedThisFrame || kb.numpad1Key.wasPressedThisFrame) picked = 0;
+            else if (kb.bKey.wasPressedThisFrame || kb.digit2Key.wasPressedThisFrame || kb.numpad2Key.wasPressedThisFrame) picked = 1;
+            else if (kb.cKey.wasPressedThisFrame || kb.digit3Key.wasPressedThisFrame || kb.numpad3Key.wasPressedThisFrame) picked = 2;
+            else if (kb.dKey.wasPressedThisFrame || kb.digit4Key.wasPressedThisFrame || kb.numpad4Key.wasPressedThisFrame) picked = 3;
+
+            if (picked >= 0)
+            {
+                blindKeyboardSelection = picked;
+                RefreshBlindKeyboardSelectionVisual();
+                GameSfxHub.Instance?.PlayTap();
+            }
+
+            bool submit = kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame;
+            if (submit && blindKeyboardSelection >= 0)
+            {
+                NotifyBlindPick(blindKeyboardSelection);
+            }
+        }
+
+        private void RefreshBlindKeyboardSelectionVisual()
+        {
+            if (blindChoiceButtons == null) return;
+            for (int i = 0; i < blindChoiceButtons.Length; i++)
+            {
+                Button b = blindChoiceButtons[i];
+                if (b == null) continue;
+                Image row = b.GetComponent<Image>();
+                if (row == null) continue;
+                row.color = (blindInQuestionPhase && b.interactable && i == blindKeyboardSelection) ? BlindRowHover : BlindRowIdle;
+            }
         }
 
         private void TickLiveKeyboardDraft()
@@ -5146,10 +5220,26 @@ namespace CongoGames.Presentation
 
             demo.gridFoundToastUser = CreateText(gridToast.transform, "User", font, 24, TextAnchor.MiddleCenter, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, 20f), new Vector2(-26f, 34f));
             demo.gridFoundToastUser.color = new Color(0.95f, 0.95f, 1f, 1f);
-            demo.gridFoundToastWord = CreateText(gridToast.transform, "Word", font, 52, TextAnchor.MiddleCenter, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, -20f), new Vector2(-26f, 72f));
+            demo.gridFoundToastWord = CreateText(gridToast.transform, "Word", font, 34, TextAnchor.MiddleCenter, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, -20f), new Vector2(-26f, 76f));
             demo.gridFoundToastWord.color = new Color(0.3f, 1f, 0.55f, 1f);
             demo.gridFoundToastPoints = CreateText(gridToast.transform, "Points", font, 34, TextAnchor.MiddleCenter, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 22f), new Vector2(-26f, 42f));
             demo.gridFoundToastPoints.color = new Color(1f, 0.84f, 0.25f, 1f);
+            if (demo.gridFoundToastWord != null)
+            {
+                demo.gridFoundToastWord.horizontalOverflow = HorizontalWrapMode.Wrap;
+                demo.gridFoundToastWord.verticalOverflow = VerticalWrapMode.Truncate;
+                demo.gridFoundToastWord.resizeTextForBestFit = true;
+                demo.gridFoundToastWord.resizeTextMinSize = 16;
+                demo.gridFoundToastWord.resizeTextMaxSize = 34;
+                demo.gridFoundToastWord.lineSpacing = 0.9f;
+            }
+            if (demo.gridFoundToastUser != null)
+            {
+                demo.gridFoundToastUser.horizontalOverflow = HorizontalWrapMode.Overflow;
+                demo.gridFoundToastUser.resizeTextForBestFit = true;
+                demo.gridFoundToastUser.resizeTextMinSize = 16;
+                demo.gridFoundToastUser.resizeTextMaxSize = 24;
+            }
 
             GameObject blind = PanelShell(modeRoot, "PanelBlind", "blind-test", new Color(0.1f, 0.06f, 0.14f, 0.96f), white, surf);
             demo.blindTitle = Title(blind.transform, font, "BTitle", "Blind test", new Vector2(0f, -30f));

@@ -321,14 +321,14 @@ namespace CongoGames.Presentation
                 }
                 else
                 {
-                    string[] rootFolders =
-                    {
-                        Path.Combine(Application.streamingAssetsPath, "Theme", "BlindTest"),
-                        Path.Combine(Application.streamingAssetsPath, "Theme", "playlist"),
-                        Path.Combine(Application.streamingAssetsPath, "Theme")
-                    };
+                    string[] rootFolders = CollectBlindAudioRootFolders();
                     foreach (string root in rootFolders)
                     {
+                        if (string.IsNullOrWhiteSpace(root) || !Directory.Exists(root))
+                        {
+                            continue;
+                        }
+
                         foreach (string baseClean in baseCandidates)
                         {
                             foreach (string ext in exts)
@@ -422,6 +422,53 @@ namespace CongoGames.Presentation
             blindLoop.Play();
             RefreshSfxVolumes();
             blindMusicCo = null;
+        }
+
+        private static string[] CollectBlindAudioRootFolders()
+        {
+            var roots = new List<string>(8);
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            void add(string p)
+            {
+                if (string.IsNullOrWhiteSpace(p)) return;
+                try
+                {
+                    string full = Path.GetFullPath(p);
+                    if (seen.Add(full)) roots.Add(full);
+                }
+                catch
+                {
+                    if (seen.Add(p)) roots.Add(p);
+                }
+            }
+
+            // Sources standard du projet Unity.
+            add(Path.Combine(Application.streamingAssetsPath, "Theme", "BlindTest"));
+            add(Path.Combine(Application.streamingAssetsPath, "Theme", "playlist"));
+            add(Path.Combine(Application.streamingAssetsPath, "Theme"));
+
+#if UNITY_EDITOR
+            // En éditeur : supporte aussi la playlist racine du dépôt (C:/Congogame/playlist).
+            try
+            {
+                add(Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "playlist")));
+            }
+            catch { }
+#endif
+
+            // En build : supporte un dossier "playlist" à côté du .exe.
+            try
+            {
+                string gameFolder = Directory.GetParent(Application.dataPath)?.FullName;
+                if (!string.IsNullOrWhiteSpace(gameFolder))
+                {
+                    add(Path.Combine(gameFolder, "playlist"));
+                }
+            }
+            catch { }
+
+            return roots.ToArray();
         }
 
         private void SaveBlindPlaybackCursor()

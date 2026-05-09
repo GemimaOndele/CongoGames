@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.WebSockets;
@@ -79,6 +80,9 @@ namespace CongoGames.Network
         private readonly HashSet<string> quizAnsweredUsers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly int[] quizVoteCounts = new int[4];
         private static readonly Regex QuizChoiceRegex = new Regex(@"(?:^|[^A-Z0-9])([ABCD]|[1-4])(?:[^A-Z0-9]|$)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        [SerializeField] [Min(0f)] private float qcmVoteDisplaySeconds = 5f;
+        [SerializeField] [Min(0f)] private float qcmScoreAfterVoteGapSeconds = 2f;
+        private Coroutine pendingCorrectToastCo;
 
         /// <summary>
         /// Les callbacks async du <see cref="ClientWebSocket"/> peuvent s’exécuter hors du thread Unity ;
@@ -157,7 +161,20 @@ namespace CongoGames.Network
 
         private async Task ConnectAndListen(CancellationToken token)
         {
-            socket = await ConnectWithFallback(token);
+            ClientWebSocket connected = await ConnectWithFallback(token);
+            if (connected == null)
+            {
+                return;
+            }
+
+            if (wsShutdownRequested || token.IsCancellationRequested)
+            {
+                try { connected.Abort(); } catch { }
+                try { connected.Dispose(); } catch { }
+                return;
+            }
+
+            socket = connected;
             _ = ReceiveLoop(token);
         }
 
@@ -167,6 +184,11 @@ namespace CongoGames.Network
             string lastTarget = "";
             for (int i = 0; i < targets.Length; i++)
             {
+                if (wsShutdownRequested || token.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 string target = targets[i];
                 lastTarget = target;
                 ClientWebSocket candidate = null;
@@ -423,10 +445,8 @@ namespace CongoGames.Network
             }
 
             string user = string.IsNullOrWhiteSpace(msg.user) ? "joueur" : msg.user.Trim();
-            RegisterQuizVote(user, answer);
-
-            // Un seul score par utilisateur et par question en cours.
-            if (quizAnsweredUsers.Contains(user))
+            // Un seul vote + score (première réponse uniquement) par utilisateur et par question.
+            if (!RegisterQuizVote(user, answer))
             {
                 return;
             }
@@ -443,7 +463,18 @@ namespace CongoGames.Network
             {
                 GameAudioManager.Instance?.OnLiveCorrectAnswer();
                 AIHostManager.Instance?.Speak(user + " bonne reponse.");
-                MiniGamePanelContent.Instance?.ShowExternalCorrectAnswerToast(user, msg.avatarUrl ?? msg.profilePictureUrl ?? "", answer, Mathf.Max(1, awarded));
+                if (pendingCorrectToastCo != null)
+                {
+                    StopCoroutine(pendingCorrectToastCo);
+                    pendingCorrectToastCo = null;
+                }
+                float wait = Mathf.Max(0f, qcmVoteDisplaySeconds) + Mathf.Max(0f, qcmScoreAfterVoteGapSeconds);
+                pendingCorrectToastCo = StartCoroutine(CoShowCorrectToastAfterDelay(
+                    user,
+                    msg.avatarUrl ?? msg.profilePictureUrl ?? "",
+                    answer,
+                    Mathf.Max(1, awarded),
+                    wait));
             }
             else
             {
@@ -539,23 +570,28 @@ namespace CongoGames.Network
             quizAnsweredUsers.Clear();
             for (int i = 0; i < quizVoteCounts.Length; i++) quizVoteCounts[i] = 0;
             questionUI?.SetLiveVoteDistribution(0, 0, 0, 0);
+            if (pendingCorrectToastCo != null)
+            {
+                StopCoroutine(pendingCorrectToastCo);
+                pendingCorrectToastCo = null;
+            }
         }
 
-        private void RegisterQuizVote(string user, string answer)
+        private bool RegisterQuizVote(string user, string answer)
         {
-            if (string.IsNullOrWhiteSpace(user)) return;
+            if (string.IsNullOrWhiteSpace(user)) return false;
             int idx = LetterToIndex(answer);
-            if (idx < 0) return;
+            if (idx < 0) return false;
 
-            if (quizVoteByUser.TryGetValue(user, out string old))
+            if (quizVoteByUser.ContainsKey(user))
             {
-                int oldIdx = LetterToIndex(old);
-                if (oldIdx >= 0) quizVoteCounts[oldIdx] = Mathf.Max(0, quizVoteCounts[oldIdx] - 1);
+                return false;
             }
 
             quizVoteByUser[user] = answer;
             quizVoteCounts[idx]++;
             questionUI?.SetLiveVoteDistribution(quizVoteCounts[0], quizVoteCounts[1], quizVoteCounts[2], quizVoteCounts[3]);
+            return true;
         }
 
         private static int LetterToIndex(string letter)
@@ -568,6 +604,13 @@ namespace CongoGames.Network
                 case "D": return 3;
                 default: return -1;
             }
+        }
+
+        private IEnumerator CoShowCorrectToastAfterDelay(string user, string avatarUrl, string answerLetter, int points, float delaySec)
+        {
+            yield return new WaitForSecondsRealtime(Mathf.Max(0f, delaySec));
+            MiniGamePanelContent.Instance?.ShowExternalCorrectAnswerToast(user, avatarUrl, answerLetter, Mathf.Max(1, points));
+            pendingCorrectToastCo = null;
         }
 
         private static bool TryParseQuizAnswerFromChat(string raw, out string answer)
@@ -645,19 +688,31 @@ namespace CongoGames.Network
                 cts = null;
             }
 
-            if (socket != null)
+            ClientWebSocket s = socket;
+            socket = null;
+            if (s != null)
             {
                 try
                 {
-                    socket.Abort();
+                    if (s.State == WebSocketState.Open || s.State == WebSocketState.CloseReceived)
+                    {
+                        using var closeCts = new CancellationTokenSource(180);
+                        s.CloseAsync(WebSocketCloseStatus.NormalClosure, "shutdown", closeCts.Token)
+                            .GetAwaiter()
+                            .GetResult();
+                    }
                 }
                 catch { }
                 try
                 {
-                    socket.Dispose();
+                    s.Abort();
                 }
                 catch { }
-                socket = null;
+                try
+                {
+                    s.Dispose();
+                }
+                catch { }
             }
         }
     }
