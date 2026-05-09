@@ -1,0 +1,14 @@
+{
+  "replacements": [
+    { "from": "chat", "to": "tchat" },
+    { "from": "te", "to": "té" },
+    { "from": "mbote", "to": "mboté" },
+    { "from": "nzele", "to": "nzèlè" },
+    { "from": "mwasi", "to": "mwassi" },
+    { "from": "moasi", "to": "mwassi" },
+    { "from": "nana", "to": "nana" },
+    { "from": "momi", "to": "momí" },
+    { "from": "momí", "to": "momí" },
+    { "from": "momie", "to": "momie" }
+  ]
+}

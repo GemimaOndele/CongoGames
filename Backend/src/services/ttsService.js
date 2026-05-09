@@ -5,17 +5,64 @@
 
 import { isOpenAiSpeechReady, synthesizeOpenAiSpeechToPcm } from "./openAiSpeechService.js";
 import { isEdgeTtsEnabled, synthesizeEdgeToPcm } from "./edgeTtsService.js";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const DEFAULT_MODEL = "eleven_multilingual_v2";
 const MAX_CHARS = 2500;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const DEFAULT_PRONUNCIATION_OVERRIDES = [
+  ["chat", "tchat"],
+  ["te", "té"],
+  ["mbote", "mboté"],
+  ["nzele", "nzèlè"],
+  ["mwasi", "mwassi"],
+  ["moasi", "mwassi"],
+  ["nana", "nana"],
+  ["momi", "momí"],
+  ["momí", "momí"],
+  ["momie", "momie"]
+];
+
+function escapeRegex(input) {
+  return String(input || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function loadPronunciationOverrides() {
+  const fromConfig = [];
+  try {
+    const cfgPath = path.resolve(__dirname, "../config/tts-pronunciation-overrides.json");
+    const raw = readFileSync(cfgPath, "utf8");
+    const json = JSON.parse(raw);
+    const list = Array.isArray(json?.replacements) ? json.replacements : [];
+    for (const item of list) {
+      const from = String(item?.from || "").trim();
+      const to = String(item?.to || "").trim();
+      if (!from || !to) continue;
+      fromConfig.push([from, to]);
+    }
+  } catch {
+    // Fallback silencieux: on garde les règles codées en dur.
+  }
+
+  const source = fromConfig.length > 0 ? fromConfig : DEFAULT_PRONUNCIATION_OVERRIDES;
+  return source.map(([from, to]) => [new RegExp(`\\b${escapeRegex(from)}\\b`, "gi"), to]);
+}
+
+const PRONUNCIATION_OVERRIDES = loadPronunciationOverrides();
 
 function applyFrenchPronunciationOverrides(text) {
   const src = String(text || "");
   if (!src) return src;
 
-  // "chat" (messagerie / chatter) -> prononcé "tchatte".
-  // On garde volontairement cette règle simple demandée par l'utilisateur.
-  return src.replace(/\bchat\b/gi, "tchatte");
+  let out = src;
+  for (const [rx, repl] of PRONUNCIATION_OVERRIDES) {
+    out = out.replace(rx, repl);
+  }
+  return out;
 }
 
 export function isElevenLabsReady() {

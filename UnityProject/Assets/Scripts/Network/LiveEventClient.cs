@@ -415,7 +415,7 @@ namespace CongoGames.Network
             {
                 OnChatPulse?.Invoke(msg.user ?? "", raw, msg.avatarUrl ?? msg.profilePictureUrl ?? "");
             }
-            string answer = (msg.message ?? string.Empty).Trim().ToUpperInvariant();
+            string answer = (msg.message ?? msg.text ?? string.Empty).Trim().ToUpperInvariant();
             if (answer != "A" && answer != "B" && answer != "C" && answer != "D") return;
 
             string user = string.IsNullOrWhiteSpace(msg.user) ? "joueur" : msg.user.Trim();

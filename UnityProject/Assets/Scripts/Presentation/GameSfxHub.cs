@@ -42,6 +42,7 @@ namespace CongoGames.Presentation
         public bool IsBlindMusicPlaying => blindLoop != null && blindLoop.isPlaying && blindLoop.clip != null;
         public bool IsBlindMusicLoading => blindMusicCo != null;
         private static Dictionary<string, string> blindTrackAliasCache;
+        private static Dictionary<string, string> blindLooseBaseCache;
 
         private void Awake()
         {
@@ -416,13 +417,48 @@ namespace CongoGames.Presentation
                 return Array.Empty<string>();
             }
 
-            var candidates = new List<string>(2) { baseClean };
-            if (TryResolveTrackAlias(baseClean, out string alias) && !string.Equals(alias, baseClean, StringComparison.OrdinalIgnoreCase))
+            var candidates = new List<string>(4);
+            AddUniqueCandidate(candidates, baseClean);
+
+            if (TryResolveTrackAlias(baseClean, out string alias))
             {
-                candidates.Add(alias);
+                AddUniqueCandidate(candidates, alias);
+            }
+
+            if (!IsTrackKey(baseClean) && TryResolveTrackKeyFromNamedBase(baseClean, out string trackKey))
+            {
+                AddUniqueCandidate(candidates, trackKey);
+                if (TryResolveTrackAlias(trackKey, out string aliasFromTrack))
+                {
+                    AddUniqueCandidate(candidates, aliasFromTrack);
+                }
+            }
+
+            if (TryResolveLoosePlaylistBase(baseClean, out string bestLoose))
+            {
+                AddUniqueCandidate(candidates, bestLoose);
             }
 
             return candidates.ToArray();
+        }
+
+        private static void AddUniqueCandidate(List<string> candidates, string candidate)
+        {
+            if (candidates == null || string.IsNullOrWhiteSpace(candidate))
+            {
+                return;
+            }
+
+            string c = candidate.Trim();
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                if (string.Equals(candidates[i], c, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+            }
+
+            candidates.Add(c);
         }
 
         private static bool TryResolveTrackAlias(string trackBase, out string resolvedBase)
@@ -457,6 +493,170 @@ namespace CongoGames.Presentation
             {
                 resolvedBase = byIndex;
                 return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryResolveTrackKeyFromNamedBase(string namedBase, out string trackKey)
+        {
+            trackKey = null;
+            if (string.IsNullOrWhiteSpace(namedBase))
+            {
+                return false;
+            }
+
+            string normalizedInput = NormalizeForMatch(namedBase);
+            if (string.IsNullOrWhiteSpace(normalizedInput))
+            {
+                return false;
+            }
+
+            try
+            {
+                string metaPath = Path.Combine(Application.streamingAssetsPath, "Datasets", "blind_playlist_meta.json");
+                if (!File.Exists(metaPath))
+                {
+                    return false;
+                }
+
+                string json = File.ReadAllText(metaPath);
+                BlindMetaFileForAlias meta = JsonUtility.FromJson<BlindMetaFileForAlias>(json);
+                if (meta?.items == null || meta.items.Length == 0)
+                {
+                    return false;
+                }
+
+                foreach (BlindMetaItemForAlias item in meta.items)
+                {
+                    if (item == null || string.IsNullOrWhiteSpace(item.fileBase))
+                    {
+                        continue;
+                    }
+
+                    if (!IsTrackKey(item.fileBase))
+                    {
+                        continue;
+                    }
+
+                    string joined = (item.artist ?? "") + " - " + (item.title ?? "");
+                    string joinedN = NormalizeForMatch(joined);
+                    if (!string.IsNullOrWhiteSpace(joinedN) && string.Equals(joinedN, normalizedInput, StringComparison.Ordinal))
+                    {
+                        trackKey = item.fileBase.Trim();
+                        return true;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // On reste permissif : le blind test continue même si ce mapping échoue.
+            }
+
+            return false;
+        }
+
+        private static bool TryResolveLoosePlaylistBase(string rawBase, out string resolvedBase)
+        {
+            resolvedBase = null;
+            if (string.IsNullOrWhiteSpace(rawBase))
+            {
+                return false;
+            }
+
+            if (StreamingAssetsUrl.IsWebGlData)
+            {
+                return false;
+            }
+
+            string key = rawBase.Trim();
+            if (blindLooseBaseCache == null)
+            {
+                blindLooseBaseCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            }
+            else if (blindLooseBaseCache.TryGetValue(key, out string cached) && !string.IsNullOrWhiteSpace(cached))
+            {
+                resolvedBase = cached;
+                return true;
+            }
+
+            try
+            {
+                string playlistDir = Path.Combine(Application.streamingAssetsPath, "Theme", "playlist");
+                if (!Directory.Exists(playlistDir))
+                {
+                    return false;
+                }
+
+                string target = NormalizeForMatch(key);
+                if (string.IsNullOrWhiteSpace(target))
+                {
+                    return false;
+                }
+
+                string[] files = Directory.GetFiles(playlistDir);
+                int bestScore = -1;
+                string best = null;
+                foreach (string f in files)
+                {
+                    string ext = Path.GetExtension(f);
+                    if (!ext.Equals(".ogg", StringComparison.OrdinalIgnoreCase)
+                        && !ext.Equals(".mp3", StringComparison.OrdinalIgnoreCase)
+                        && !ext.Equals(".wav", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    string baseName = Path.GetFileNameWithoutExtension(f);
+                    string norm = NormalizeForMatch(baseName);
+                    if (string.IsNullOrWhiteSpace(norm))
+                    {
+                        continue;
+                    }
+
+                    int score = 0;
+                    if (string.Equals(norm, target, StringComparison.Ordinal))
+                    {
+                        score += 1000;
+                    }
+                    if (norm.Contains(target) || target.Contains(norm))
+                    {
+                        score += 200;
+                    }
+
+                    string[] toksA = norm.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] toksB = target.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    int overlap = 0;
+                    for (int i = 0; i < toksA.Length; i++)
+                    {
+                        for (int j = 0; j < toksB.Length; j++)
+                        {
+                            if (toksA[i] == toksB[j])
+                            {
+                                overlap++;
+                                break;
+                            }
+                        }
+                    }
+                    score += overlap * 7;
+
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        best = baseName;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(best) && bestScore >= 12)
+                {
+                    blindLooseBaseCache[key] = best;
+                    resolvedBase = best;
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                // Pas bloquant.
             }
 
             return false;

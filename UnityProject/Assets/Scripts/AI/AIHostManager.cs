@@ -300,10 +300,49 @@ namespace CongoGames.AI
             s = s.Replace(" ;", ",");
             s = s.Replace(" :", ",");
 
+            // Homographes FR: "chat" (messagerie) doit être lu "tchat".
+            s = ReplaceWholeWordInsensitive(s, "chat", "tchat");
+            s = ReplaceWholeWordInsensitive(s, "chater", "tchater");
+            s = ReplaceWholeWordInsensitive(s, "chatter", "tchatter");
+
             // Mini dictionnaire local: prononciation plus stable des noms propres congolais.
             s = ApplySpeechDictionary(s);
 
             return s.Trim();
+        }
+
+        private static string ReplaceWholeWordInsensitive(string input, string find, string replace)
+        {
+            if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(find))
+            {
+                return input ?? "";
+            }
+
+            int idx = input.IndexOf(find, StringComparison.OrdinalIgnoreCase);
+            if (idx < 0)
+            {
+                return input;
+            }
+
+            var sb = new System.Text.StringBuilder(input.Length + 24);
+            int start = 0;
+            while (idx >= 0)
+            {
+                int before = idx - 1;
+                int after = idx + find.Length;
+                bool leftOk = before < 0 || !char.IsLetterOrDigit(input[before]);
+                bool rightOk = after >= input.Length || !char.IsLetterOrDigit(input[after]);
+                if (leftOk && rightOk)
+                {
+                    sb.Append(input, start, idx - start);
+                    sb.Append(replace);
+                    start = idx + find.Length;
+                }
+                idx = input.IndexOf(find, idx + find.Length, StringComparison.OrdinalIgnoreCase);
+            }
+
+            sb.Append(input, start, input.Length - start);
+            return sb.ToString();
         }
 
         private static string ApplySpeechDictionary(string text)

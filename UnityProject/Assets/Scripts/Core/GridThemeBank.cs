@@ -79,7 +79,7 @@ namespace CongoGames.Core
             }),
             new Theme("eco", "Commerce & vie quotidienne", new[]
             {
-                "MARCHE", "VENTE", "POIDS", "PRIX", "KIOSK", "CAFE", "PAIN", "SABLE", "ROUTE", "GARES", "TAXES", "PRIME", "SALAIRE", "OFFRE", "ACHAT", "BUDGET", "CREDIT", "STOCKS", "BOUTIK", "CAISSE"
+                "MARCHE", "VENTE", "POIDS", "PRIX", "KIOSQUE", "CAFE", "PAIN", "SABLE", "ROUTE", "GARES", "TAXES", "PRIME", "SALAIRE", "OFFRE", "ACHAT", "BUDGET", "CREDIT", "STOCKS", "BOUTIK", "CAISSE"
             }),
         };
 
