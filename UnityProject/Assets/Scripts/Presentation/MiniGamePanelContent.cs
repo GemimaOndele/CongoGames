@@ -222,6 +222,7 @@ namespace CongoGames.Presentation
         [SerializeField] private float preMusicCountdownSeconds = 3f;
         [SerializeField] private float postHostBeforeCountdownSeconds = 2f;
         [SerializeField] private float hostPostAuthorizeDelaySeconds = 5f;
+        [SerializeField] private float blindQuestionVoteSeconds = 12f;
         private bool blindInQuestionPhase;
         private Coroutine blindListenCo;
         private Coroutine imageOrchestrationCo;
@@ -230,8 +231,12 @@ namespace CongoGames.Presentation
         private string[] blindDisplayedChoices = new string[4];
         private int blindMaskedChoiceIndex = -1;
         private string blindMaskedChoiceValue = "";
+        private string blindQuestionBaseText = "";
         private float blindListenEndUnscaled;
         private float blindListenWindowSec;
+        private float blindQuestionEndUnscaled;
+        private readonly int[] blindLiveVoteCounts = new int[4];
+        private readonly Dictionary<string, int> blindLiveVoteByUser = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private Image imageGuessVeil;
         [SerializeField] private float imageGuessRevealSec = 15f;
         private const float ImageGuessMusicClueSec = 20f;
@@ -289,9 +294,12 @@ namespace CongoGames.Presentation
         private bool chronoTimerUrgentPlayed;
 
         [Header("Grilles thématiques (mots mélangés / mots croisés)")]
-        [Tooltip("Démo : 2 manches = 2 grilles thématiques (5–12 mots) avant le prochain mode ; en live, le chrono de la manche continue.")]
+        [Tooltip("Démo : 2 manches = 2 grilles thématiques (5–21 mots) avant le prochain mode ; en live, le chrono de la manche continue.")]
         [SerializeField] private int gridSessionsPerThematicBlock = 2;
-        [SerializeField] private int gridThematicWordCount = 8;
+        [SerializeField] private int gridThematicWordCount = 15;
+        [Tooltip("Pause globale (en secondes, temps réel) après mot trouvé dans les modes grilles.")]
+        [SerializeField] private float gridFoundPauseSeconds = 5f;
+        [SerializeField] private bool pauseGameplayOnGridFound = true;
         private int gridMotsJeuSessionIndex; // 1 = premier mot, …
         private int gridThematicBlockRound; // 0 = non initialisé, 1 = 1re grille, 2 = 2e…
         private string currentGridThemeLabel = "";
@@ -309,6 +317,7 @@ namespace CongoGames.Presentation
         private Coroutine gridFoundToastCo;
         private Coroutine gridFoundAvatarCo;
         private readonly Dictionary<string, Texture2D> gridAvatarCache = new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase);
+        private bool skipNextPostAnswerHold;
         [Tooltip("Cible active (mots mélangés + mots croisés) — rétro compatible avec CurrentScrambleAnswer.")]
         public string CurrentScrambleTargetWord { get; private set; } = "CONGO";
         [Tooltip("Dernier(s) mots reconnus en mots croisés (séparateur « · »)")]
@@ -335,8 +344,8 @@ namespace CongoGames.Presentation
         private string liveTypedModeId = "";
 
         private static readonly Color CrosswordFoundCellBg = new Color(0.24f, 0.72f, 0.4f, 1f);
-        private static readonly Color CrosswordFoundLetter = new Color(0.95f, 0.98f, 0.94f, 1f);
-        private static readonly Color CrosswordDefaultLetter = new Color(0.77f, 0.84f, 0.9f, 1f);
+        private static readonly Color CrosswordFoundLetter = new Color(0.98f, 0.98f, 0.98f, 1f);
+        private static readonly Color CrosswordDefaultLetter = new Color(0.93f, 0.94f, 0.96f, 1f);
 
         private static string BuildWordBankProgressBar(int found, int total, int width = 14)
         {
@@ -364,14 +373,15 @@ namespace CongoGames.Presentation
                     if (i > 0) sb.Append("  ");
                     string key = GridThemeBank.SanitizeForGrid(currentGridAllWords[i] ?? "");
                     if (string.IsNullOrEmpty(key)) continue;
+                    string keyUi = GridThemeBank.ToUiDisplayWord(key);
                     bool solved = currentGridSolved != null && currentGridSolved.Contains(key);
                     if (solved)
                     {
-                        sb.Append("<color=#39FF6E><b>").Append(key).Append("</b></color>");
+                        sb.Append("<color=#39FF6E><b>").Append(keyUi).Append("</b></color>");
                     }
                     else
                     {
-                        int n = Mathf.Clamp(key.Length, 3, 14);
+                        int n = Mathf.Clamp(keyUi.Length, 3, 16);
                         sb.Append("<color=#5C616B>").Append(new string('●', n)).Append("</color>");
                     }
                 }
@@ -399,14 +409,15 @@ namespace CongoGames.Presentation
         {
             if (string.IsNullOrEmpty(wordUpper)) return;
             string gloss = GridThemeBank.TryGlossFr(wordUpper);
+            string displayWord = GridThemeBank.ToUiDisplayWord(wordUpper);
             string line = string.IsNullOrEmpty(gloss)
-                ? wordUpper
-                : wordUpper + " — " + gloss + " (FR)";
+                ? displayWord
+                : displayWord + " — " + gloss + " (FR)";
             gridFoundHistory.Add(line);
             RefreshGridFoundPanel();
         }
 
-        private void ShowGridFoundToast(string foundWord, int pointsDelta)
+        private void ShowGridFoundToast(string foundWord, int pointsDelta, string forcedUser = null, string forcedAvatarUrl = null)
         {
             if (gridFoundToastRoot == null || string.IsNullOrWhiteSpace(foundWord))
             {
@@ -415,7 +426,7 @@ namespace CongoGames.Presentation
 
             GameSfxHub.Instance?.PlayUiPop(0.2f);
 
-            string user = ResolveCurrentGridPlayerName();
+            string user = string.IsNullOrWhiteSpace(forcedUser) ? ResolveCurrentGridPlayerName() : forcedUser.Trim();
             if (gridFoundToastUser != null)
             {
                 gridFoundToastUser.text = user;
@@ -423,12 +434,21 @@ namespace CongoGames.Presentation
 
             if (gridFoundToastWord != null)
             {
-                gridFoundToastWord.text = foundWord;
+                gridFoundToastWord.text = GridThemeBank.ToUiDisplayWord(foundWord);
             }
 
             if (gridFoundToastPoints != null)
             {
-                gridFoundToastPoints.text = "+" + Mathf.Max(1, pointsDelta);
+                int totalScore = 0;
+                int rank = -1;
+                bool hasRank = ScoreManager.Instance != null && ScoreManager.Instance.TryGetPlayerScoreAndRank(user, out totalScore, out rank);
+                string rankChunk = hasRank ? ("  <color=#FFFFFF>#"+ rank + "</color>") : "";
+                bool donor = IsGiftContributor(user);
+                string pointsColor = donor ? "#8B5E3C" : "#FFFFFF";
+                gridFoundToastPoints.text =
+                    "<color=" + pointsColor + ">+" + Mathf.Max(1, pointsDelta) + "</color>"
+                    + "  <color=#9CD6FF>TOTAL " + totalScore + "</color>"
+                    + rankChunk;
             }
 
             if (gridFoundToastAvatar != null)
@@ -456,7 +476,7 @@ namespace CongoGames.Presentation
                 }
             }
 
-            string avatarUrl = ResolveCurrentGridAvatarUrl();
+            string avatarUrl = string.IsNullOrWhiteSpace(forcedAvatarUrl) ? ResolveCurrentGridAvatarUrl() : forcedAvatarUrl.Trim();
             if (gridFoundToastAvatarPhoto != null)
             {
                 gridFoundToastAvatarPhoto.texture = null;
@@ -478,6 +498,7 @@ namespace CongoGames.Presentation
                 StopCoroutine(gridFoundToastCo);
             }
 
+            skipNextPostAnswerHold = true;
             gridFoundToastCo = StartCoroutine(CoShowGridFoundToast());
         }
 
@@ -490,6 +511,24 @@ namespace CongoGames.Presentation
             }
 
             return points;
+        }
+
+        private int GrantModeSuccessPoints(int points = 10, string user = null)
+        {
+            int p = Mathf.Max(1, points);
+            string targetUser = string.IsNullOrWhiteSpace(user) ? ResolveCurrentGridPlayerName() : user.Trim();
+            if (ScoreManager.Instance != null)
+            {
+                ScoreManager.Instance.AddPoints(targetUser, p);
+            }
+
+            return p;
+        }
+
+        public void ShowExternalCorrectAnswerToast(string user, string avatarUrl, string foundWord, int pointsDelta)
+        {
+            if (string.IsNullOrWhiteSpace(foundWord)) return;
+            ShowGridFoundToast(foundWord, Mathf.Max(1, pointsDelta), user, avatarUrl);
         }
 
         private string ResolveCurrentGridPlayerName()
@@ -583,8 +622,14 @@ namespace CongoGames.Presentation
             gridFoundToastRoot.localScale = new Vector3(0.95f, 0.95f, 1f);
 
             float inDur = 0.26f;
-            float hold = 2.6f;
+            float hold = Mathf.Max(0.5f, gridFoundPauseSeconds);
             float outDur = 0.28f;
+            float prevTimeScale = Time.timeScale;
+            bool paused = pauseGameplayOnGridFound;
+            if (paused)
+            {
+                Time.timeScale = 0f;
+            }
             float t = 0f;
             while (t < inDur)
             {
@@ -648,7 +693,24 @@ namespace CongoGames.Presentation
             if (gridFoundToastAvatarPhoto != null) gridFoundToastAvatarPhoto.transform.localScale = Vector3.one;
             if (gridFoundToastAvatar != null) gridFoundToastAvatar.transform.localScale = Vector3.one;
             if (gridFoundToastRoot != null) gridFoundToastRoot.gameObject.SetActive(false);
+            if (paused)
+            {
+                Time.timeScale = prevTimeScale;
+            }
             gridFoundToastCo = null;
+        }
+
+        private bool IsGiftContributor(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return false;
+            }
+
+            LiveEventClient lc = liveLikeSource != null ? liveLikeSource : FindAnyObjectByType<LiveEventClient>();
+            if (lc == null) return false;
+            return string.Equals(lc.LastEventType ?? "", "gift", StringComparison.OrdinalIgnoreCase)
+                && string.Equals((lc.LastEventUser ?? "").Trim(), username.Trim(), StringComparison.OrdinalIgnoreCase);
         }
 
         private void AdvanceGridMotsJeu()
@@ -721,7 +783,10 @@ namespace CongoGames.Presentation
 
         private IEnumerator CoAdvanceAfterAnswerHold()
         {
-            float hold = Mathf.Clamp(postAnswerHoldSeconds, 1f, 30f);
+            float hold = skipNextPostAnswerHold
+                ? 0.05f
+                : Mathf.Clamp(postAnswerHoldSeconds, 1f, 30f);
+            skipNextPostAnswerHold = false;
             yield return new WaitForSecondsRealtime(hold);
             postAnswerAdvanceCo = null;
             GameModeManager.Instance?.AdvanceRoundOrNextMode();
@@ -881,7 +946,7 @@ namespace CongoGames.Presentation
             else if (crosswordHintCellIndices.Contains(cellIndex))
             {
                 tx.text = char.ToUpperInvariant(lastWordSearchGrid[r, c]).ToString();
-                tx.color = new Color(0.92f, 0.96f, 0.84f, 1f);
+                tx.color = new Color(0.95f, 0.96f, 0.98f, 1f);
             }
             else
             {
@@ -990,13 +1055,59 @@ namespace CongoGames.Presentation
         private void HandleLiveChatPulse(string user, string message, string avatarUrl)
         {
             GameModeManager gmm = GameModeManager.Instance;
-            if (gmm == null || !string.Equals(gmm.ActiveModeId, "semantic", StringComparison.OrdinalIgnoreCase))
+            if (gmm == null)
             {
                 return;
             }
-            if (semanticRoundResolved) return;
 
-            string w = GridThemeBank.SanitizeForGrid(message ?? "");
+            string mode = gmm.ActiveModeId ?? "";
+            string msg = (message ?? "").Trim();
+            if (string.IsNullOrWhiteSpace(msg))
+            {
+                return;
+            }
+
+            // Modes QCM (blind test): accepte A/B/C/D ou 1/2/3/4 depuis le chat
+            if (string.Equals(mode, "blind-test", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!blindInQuestionPhase) return;
+                if (!TryParseChoiceFromChat(msg, out int pick)) return;
+                RegisterBlindLiveVote(string.IsNullOrWhiteSpace(user) ? "joueur" : user.Trim(), pick);
+                return;
+            }
+
+            // Modes grilles / texte: le chat agit comme une soumission directe.
+            if (string.Equals(mode, "word-scramble", StringComparison.OrdinalIgnoreCase))
+            {
+                if (wordAnswerInput != null) wordAnswerInput.text = msg;
+                OnWordSubmit(this);
+                return;
+            }
+
+            if (string.Equals(mode, "crossword-lite", StringComparison.OrdinalIgnoreCase))
+            {
+                if (crosswordAnswerInput != null) crosswordAnswerInput.text = msg;
+                OnCrosswordSubmit(this);
+                return;
+            }
+
+            if (string.Equals(mode, "mystery-word", StringComparison.OrdinalIgnoreCase))
+            {
+                if (mysteryAnswerInput != null) mysteryAnswerInput.text = msg;
+                OnMysterySubmit(this);
+                return;
+            }
+
+            if (string.Equals(mode, "image-guess", StringComparison.OrdinalIgnoreCase))
+            {
+                if (imageGuessInput != null) imageGuessInput.text = msg;
+                OnImageGuessSubmit(this);
+                return;
+            }
+
+            if (!string.Equals(mode, "semantic", StringComparison.OrdinalIgnoreCase) || semanticRoundResolved) return;
+
+            string w = GridThemeBank.SanitizeForGrid(msg);
             if (string.IsNullOrEmpty(w) || w.Length < 2) return;
             if (w.Length > 20) w = w.Substring(0, 20);
             string u = string.IsNullOrWhiteSpace(user) ? "joueur" : user.Trim();
@@ -1011,6 +1122,38 @@ namespace CongoGames.Presentation
                 semanticLiveRevealCo = null;
             }
             semanticLiveRevealCo = StartCoroutine(CoRevealSemanticRows());
+        }
+
+        private static bool TryParseChoiceFromChat(string raw, out int index)
+        {
+            index = -1;
+            if (string.IsNullOrWhiteSpace(raw)) return false;
+            string t = raw.Trim().ToUpperInvariant();
+            if (t.Length > 1)
+            {
+                // garde la première lettre utile (ex: "A.", "A)", "A ")
+                t = t[0].ToString();
+            }
+
+            if (t == "A" || t == "1") { index = 0; return true; }
+            if (t == "B" || t == "2") { index = 1; return true; }
+            if (t == "C" || t == "3") { index = 2; return true; }
+            if (t == "D" || t == "4") { index = 3; return true; }
+            return false;
+        }
+
+        private void RegisterBlindLiveVote(string username, int pick)
+        {
+            pick = Mathf.Clamp(pick, 0, 3);
+            if (blindLiveVoteByUser.TryGetValue(username, out int old))
+            {
+                old = Mathf.Clamp(old, 0, 3);
+                blindLiveVoteCounts[old] = Mathf.Max(0, blindLiveVoteCounts[old] - 1);
+            }
+
+            blindLiveVoteByUser[username] = pick;
+            blindLiveVoteCounts[pick]++;
+            RefreshBlindVoteHud();
         }
 
         private void UpsertSemanticLiveEntry(string user, string word, string avatarUrl, float progress01)
@@ -1711,7 +1854,7 @@ namespace CongoGames.Presentation
             tx.horizontalOverflow = HorizontalWrapMode.Overflow;
             tx.verticalOverflow = VerticalWrapMode.Overflow;
             tx.alignment = TextAnchor.MiddleCenter;
-            tx.color = new Color(1f, 0.94f, 0.2f, 1f);
+            tx.color = new Color(0.94f, 0.95f, 0.97f, 1f);
             Outline ol = tx.GetComponent<Outline>();
             if (ol == null) ol = tx.gameObject.AddComponent<Outline>();
             ol.effectColor = new Color(0f, 0f, 0f, 0.94f);
@@ -2960,8 +3103,8 @@ namespace CongoGames.Presentation
                 tx.color = wordScrambleFoundCellIndices.Contains(cellIndex)
                     ? CrosswordFoundLetter
                     : (wordScrambleHintCellIndices.Contains(cellIndex)
-                        ? new Color(0.9f, 0.95f, 0.82f, 1f)
-                        : new Color(0.74f, 0.78f, 0.84f, 1f));
+                        ? new Color(0.95f, 0.96f, 0.98f, 1f)
+                        : new Color(0.93f, 0.94f, 0.96f, 1f));
             }
         }
 
@@ -3005,7 +3148,7 @@ namespace CongoGames.Presentation
                     }
 
                     wordScrambleTiles[idx].text = scrambled[i].ToString();
-                    wordScrambleTiles[idx].color = new Color(0.9f, 0.86f, 0.58f, 1f);
+                    wordScrambleTiles[idx].color = new Color(0.94f, 0.95f, 0.97f, 1f);
                     playableTile[idx] = true;
                 }
 
@@ -3018,7 +3161,7 @@ namespace CongoGames.Presentation
             {
                 if (wordScrambleTiles[i] == null) continue;
                 wordScrambleTiles[i].text = scrambled[i].ToString();
-                wordScrambleTiles[i].color = new Color(0.9f, 0.86f, 0.58f, 1f);
+                wordScrambleTiles[i].color = new Color(0.94f, 0.95f, 0.97f, 1f);
                 playableTile[i] = true;
             }
         }
@@ -3185,6 +3328,10 @@ namespace CongoGames.Presentation
             blindMaskedChoiceValue = blindMaskedChoiceIndex >= 0 && blindMaskedChoiceIndex < displayChoices.Length
                 ? (displayChoices[blindMaskedChoiceIndex] ?? "")
                 : "";
+            blindQuestionBaseText = "";
+            blindQuestionEndUnscaled = 0f;
+            blindLiveVoteByUser.Clear();
+            for (int i = 0; i < blindLiveVoteCounts.Length; i++) blindLiveVoteCounts[i] = 0;
             for (int i = 0; i < blindChoices.Length && displayChoices != null && i < displayChoices.Length; i++)
             {
                 if (blindChoices[i] != null)
@@ -3219,6 +3366,45 @@ namespace CongoGames.Presentation
                     row.color = BlindRowIdle;
                 }
             }
+        }
+
+        private void BeginBlindQuestionPhase()
+        {
+            blindInQuestionPhase = true;
+            SetBlindChoicesInteractable(true);
+            blindQuestionEndUnscaled = 0f;
+            if (liveLikeSource != null && liveLikeSource.IsConnected)
+            {
+                blindQuestionEndUnscaled = Time.unscaledTime + Mathf.Max(6f, blindQuestionVoteSeconds);
+                RefreshBlindVoteHud();
+            }
+        }
+
+        private void RefreshBlindVoteHud()
+        {
+            if (blindSub == null || string.IsNullOrWhiteSpace(blindQuestionBaseText))
+            {
+                return;
+            }
+
+            int totalVotes = blindLiveVoteCounts[0] + blindLiveVoteCounts[1] + blindLiveVoteCounts[2] + blindLiveVoteCounts[3];
+            float rem = blindQuestionEndUnscaled > 0f ? Mathf.Max(0f, blindQuestionEndUnscaled - Time.unscaledTime) : 0f;
+            if (totalVotes <= 0)
+            {
+                blindSub.text = blindQuestionBaseText + (blindQuestionEndUnscaled > 0f
+                    ? ("\nVotes chat : en attente… (" + Mathf.CeilToInt(rem) + " s)")
+                    : "");
+                return;
+            }
+
+            string p0 = Mathf.RoundToInt(blindLiveVoteCounts[0] * 100f / totalVotes) + "%";
+            string p1 = Mathf.RoundToInt(blindLiveVoteCounts[1] * 100f / totalVotes) + "%";
+            string p2 = Mathf.RoundToInt(blindLiveVoteCounts[2] * 100f / totalVotes) + "%";
+            string p3 = Mathf.RoundToInt(blindLiveVoteCounts[3] * 100f / totalVotes) + "%";
+            string timeChunk = blindQuestionEndUnscaled > 0f ? (" • " + Mathf.CeilToInt(rem) + " s") : "";
+            blindSub.text = blindQuestionBaseText
+                + "\nVotes chat  A:" + p0 + "  B:" + p1 + "  C:" + p2 + "  D:" + p3
+                + timeChunk;
         }
 
         private IEnumerator CoBlindHostThenListen(int musicSeed, MiniGameDemoBanks.BlindRound raw, float listen)
@@ -3312,8 +3498,9 @@ namespace CongoGames.Presentation
             SetBlindChoicesInteractable(false);
             if (blindSub != null)
             {
-                blindSub.text = (string.IsNullOrEmpty(raw.SubLine) ? "" : raw.SubLine + "\n")
+                blindQuestionBaseText = (string.IsNullOrEmpty(raw.SubLine) ? "" : raw.SubLine + "\n")
                     + "L’écoute est terminée. Choisis A, B, C ou D ci-dessous.";
+                blindSub.text = blindQuestionBaseText;
             }
 
             if (blindEmoji != null) blindEmoji.text = "?  Réponds  ?";
@@ -3329,8 +3516,7 @@ namespace CongoGames.Presentation
             }
             else
             {
-                blindInQuestionPhase = true;
-                SetBlindChoicesInteractable(true);
+                BeginBlindQuestionPhase();
             }
             blindListenCo = null;
         }
@@ -3342,8 +3528,7 @@ namespace CongoGames.Presentation
             host?.Speak("Tu peux jouer.");
             yield return CoWaitHostSilence(12f);
             yield return new WaitForSecondsRealtime(Mathf.Max(0f, hostPostAuthorizeDelaySeconds));
-            blindInQuestionPhase = true;
-            SetBlindChoicesInteractable(true);
+            BeginBlindQuestionPhase();
             blindUnlockCo = null;
         }
 
@@ -3391,6 +3576,7 @@ namespace CongoGames.Presentation
             ThemeMusicPlayer.Instance?.SetBlindDuckMultiplier(1f);
             bool ok = choiceIndex == lastBlindCorrectDisplayIndex;
             blindInQuestionPhase = false;
+            blindQuestionEndUnscaled = 0f;
             SetBlindChoicesInteractable(false);
             // "Autre" : dévoile uniquement si c'est la bonne réponse.
             bool pickedMasked = choiceIndex == blindMaskedChoiceIndex;
@@ -3411,6 +3597,25 @@ namespace CongoGames.Presentation
             }
 
             GameSfxHub.Instance?.PlayResult(ok);
+            if (ok)
+            {
+                int points = GrantModeSuccessPoints(10);
+                string solved = (lastBlindCorrectDisplayIndex >= 0 && lastBlindCorrectDisplayIndex < blindDisplayedChoices.Length)
+                    ? blindDisplayedChoices[lastBlindCorrectDisplayIndex]
+                    : "BONNE REPONSE";
+                ShowGridFoundToast(solved, points);
+            }
+            if (blindSub != null && blindLiveVoteByUser.Count > 0)
+            {
+                int totalVotes = blindLiveVoteByUser.Count;
+                int correctVotes = 0;
+                foreach (KeyValuePair<string, int> kv in blindLiveVoteByUser)
+                {
+                    if (kv.Value == lastBlindCorrectDisplayIndex) correctVotes++;
+                }
+                blindSub.text = (string.IsNullOrWhiteSpace(blindQuestionBaseText) ? "Blind test" : blindQuestionBaseText)
+                    + "\nRéponses correctes: " + correctVotes + "/" + totalVotes;
+            }
             MaybeAdvanceMiniGameAfterResponse();
         }
 
@@ -3877,6 +4082,7 @@ namespace CongoGames.Presentation
         private void Update()
         {
             TickLiveKeyboardDraft();
+            TickBlindLiveVoteWindow();
             SemanticTick();
             if (GameInput.DigitKeyDown1To9(1)) OnChronoInput(0);
             else if (GameInput.DigitKeyDown1To9(2)) OnChronoInput(1);
@@ -3884,6 +4090,28 @@ namespace CongoGames.Presentation
             else if (GameInput.DigitKeyDown1To9(4)) OnChronoInput(3);
 
             ChronoTick();
+        }
+
+        private void TickBlindLiveVoteWindow()
+        {
+            if (!blindInQuestionPhase) return;
+            if (blindQuestionEndUnscaled <= 0f) return;
+            RefreshBlindVoteHud();
+            if (Time.unscaledTime < blindQuestionEndUnscaled) return;
+
+            int bestIndex = 0;
+            int bestVotes = blindLiveVoteCounts[0];
+            for (int i = 1; i < blindLiveVoteCounts.Length; i++)
+            {
+                if (blindLiveVoteCounts[i] > bestVotes)
+                {
+                    bestVotes = blindLiveVoteCounts[i];
+                    bestIndex = i;
+                }
+            }
+
+            blindQuestionEndUnscaled = 0f;
+            NotifyBlindPick(bestIndex);
         }
 
         private void TickLiveKeyboardDraft()
@@ -5066,6 +5294,8 @@ namespace CongoGames.Presentation
                     demo.semanticTimeoutCo = null;
                 }
                 demo.ShowSemanticLivePointsBadge(a, 2);
+                int points = demo.GrantModeSuccessPoints(10);
+                demo.ShowGridFoundToast(a, points);
                 GameSfxHub.Instance?.PlayResult(true);
                 demo.StartSemanticPostWinRecapAndAdvance();
                 return;
@@ -5162,6 +5392,11 @@ namespace CongoGames.Presentation
             }
 
             GameSfxHub.Instance?.PlayResult(ok);
+            if (ok)
+            {
+                int points = demo.GrantModeSuccessPoints(10);
+                demo.ShowGridFoundToast(target, points);
+            }
             MaybeAdvanceMiniGameAfterResponse();
         }
 
@@ -5200,6 +5435,11 @@ namespace CongoGames.Presentation
             }
 
             GameSfxHub.Instance?.PlayResult(ok);
+            if (ok)
+            {
+                int points = demo.GrantModeSuccessPoints(10);
+                demo.ShowGridFoundToast(demo.CurrentImageGuessRound.AnswerKey, points);
+            }
             MaybeAdvanceMiniGameAfterResponse();
         }
 

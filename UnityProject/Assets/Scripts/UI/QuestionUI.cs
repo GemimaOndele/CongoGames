@@ -317,6 +317,18 @@ namespace CongoGames.UI
             phaseBanner.text = message ?? "";
         }
 
+        public void SetLiveVoteDistribution(int a, int b, int c, int d)
+        {
+            if (phaseBanner == null) return;
+            int total = Mathf.Max(1, a + b + c + d);
+            string pa = Mathf.RoundToInt(a * 100f / total) + "%";
+            string pb = Mathf.RoundToInt(b * 100f / total) + "%";
+            string pc = Mathf.RoundToInt(c * 100f / total) + "%";
+            string pd = Mathf.RoundToInt(d * 100f / total) + "%";
+            phaseBanner.gameObject.SetActive(true);
+            phaseBanner.text = "Flux réponses : A " + pa + " • B " + pb + " • C " + pc + " • D " + pd;
+        }
+
         public void RenderLiveImmediate(LiveQuestion q)
         {
             SetupQuizRound(q);

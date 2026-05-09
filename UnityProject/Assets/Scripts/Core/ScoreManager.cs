@@ -24,9 +24,10 @@ namespace CongoGames.Core
             Instance = this;
         }
 
-        public void RegisterAnswer(string username, bool isCorrect, bool isFastest)
+        public int RegisterAnswer(string username, bool isCorrect, bool isFastest)
         {
             PlayerData player = GetOrCreate(username);
+            int awarded = 0;
             if (isCorrect)
             {
                 player.Streak++;
@@ -36,6 +37,7 @@ namespace CongoGames.Core
                     points *= mult;
                 }
                 player.Score += points;
+                awarded = points;
             }
             else
             {
@@ -43,6 +45,7 @@ namespace CongoGames.Core
             }
 
             NotifyLeaderboardChanged();
+            return awarded;
         }
 
         public void AddPoints(string username, int points)
@@ -83,6 +86,23 @@ namespace CongoGames.Core
                 .OrderByDescending(p => p.Score)
                 .Take(maxLeaderboardSize)
                 .ToList();
+        }
+
+        public bool TryGetPlayerScoreAndRank(string username, out int score, out int rank)
+        {
+            score = 0;
+            rank = -1;
+            if (string.IsNullOrWhiteSpace(username)) return false;
+            if (!players.TryGetValue(username, out PlayerData me)) return false;
+
+            score = me.Score;
+            rank = 1;
+            foreach (PlayerData p in players.Values)
+            {
+                if (p == null) continue;
+                if (p.Score > me.Score) rank++;
+            }
+            return true;
         }
 
         public int GetRegisteredPlayerCount()

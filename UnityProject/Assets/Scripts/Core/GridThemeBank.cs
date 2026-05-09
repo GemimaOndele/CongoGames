@@ -29,7 +29,9 @@ namespace CongoGames.Core
         {
             new Theme("geo", "Géo & lieux (Congo)", new[]
             {
-                "KINTELE", "POINTE", "CUVETTE", "LIKOUALA", "SANGHA", "POOL", "LEFINI", "NIARI", "LOANGO", "OUESSO", "BETOU", "IMPFON", "BANIO", "MAYOMB", "ESTUA", "BASSA", "MFOUA", "LOUBO", "KINKA", "NOIRE"
+                "KINTELE", "POINTENOIRE", "CUVETTE", "LIKOUALA", "SANGHA", "POOL",
+                "LEFINI", "NIARI", "LOANGO", "OUESSO", "BETOU", "IMPFONDO",
+                "MAYOMBE", "ESTUAIRE", "BRAZZAVILLE", "DJAMBALA", "OWANDO", "DOLISIE"
             }),
             new Theme("departements", "Départements du Congo", new[]
             {
@@ -49,11 +51,15 @@ namespace CongoGames.Core
             }),
             new Theme("nature", "Forêts, fleuve, faune", new[]
             {
-                "FLEUVE", "CONGO", "GORIL", "SANGA", "FORET", "PARC", "EQUATE", "PLUIE", "OCEAN", "RIVIERE", "COCOTI", "MANGROV", "BASSIN", "FLORE", "FAUNE", "SAHBI", "HERBE", "BOISE", "PLAGE", "CRABE"
+                "FLEUVE", "CONGO", "GORILLE", "SANGHA", "FORET", "PARC", "EQUATEUR",
+                "PLUIE", "OCEAN", "RIVIERE", "COCOTIER", "MANGROVE", "BASSIN",
+                "FLORE", "FAUNE", "HERBE", "BOISE", "PLAGE", "CRABE"
             }),
             new Theme("culture", "Culture, fête, drapeau", new[]
             {
-                "BANTOU", "RUMBA", "NGOMA", "NDOMBO", "SEBEN", "DANSE", "CHANT", "CONGO", "MBOTE", "FETE", "AOUT", "CULTUR", "FOULE", "KERMES", "DANJAR", "FOYER", "GLOIRE", "HONOR", "SCENE", "HABIT"
+                "BANTOU", "RUMBA", "NGOMA", "NDOMBOLO", "SEBEN", "DANSE",
+                "CHANT", "CONGO", "MBOTE", "FETE", "AOUT", "CULTURE",
+                "FOULE", "FOYER", "GLOIRE", "HONNEUR", "SCENE", "HABIT"
             }),
             new Theme("lingala", "Lingala — vocabulaire (mots à retrouver)", new[]
             {
@@ -78,14 +84,14 @@ namespace CongoGames.Core
         };
 
         public static int MinWords => 5;
-        public static int MaxWords => 12;
+        public static int MaxWords => 21;
 
         /// <summary>Tirage d’un thème + N mots uniques, longueur 4–12, upper sans accents pour les grilles.</summary>
         public static void DrawSessionWords(out string themeLabel, out List<string> words, int? wordCount = null)
         {
             int n = wordCount ?? Random.Range(MinWords, MaxWords + 1);
             n = Mathf.Clamp(n, MinWords, MaxWords);
-            const int maxLenForGrid = 12;
+            const int maxLenForGrid = 18;
             Theme t = Themes[Random.Range(0, Themes.Length)];
             themeLabel = t.Label;
             var pool = new List<string>(t.Words.Length);
@@ -138,10 +144,25 @@ namespace CongoGames.Core
             s = s.Trim().ToUpperInvariant();
             s = s.Replace("É", "E").Replace("È", "E").Replace("Ê", "E")
                 .Replace("À", "A").Replace("Ô", "O")
+                .Replace("-", "")
                 .Replace(" ", "")
                 .Replace("'", "");
-            if (s.Length > 12) s = s.Substring(0, 12);
             return s;
+        }
+
+        /// <summary>
+        /// Affichage UI (liste des mots trouvés) : remet des tirets pour les mots composés.
+        /// </summary>
+        public static string ToUiDisplayWord(string word)
+        {
+            string w = SanitizeForGrid(word ?? "");
+            switch (w)
+            {
+                case "POINTENOIRE": return "POINTE-NOIRE";
+                case "CUVETTEOUEST": return "CUVETTE-OUEST";
+                case "LIKOUALAUX": return "LIKOUALA-AUX-HERBES";
+                default: return w;
+            }
         }
 
         /// <summary>Glose FR optionnelle (thème langues / démo) — vide si inconnu.</summary>

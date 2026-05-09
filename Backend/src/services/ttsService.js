@@ -9,6 +9,15 @@ import { isEdgeTtsEnabled, synthesizeEdgeToPcm } from "./edgeTtsService.js";
 const DEFAULT_MODEL = "eleven_multilingual_v2";
 const MAX_CHARS = 2500;
 
+function applyFrenchPronunciationOverrides(text) {
+  const src = String(text || "");
+  if (!src) return src;
+
+  // "chat" (messagerie / chatter) -> prononcé "tchatte".
+  // On garde volontairement cette règle simple demandée par l'utilisateur.
+  return src.replace(/\bchat\b/gi, "tchatte");
+}
+
 export function isElevenLabsReady() {
   const k = process.env.ELEVENLABS_API_KEY?.trim();
   const v = process.env.ELEVENLABS_VOICE_ID?.trim();
@@ -110,7 +119,7 @@ async function synthesizeElevenLabsOnly(text, opts = {}) {
 }
 
 export async function synthesizeToAudioBase64(text, opts = {}) {
-  const clean = String(text || "").trim().slice(0, MAX_CHARS);
+  const clean = applyFrenchPronunciationOverrides(String(text || "").trim()).slice(0, MAX_CHARS);
   if (!clean) {
     throw new Error("texte vide");
   }

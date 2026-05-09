@@ -73,6 +73,9 @@ namespace CongoGames.Network
         public long LastEventTimestamp => lastEventTs;
         public long SessionLikeCount => sessionLikeCount;
         private long sessionLikeCount;
+        private readonly Dictionary<string, string> quizVoteByUser = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> quizAnsweredUsers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly int[] quizVoteCounts = new int[4];
 
         /// <summary>
         /// Les callbacks async du <see cref="ClientWebSocket"/> peuvent s’exécuter hors du thread Unity ;
@@ -414,13 +417,28 @@ namespace CongoGames.Network
             string answer = (msg.message ?? string.Empty).Trim().ToUpperInvariant();
             if (answer != "A" && answer != "B" && answer != "C" && answer != "D") return;
 
+            string user = string.IsNullOrWhiteSpace(msg.user) ? "joueur" : msg.user.Trim();
+            RegisterQuizVote(user, answer);
+
+            // Un seul score par utilisateur et par question en cours.
+            if (quizAnsweredUsers.Contains(user))
+            {
+                return;
+            }
+            quizAnsweredUsers.Add(user);
+
             bool isCorrect = QuestionManager.Instance != null && QuestionManager.Instance.ValidateAnswer(answer);
-            ScoreManager.Instance.RegisterAnswer(msg.user, isCorrect, false);
+            int awarded = 0;
+            if (ScoreManager.Instance != null)
+            {
+                awarded = ScoreManager.Instance.RegisterAnswer(user, isCorrect, false);
+            }
 
             if (isCorrect)
             {
                 GameAudioManager.Instance?.OnLiveCorrectAnswer();
-                AIHostManager.Instance?.Speak(msg.user + " bonne reponse.");
+                AIHostManager.Instance?.Speak(user + " bonne reponse.");
+                MiniGamePanelContent.Instance?.ShowExternalCorrectAnswerToast(user, msg.avatarUrl ?? msg.profilePictureUrl ?? "", answer, Mathf.Max(1, awarded));
             }
             else
             {
@@ -493,6 +511,7 @@ namespace CongoGames.Network
 
         private void HandleQuestion(LiveMessage msg)
         {
+            ResetQuizVotes();
             LiveQuestion question = new LiveQuestion
             {
                 category = msg.category,
@@ -507,6 +526,43 @@ namespace CongoGames.Network
             questionUI?.RenderLiveImmediate(question);
             lastQuestionText = question.question ?? "";
             AIHostManager.Instance?.Speak(question.question);
+        }
+
+        private void ResetQuizVotes()
+        {
+            quizVoteByUser.Clear();
+            quizAnsweredUsers.Clear();
+            for (int i = 0; i < quizVoteCounts.Length; i++) quizVoteCounts[i] = 0;
+            questionUI?.SetLiveVoteDistribution(0, 0, 0, 0);
+        }
+
+        private void RegisterQuizVote(string user, string answer)
+        {
+            if (string.IsNullOrWhiteSpace(user)) return;
+            int idx = LetterToIndex(answer);
+            if (idx < 0) return;
+
+            if (quizVoteByUser.TryGetValue(user, out string old))
+            {
+                int oldIdx = LetterToIndex(old);
+                if (oldIdx >= 0) quizVoteCounts[oldIdx] = Mathf.Max(0, quizVoteCounts[oldIdx] - 1);
+            }
+
+            quizVoteByUser[user] = answer;
+            quizVoteCounts[idx]++;
+            questionUI?.SetLiveVoteDistribution(quizVoteCounts[0], quizVoteCounts[1], quizVoteCounts[2], quizVoteCounts[3]);
+        }
+
+        private static int LetterToIndex(string letter)
+        {
+            switch ((letter ?? "").Trim().ToUpperInvariant())
+            {
+                case "A": return 0;
+                case "B": return 1;
+                case "C": return 2;
+                case "D": return 3;
+                default: return -1;
+            }
         }
 
         private void HandleSystem(LiveMessage msg)
