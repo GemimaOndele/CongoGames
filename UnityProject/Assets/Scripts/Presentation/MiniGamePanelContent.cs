@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -25,6 +26,7 @@ namespace CongoGames.Presentation
     {
         public static MiniGamePanelContent Instance { get; private set; }
         public bool IsScorePauseOverlayVisible => gridFoundToastRoot != null && gridFoundToastRoot.gameObject.activeSelf;
+        public float NextQuestionAnnouncementEarliestUnscaledTime => nextQuestionAnnouncementEarliestUnscaledTime;
         private static readonly Regex ChatChoiceRegex = new Regex(@"(?:^|[^A-Z0-9])([ABCD]|[1-4])(?:[^A-Z0-9]|$)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private const int CrosswordCols = 10;
@@ -265,17 +267,43 @@ namespace CongoGames.Presentation
 
         /// <summary>Mot attendu pour la démo « mot mystère » (Valider).</summary>
         public string CurrentMysteryAnswer { get; private set; } = "CONGO";
+        private readonly HashSet<char> mysteryRevealedLetters = new HashSet<char>();
+        private readonly Dictionary<string, int> mysteryValidHitsByUser = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
         [Header("Mémoire")]
         public Text memoryTitle;
         public Text memorySubtitle;
-        public Button[] memoryCards = new Button[8];
-        private readonly string[] memoryPairLetters = { "CO", "CO", "NG", "NG", "MB", "MB", "RU", "RU" };
-        private readonly bool[] memoryCardMatched = new bool[8];
-        private int memorySeed;
-        private int memoryFirstPickIndex = -1;
-        private string[] memoryDeckOrder;
-        private Coroutine memoryMismatchCo;
+        public Button[] memoryCards = new Button[12];
+        [SerializeField] [Range(2f, 3f)] private float memoryRevealSeconds = 2.4f;
+        private readonly string[] memoryPaletteNames = { "rouge", "bleu", "vert", "jaune", "violet", "orange", "rose", "cyan" };
+        private readonly Color[] memoryPaletteColors =
+        {
+            new Color(0.85f, 0.26f, 0.28f, 1f), new Color(0.25f, 0.58f, 0.96f, 1f), new Color(0.24f, 0.76f, 0.44f, 1f), new Color(0.96f, 0.82f, 0.26f, 1f),
+            new Color(0.58f, 0.42f, 0.9f, 1f), new Color(0.95f, 0.57f, 0.22f, 1f), new Color(0.94f, 0.45f, 0.66f, 1f), new Color(0.2f, 0.82f, 0.86f, 1f)
+        };
+        private readonly string[] memoryShapeNames = { "cercle", "triangle", "carre", "losange", "etoile", "hexagone" };
+        private MemoryCellDescriptor[] memorySequence = Array.Empty<MemoryCellDescriptor>();
+        private string memoryComposedWord = "";
+        private bool memoryAwaitingAnswer;
+        private string memoryQuestionPrompt = "";
+        private string memoryExpectedAnswer = "";
+        private Coroutine memoryRevealCo;
+
+        private struct MemoryCellDescriptor
+        {
+            public char Letter;
+            public int Number;
+            public int ColorIndex;
+            public int ShapeIndex;
+        }
+
+        private enum MemoryQuestionType
+        {
+            Word,
+            NumberSequence,
+            ColorOfNumber,
+            ShapeOfLetter
+        }
         private int lastBlindCorrectDisplayIndex;
         private Coroutine blindEmojiPulseCo;
         private bool secondaryPanelsEnsured;
@@ -302,9 +330,11 @@ namespace CongoGames.Presentation
         [SerializeField] private int gridSessionsPerThematicBlock = 2;
         [SerializeField] private int gridThematicWordCount = 15;
         [Tooltip("Durée d'affichage du score (secondes réelles) pour tous les modes qui montrent le toast score.")]
-        [SerializeField] private float gridFoundPauseSeconds = 5f;
+        [SerializeField] private float gridFoundPauseSeconds = 6f;
         [Tooltip("Délai global (secondes réelles) après feedback (étoiles/croix) avant d'afficher le score, tous modes.")]
         [SerializeField] private float scoreToastDelayAfterFeedbackSeconds = 2f;
+        [Tooltip("Délai global (secondes réelles) après disparition du score avant l'annonce de la question suivante, tous modes.")]
+        [SerializeField] private float scoreToastPostGapBeforeAnnouncementSeconds = 3f;
         [SerializeField] private bool pauseGameplayOnGridFound = true;
         private int gridMotsJeuSessionIndex; // 1 = premier mot, …
         private int gridThematicBlockRound; // 0 = non initialisé, 1 = 1re grille, 2 = 2e…
@@ -323,6 +353,8 @@ namespace CongoGames.Presentation
         private Coroutine gridFoundToastCo;
         private Coroutine gridFoundAvatarCo;
         private readonly Dictionary<string, Texture2D> gridAvatarCache = new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase);
+        private float nextQuestionAnnouncementEarliestUnscaledTime;
+        private float additionalAnnouncementDelayAfterScoreSeconds;
         private bool skipNextPostAnswerHold;
         [Tooltip("Cible active (mots mélangés + mots croisés) — rétro compatible avec CurrentScrambleAnswer.")]
         public string CurrentScrambleTargetWord { get; private set; } = "CONGO";
@@ -538,6 +570,13 @@ namespace CongoGames.Presentation
             ShowGridFoundToast(foundWord, Mathf.Max(1, pointsDelta), user, avatarUrl);
         }
 
+        public void RequestAdditionalAnnouncementDelay(float extraSeconds)
+        {
+            additionalAnnouncementDelayAfterScoreSeconds = Mathf.Max(
+                additionalAnnouncementDelayAfterScoreSeconds,
+                Mathf.Clamp(extraSeconds, 0f, 12f));
+        }
+
         private static string FormatFoundAnswerForToast(string raw)
         {
             string s = (raw ?? "").Trim();
@@ -637,8 +676,8 @@ namespace CongoGames.Presentation
             CanvasGroup cg = gridFoundToastRoot.GetComponent<CanvasGroup>();
             if (cg != null) cg.alpha = 0f;
 
-            Vector2 basePos = new Vector2(-420f, -120f);
-            Vector2 startPos = new Vector2(-220f, -120f);
+            Vector2 basePos = new Vector2(-520f, -116f);
+            Vector2 startPos = new Vector2(-360f, -116f);
             gridFoundToastRoot.anchoredPosition = startPos;
             gridFoundToastRoot.localScale = new Vector3(0.95f, 0.95f, 1f);
 
@@ -677,7 +716,7 @@ namespace CongoGames.Presentation
 
                 if (gridFoundToastBackground != null)
                 {
-                    gridFoundToastBackground.color = Color.Lerp(new Color(0.17f, 0.09f, 0.28f, 0.94f), new Color(0.23f, 0.11f, 0.35f, 0.98f), pulse);
+                    gridFoundToastBackground.color = Color.Lerp(new Color(0.14f, 0.08f, 0.24f, 0.985f), new Color(0.2f, 0.1f, 0.31f, 1f), pulse);
                 }
 
                 Transform avatarTf = null;
@@ -706,7 +745,7 @@ namespace CongoGames.Presentation
                 t += Time.unscaledDeltaTime;
                 float p = Mathf.Clamp01(t / outDur);
                 if (cg != null) cg.alpha = 1f - p;
-                gridFoundToastRoot.anchoredPosition = Vector2.LerpUnclamped(basePos, new Vector2(-560f, -120f), p);
+                gridFoundToastRoot.anchoredPosition = Vector2.LerpUnclamped(basePos, new Vector2(-700f, -116f), p);
                 gridFoundToastRoot.localScale = Vector3.LerpUnclamped(Vector3.one, new Vector3(0.97f, 0.97f, 1f), p);
                 yield return null;
             }
@@ -718,6 +757,12 @@ namespace CongoGames.Presentation
             {
                 Time.timeScale = prevTimeScale;
             }
+            nextQuestionAnnouncementEarliestUnscaledTime = Mathf.Max(
+                nextQuestionAnnouncementEarliestUnscaledTime,
+                Time.unscaledTime
+                + Mathf.Clamp(scoreToastPostGapBeforeAnnouncementSeconds, 0f, 10f)
+                + additionalAnnouncementDelayAfterScoreSeconds);
+            additionalAnnouncementDelayAfterScoreSeconds = 0f;
             gridFoundToastCo = null;
         }
 
@@ -1119,8 +1164,13 @@ namespace CongoGames.Presentation
 
             if (string.Equals(mode, "mystery-word", StringComparison.OrdinalIgnoreCase))
             {
-                if (mysteryAnswerInput != null) mysteryAnswerInput.text = msg;
-                OnMysterySubmit(this);
+                SubmitMysteryLetterGuess(msg, string.IsNullOrWhiteSpace(user) ? "joueur" : user.Trim(), avatarUrl ?? "");
+                return;
+            }
+
+            if (string.Equals(mode, "memory", StringComparison.OrdinalIgnoreCase))
+            {
+                SubmitMemoryAnswer(msg, string.IsNullOrWhiteSpace(user) ? "joueur" : user.Trim(), avatarUrl ?? "");
                 return;
             }
 
@@ -2569,20 +2619,20 @@ namespace CongoGames.Presentation
             if (wordAnswerInput != null)
             {
                 wordAnswerInput.text = "";
-                wordAnswerInput.interactable = !liveMode;
-                wordAnswerInput.gameObject.SetActive(!liveMode);
+                wordAnswerInput.interactable = false;
+                wordAnswerInput.gameObject.SetActive(false);
             }
 
             if (wordSubmitButton != null)
             {
-                wordSubmitButton.gameObject.SetActive(!liveMode);
-                wordSubmitButton.interactable = !liveMode;
+                wordSubmitButton.gameObject.SetActive(false);
+                wordSubmitButton.interactable = false;
             }
 
             if (wordClearButton != null)
             {
-                wordClearButton.gameObject.SetActive(!liveMode);
-                wordClearButton.interactable = !liveMode;
+                wordClearButton.gameObject.SetActive(false);
+                wordClearButton.interactable = false;
             }
 
             if (wordFeedback != null) wordFeedback.text = "";
@@ -3267,29 +3317,27 @@ namespace CongoGames.Presentation
             if (crosswordAnswerInput != null)
             {
                 crosswordAnswerInput.text = "";
-                crosswordAnswerInput.interactable = !liveMode;
-                crosswordAnswerInput.gameObject.SetActive(!liveMode);
+                crosswordAnswerInput.interactable = false;
+                crosswordAnswerInput.gameObject.SetActive(false);
             }
 
             if (crosswordClearButton != null)
             {
-                crosswordClearButton.gameObject.SetActive(!liveMode);
-                crosswordClearButton.interactable = !liveMode;
+                crosswordClearButton.gameObject.SetActive(false);
+                crosswordClearButton.interactable = false;
             }
 
             if (crosswordSubmitButton != null)
             {
-                crosswordSubmitButton.gameObject.SetActive(!liveMode);
-                crosswordSubmitButton.interactable = !liveMode;
+                crosswordSubmitButton.gameObject.SetActive(false);
+                crosswordSubmitButton.interactable = false;
             }
 
             if (crosswordFeedback != null)
             {
                 int gTotal = currentGridAllWords != null ? currentGridAllWords.Count : 0;
                 crosswordFeedback.text = "Définitions : " + BuildCrosswordCluesText(2)
-                    + (liveMode
-                        ? "\n<color=#89A2BF>Manche " + gridMotsJeuSessionIndex + "/" + gTotal + " • Mode live: réponds via chat/keyboard.</color>"
-                        : "\n<color=#89A2BF>Manche " + gridMotsJeuSessionIndex + "/" + gTotal + " • Tape un mot puis Valider.</color>");
+                    + "\n<color=#89A2BF>Manche " + gridMotsJeuSessionIndex + "/" + gTotal + " • Réponds via chat/clavier puis Entrée.</color>";
             }
 
             // Interactabilité des cases gérée par BuildWordSearchAndFillGrid (cases noires bloquées).
@@ -3680,190 +3728,297 @@ namespace CongoGames.Presentation
                 }
                 blindSub.text = (string.IsNullOrWhiteSpace(blindQuestionBaseText) ? "Blind test" : blindQuestionBaseText)
                     + "\nRéponses correctes: " + correctVotes + "/" + totalVotes;
+                RequestAdditionalAnnouncementDelay(6f);
             }
             MaybeAdvanceMiniGameAfterResponse();
         }
 
         private void ApplyMysteryDemo()
         {
-            LiveEventClient live = FindAnyObjectByType<LiveEventClient>();
-            bool liveMode = live != null && live.IsConnected;
             string w = MiniGameDemoBanks.NextMysteryWord();
             CurrentMysteryAnswer = (w ?? "CONGO").Trim().ToUpperInvariant();
             int len = CurrentMysteryAnswer.Length;
             string level = len <= 5 ? "Niveau 1/3" : (len <= 7 ? "Niveau 2/3" : "Niveau 3/3");
             if (mysteryTitle != null) mysteryTitle.text = "Mot mystère — " + level;
-            if (mysteryMask != null) mysteryMask.text = MiniGameDemoBanks.MysteryDisplayLine(w);
+            mysteryRevealedLetters.Clear();
+            mysteryValidHitsByUser.Clear();
+            RebuildMysteryMask();
 
-            if (mysteryAnswerInput != null)
-            {
-                mysteryAnswerInput.text = "";
-                mysteryAnswerInput.interactable = true;
-                mysteryAnswerInput.gameObject.SetActive(true);
-            }
-
-            if (mysteryClearButton != null)
-            {
-                mysteryClearButton.gameObject.SetActive(true);
-                mysteryClearButton.interactable = true;
-            }
-
-            if (mysterySubmitButton != null)
-            {
-                mysterySubmitButton.gameObject.SetActive(true);
-                mysterySubmitButton.interactable = true;
-            }
+            if (mysteryAnswerInput != null) mysteryAnswerInput.gameObject.SetActive(false);
+            if (mysteryClearButton != null) mysteryClearButton.gameObject.SetActive(false);
+            if (mysterySubmitButton != null) mysterySubmitButton.gameObject.SetActive(false);
 
             if (mysteryFeedback != null)
             {
                 string hint = MysteryHints.TryGetValue(CurrentMysteryAnswer, out string h) ? h : "Observe les lettres affichées.";
-                mysteryFeedback.text = liveMode
-                    ? "Indice: " + hint + " Réponds dans le chat."
-                    : "Indice: " + hint;
+                mysteryFeedback.text = "Indice: " + hint + " Envoie une lettre dans le chat/clavier.";
+            }
+        }
+
+        private void RebuildMysteryMask()
+        {
+            if (mysteryMask == null)
+            {
+                return;
+            }
+
+            string target = CurrentMysteryAnswer ?? "";
+            if (target.Length == 0)
+            {
+                mysteryMask.text = "_";
+                return;
+            }
+
+            var sb = new System.Text.StringBuilder(target.Length * 2);
+            for (int i = 0; i < target.Length; i++)
+            {
+                char c = target[i];
+                bool reveal = !char.IsLetter(c) || mysteryRevealedLetters.Contains(c);
+                sb.Append(reveal ? c : '_');
+                if (i < target.Length - 1) sb.Append(' ');
+            }
+            mysteryMask.text = sb.ToString();
+        }
+
+        private void SubmitMysteryLetterGuess(string raw, string user, string avatarUrl)
+        {
+            string target = (CurrentMysteryAnswer ?? "").Trim().ToUpperInvariant();
+            if (target.Length == 0) return;
+
+            string clean = (raw ?? "").Trim().ToUpperInvariant();
+            if (string.IsNullOrEmpty(clean)) return;
+
+            char letter = '\0';
+            for (int i = 0; i < clean.Length; i++)
+            {
+                if (char.IsLetter(clean[i]))
+                {
+                    letter = clean[i];
+                    break;
+                }
+            }
+            if (letter == '\0') return;
+
+            bool liveConnected = liveLikeSource != null && liveLikeSource.IsConnected;
+            bool singlePlayerLocal = !liveConnected;
+            string username = string.IsNullOrWhiteSpace(user) ? "joueur" : user.Trim();
+            if (!singlePlayerLocal)
+            {
+                int used = mysteryValidHitsByUser.TryGetValue(username, out int v) ? v : 0;
+                if (used >= 2)
+                {
+                    if (mysteryFeedback != null)
+                    {
+                        mysteryFeedback.text = username + " a déjà utilisé ses 2 lettres valides.";
+                    }
+                    return;
+                }
+            }
+
+            bool contains = target.IndexOf(letter) >= 0;
+            if (!contains)
+            {
+                if (mysteryFeedback != null)
+                {
+                    mysteryFeedback.text = "La lettre " + letter + " n'est pas dans le mot.";
+                }
+                GameSfxHub.Instance?.PlayResult(false, hostVoiceCommentary: false);
+                return;
+            }
+
+            bool newlyRevealed = mysteryRevealedLetters.Add(letter);
+            if (!singlePlayerLocal && newlyRevealed)
+            {
+                mysteryValidHitsByUser[username] = (mysteryValidHitsByUser.TryGetValue(username, out int old) ? old : 0) + 1;
+            }
+            RebuildMysteryMask();
+            GameSfxHub.Instance?.PlayTap();
+
+            bool solved = true;
+            for (int i = 0; i < target.Length; i++)
+            {
+                char c = target[i];
+                if (char.IsLetter(c) && !mysteryRevealedLetters.Contains(c))
+                {
+                    solved = false;
+                    break;
+                }
+            }
+
+            if (solved)
+            {
+                if (mysteryFeedback != null) mysteryFeedback.text = "Mot trouvé: " + target.ToLowerInvariant();
+                int points = GrantModeSuccessPoints(10, username);
+                ShowExternalCorrectAnswerToast(username, avatarUrl ?? "", target, points);
+                MaybeAdvanceMiniGameAfterResponse();
+                return;
+            }
+
+            if (mysteryFeedback != null)
+            {
+                if (singlePlayerLocal)
+                {
+                    mysteryFeedback.text = "Bonne lettre: " + letter + ". Continue.";
+                }
+                else
+                {
+                    int left = Mathf.Max(0, 2 - (mysteryValidHitsByUser.TryGetValue(username, out int usedNow) ? usedNow : 0));
+                    mysteryFeedback.text = username + " a trouvé " + letter + ". Lettres valides restantes: " + left + ".";
+                }
             }
         }
 
         private void ApplyMemoryDemo()
         {
-            if (memoryTitle != null) memoryTitle.text = "Mémoire — paires Congo";
+            if (memoryTitle != null) memoryTitle.text = "Mémoire — séquence lettres/chiffres/formes";
+            if (memoryRevealCo != null)
+            {
+                StopCoroutine(memoryRevealCo);
+                memoryRevealCo = null;
+            }
+            memoryAwaitingAnswer = false;
+
+            string word = MiniGameDemoBanks.NextMysteryWord();
+            word = GridThemeBank.SanitizeForGrid(word ?? "");
+            if (string.IsNullOrEmpty(word)) word = "CONGO";
+            int count = Mathf.Clamp(word.Length, 6, memoryCards != null ? memoryCards.Length : 8);
+            memoryComposedWord = word.Substring(0, count);
+            memorySequence = new MemoryCellDescriptor[count];
+            System.Random rng = new System.Random(UnityEngine.Random.Range(0, int.MaxValue));
+            for (int i = 0; i < count; i++)
+            {
+                memorySequence[i] = new MemoryCellDescriptor
+                {
+                    Letter = memoryComposedWord[i],
+                    Number = i + 1,
+                    ColorIndex = rng.Next(memoryPaletteNames.Length),
+                    ShapeIndex = rng.Next(memoryShapeNames.Length)
+                };
+            }
+            SetupMemoryCardsMasked();
+            memoryQuestionPrompt = "";
+            memoryExpectedAnswer = "";
             if (memorySubtitle != null)
             {
-                memorySubtitle.text = "Trouve les paires CO/NG/MB/RU. Deux cartes identiques restent ouvertes.";
+                memorySubtitle.text = "Observe la séquence pendant 2 à 3 secondes, puis réponds via chat/clavier.";
             }
+            memoryRevealCo = StartCoroutine(CoMemoryRevealThenQuestion());
+        }
 
-            memorySeed = UnityEngine.Random.Range(0, 99999);
-            System.Random rng = new System.Random(memorySeed);
-            string[] deck = (string[])memoryPairLetters.Clone();
-            for (int i = deck.Length - 1; i > 0; i--)
+        private void SetupMemoryCardsMasked()
+        {
+            if (memoryCards == null) return;
+            for (int i = 0; i < memoryCards.Length; i++)
             {
-                int j = rng.Next(i + 1);
-                (deck[i], deck[j]) = (deck[j], deck[i]);
-            }
-
-            memoryDeckOrder = deck;
-            memoryFirstPickIndex = -1;
-            if (memoryMismatchCo != null)
-            {
-                StopCoroutine(memoryMismatchCo);
-                memoryMismatchCo = null;
-            }
-
-            for (int i = 0; i < memoryCardMatched.Length; i++)
-            {
-                memoryCardMatched[i] = false;
-            }
-
-            for (int i = 0; i < memoryCards.Length && i < deck.Length; i++)
-            {
-                int idx = i;
                 Button b = memoryCards[i];
                 if (b == null) continue;
-                Text tx = b.GetComponentInChildren<Text>();
-                if (tx != null)
-                {
-                    tx.text = "?";
-                    tx.fontSize = 46;
-                    tx.fontStyle = FontStyle.Bold;
-                }
-
                 b.onClick.RemoveAllListeners();
-                b.onClick.AddListener(() => OnMemoryCardClicked(idx, tx));
+                b.interactable = false;
+                Image bg = b.GetComponent<Image>();
+                if (bg != null) bg.color = new Color(0.08f, 0.12f, 0.18f, 0.92f);
+                Text tx = b.GetComponentInChildren<Text>();
+                if (tx == null) continue;
+                tx.text = i < memorySequence.Length ? "?" : "";
+                tx.fontSize = 22;
+                tx.fontStyle = FontStyle.Bold;
+                tx.color = Color.white;
             }
         }
 
-        private void OnMemoryCardClicked(int index, Text tx)
+        private IEnumerator CoMemoryRevealThenQuestion()
         {
-            if (tx == null || memoryDeckOrder == null || index < 0 || index >= memoryDeckOrder.Length)
+            if (memoryCards != null)
             {
-                return;
-            }
-
-            if (memoryMismatchCo != null)
-            {
-                return;
-            }
-
-            if (memoryCardMatched[index])
-            {
-                return;
-            }
-
-            if (tx.text != "?" && memoryFirstPickIndex >= 0 && memoryFirstPickIndex != index)
-            {
-                return;
-            }
-
-            GameSfxHub.Instance?.PlayTap();
-
-            if (memoryFirstPickIndex < 0)
-            {
-                memoryFirstPickIndex = index;
-                tx.text = memoryDeckOrder[index];
-                if (memorySubtitle != null)
+                for (int i = 0; i < memoryCards.Length && i < memorySequence.Length; i++)
                 {
-                    memorySubtitle.text = "Bien. Ouvre une 2e carte pour chercher la paire.";
+                    Button b = memoryCards[i];
+                    if (b == null) continue;
+                    Text tx = b.GetComponentInChildren<Text>();
+                    Image bg = b.GetComponent<Image>();
+                    if (bg != null) bg.color = memoryPaletteColors[memorySequence[i].ColorIndex];
+                    if (tx != null)
+                    {
+                        tx.text = memorySequence[i].Letter + "\n" + memorySequence[i].Number + " • " + memoryShapeNames[memorySequence[i].ShapeIndex];
+                        tx.fontSize = 20;
+                    }
                 }
-
-                return;
             }
 
-            if (memoryFirstPickIndex == index)
+            yield return new WaitForSecondsRealtime(Mathf.Clamp(memoryRevealSeconds, 2f, 3f));
+            SetupMemoryCardsMasked();
+            BuildMemoryQuestion();
+            memoryAwaitingAnswer = true;
+            memoryRevealCo = null;
+        }
+
+        private void BuildMemoryQuestion()
+        {
+            if (memorySequence == null || memorySequence.Length == 0)
             {
-                return;
+                memoryQuestionPrompt = "Quel mot a été affiché ?";
+                memoryExpectedAnswer = "CONGO";
             }
-
-            int first = memoryFirstPickIndex;
-            memoryFirstPickIndex = -1;
-            Text firstTx = memoryCards != null && first < memoryCards.Length && memoryCards[first] != null
-                ? memoryCards[first].GetComponentInChildren<Text>()
-                : null;
-            tx.text = memoryDeckOrder[index];
-            bool match = memoryDeckOrder[first] == memoryDeckOrder[index];
-            if (match)
+            else
             {
-                memoryCardMatched[first] = true;
-                memoryCardMatched[index] = true;
-                GameSfxHub.Instance?.PlayResult(true);
-                int openLeft = 0;
-                for (int k = 0; k < memoryCardMatched.Length; k++)
+                MemoryQuestionType q = (MemoryQuestionType)UnityEngine.Random.Range(0, 4);
+                int pivot = UnityEngine.Random.Range(0, memorySequence.Length);
+                MemoryCellDescriptor cell = memorySequence[pivot];
+                switch (q)
                 {
-                    if (!memoryCardMatched[k]) openLeft++;
+                    case MemoryQuestionType.NumberSequence:
+                        memoryQuestionPrompt = "Quelle est la suite des chiffres ?";
+                        memoryExpectedAnswer = string.Join("-", memorySequence.Select(s => s.Number.ToString()));
+                        break;
+                    case MemoryQuestionType.ColorOfNumber:
+                        memoryQuestionPrompt = "Quelle était la couleur du numero " + cell.Number + " ?";
+                        memoryExpectedAnswer = memoryPaletteNames[cell.ColorIndex];
+                        break;
+                    case MemoryQuestionType.ShapeOfLetter:
+                        memoryQuestionPrompt = "Quelle etait la forme de la lettre " + cell.Letter + " ?";
+                        memoryExpectedAnswer = memoryShapeNames[cell.ShapeIndex];
+                        break;
+                    default:
+                        memoryQuestionPrompt = "Quel mot forme la suite des lettres ?";
+                        memoryExpectedAnswer = memoryComposedWord;
+                        break;
                 }
-
-                int pairsLeft = openLeft / 2;
-                if (memorySubtitle != null)
-                {
-                    memorySubtitle.text = openLeft == 0
-                        ? "Toutes les paires trouvées — bravo !"
-                        : "Paire trouvée. Reste " + pairsLeft + " paire(s).";
-                }
-
-                if (openLeft == 0)
-                {
-                    MaybeAdvanceMiniGameAfterResponse();
-                }
-
-                return;
             }
 
             if (memorySubtitle != null)
             {
-                memorySubtitle.text = "Pas la même. Les cartes se referment.";
+                memorySubtitle.text = memoryQuestionPrompt + " (réponds via chat/clavier)";
             }
-
-            memoryMismatchCo = StartCoroutine(CoMemoryFlipBack(first, index, firstTx, tx));
         }
 
-        private IEnumerator CoMemoryFlipBack(int i1, int i2, Text t1, Text t2)
+        private void SubmitMemoryAnswer(string raw, string user, string avatarUrl)
         {
-            yield return new WaitForSeconds(0.65f);
-            if (t1 != null && !memoryCardMatched[i1]) t1.text = "?";
-            if (t2 != null && !memoryCardMatched[i2]) t2.text = "?";
-            memoryMismatchCo = null;
-            if (memorySubtitle != null)
+            if (!memoryAwaitingAnswer) return;
+            string normalized = NormalizeMemoryInput(raw);
+            if (string.IsNullOrEmpty(normalized)) return;
+
+            string expected = NormalizeMemoryInput(memoryExpectedAnswer);
+            bool ok = string.Equals(normalized, expected, StringComparison.OrdinalIgnoreCase);
+            GameSfxHub.Instance?.PlayResult(ok);
+            if (ok)
             {
-                memorySubtitle.text = "Trouve les paires CO/NG/MB/RU.";
+                memoryAwaitingAnswer = false;
+                string username = string.IsNullOrWhiteSpace(user) ? ResolveCurrentGridPlayerName() : user.Trim();
+                int points = GrantModeSuccessPoints(10, username);
+                ShowExternalCorrectAnswerToast(username, avatarUrl ?? "", memoryExpectedAnswer, points);
+                MaybeAdvanceMiniGameAfterResponse();
             }
+            else if (memorySubtitle != null)
+            {
+                memorySubtitle.text = "Mauvaise réponse. " + memoryQuestionPrompt + " (attendu: " + memoryExpectedAnswer + ")";
+            }
+        }
+
+        private static string NormalizeMemoryInput(string raw)
+        {
+            string s = (raw ?? "").Trim().ToUpperInvariant();
+            s = s.Replace(" ", "").Replace("_", "").Replace(".", "").Replace(",", "").Replace(";", "").Replace("/", "-");
+            while (s.Contains("--")) s = s.Replace("--", "-");
+            return s;
         }
 
         private void ApplyChronoDemo()
@@ -4226,12 +4381,11 @@ namespace CongoGames.Presentation
             string modeId = gmm.ActiveModeId ?? "";
             bool supported = string.Equals(modeId, "word-scramble", StringComparison.Ordinal)
                              || string.Equals(modeId, "crossword-lite", StringComparison.Ordinal)
-                             || string.Equals(modeId, "semantic", StringComparison.Ordinal);
-            if (!supported) return;
-
-            LiveEventClient live = FindAnyObjectByType<LiveEventClient>();
-            bool liveConnected = live != null && live.IsConnected;
-            if (!liveConnected)
+                             || string.Equals(modeId, "semantic", StringComparison.Ordinal)
+                             || string.Equals(modeId, "mystery-word", StringComparison.Ordinal)
+                             || string.Equals(modeId, "memory", StringComparison.Ordinal)
+                             || string.Equals(modeId, "image-guess", StringComparison.Ordinal);
+            if (!supported)
             {
                 liveTypedDraft = "";
                 liveTypedModeId = "";
@@ -4437,6 +4591,19 @@ namespace CongoGames.Presentation
                 if (crosswordAnswerInput != null) crosswordAnswerInput.text = draft;
                 OnCrosswordSubmit(this);
             }
+            else if (string.Equals(modeId, "image-guess", StringComparison.Ordinal))
+            {
+                if (imageGuessInput != null) imageGuessInput.text = draft;
+                OnImageGuessSubmit(this);
+            }
+            else if (string.Equals(modeId, "mystery-word", StringComparison.Ordinal))
+            {
+                SubmitMysteryLetterGuess(draft, ResolveCurrentGridPlayerName(), ResolveCurrentGridAvatarUrl());
+            }
+            else if (string.Equals(modeId, "memory", StringComparison.Ordinal))
+            {
+                SubmitMemoryAnswer(draft, ResolveCurrentGridPlayerName(), ResolveCurrentGridAvatarUrl());
+            }
 
             liveTypedDraft = "";
         }
@@ -4466,6 +4633,27 @@ namespace CongoGames.Presentation
                     crosswordFeedback.text = "Définitions : " + BuildCrosswordCluesText(2)
                         + "\n<color=#8FD7FF>Live saisie : " + draft + "</color>  <color=#9DB4C7>(Entrée = valider)</color>"
                         + "\n<color=#89A2BF>Manche " + gridMotsJeuSessionIndex + "/" + gTotal + " • Mode live</color>";
+                }
+            }
+            else if (string.Equals(modeId, "mystery-word", StringComparison.Ordinal))
+            {
+                if (mysteryFeedback != null)
+                {
+                    mysteryFeedback.text = "<color=#8FD7FF>Saisie : " + draft + "</color>  <color=#9DB4C7>(Entrée = envoyer une lettre)</color>";
+                }
+            }
+            else if (string.Equals(modeId, "memory", StringComparison.Ordinal))
+            {
+                if (memorySubtitle != null)
+                {
+                    memorySubtitle.text = memoryQuestionPrompt + "\n<color=#8FD7FF>Saisie : " + draft + "</color>  <color=#9DB4C7>(Entrée = valider)</color>";
+                }
+            }
+            else if (string.Equals(modeId, "image-guess", StringComparison.Ordinal))
+            {
+                if (imageGuessFeedback != null)
+                {
+                    imageGuessFeedback.text = "<color=#8FD7FF>Saisie : " + draft + "</color>  <color=#9DB4C7>(Entrée = valider)</color>";
                 }
             }
         }
@@ -4571,11 +4759,16 @@ namespace CongoGames.Presentation
             if (imageGuessInput != null)
             {
                 imageGuessInput.text = "";
-                imageGuessInput.interactable = true;
+                imageGuessInput.interactable = false;
+                imageGuessInput.gameObject.SetActive(false);
             }
 
             if (imageGuessFeedback != null) imageGuessFeedback.text = "";
-            if (imageGuessSubmit != null) imageGuessSubmit.interactable = false;
+            if (imageGuessSubmit != null)
+            {
+                imageGuessSubmit.interactable = false;
+                imageGuessSubmit.gameObject.SetActive(false);
+            }
 
             if (imagePlaceholder != null)
             {
@@ -5187,10 +5380,13 @@ namespace CongoGames.Presentation
             demo.crosswordSubmitButton = BuildPrimaryButton(crossFoot.transform, font, "Valider", new Vector2(260f, -128f), () => OnCrosswordSubmit(demo));
 
             // Popup style live (pseudo + mot trouvé + points) inspiré des overlays type Braingame.
-            GameObject gridToast = CreateRect(modeRoot, "GridFoundToast", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -24f), new Vector2(360f, 250f));
+            GameObject gridToast = CreateRect(modeRoot, "GridFoundToast", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -24f), new Vector2(440f, 276f));
+            Canvas gridToastCanvas = gridToast.AddComponent<Canvas>();
+            gridToastCanvas.overrideSorting = true;
+            gridToastCanvas.sortingOrder = 980;
             Image gridToastBg = gridToast.AddComponent<Image>();
             gridToastBg.sprite = white;
-            gridToastBg.color = new Color(0.17f, 0.09f, 0.28f, 0.96f);
+            gridToastBg.color = new Color(0.14f, 0.08f, 0.24f, 0.99f);
             Outline gridToastOl = gridToast.AddComponent<Outline>();
             gridToastOl.effectColor = new Color(0.12f, 0.95f, 0.86f, 0.98f);
             gridToastOl.effectDistance = new Vector2(3f, -3f);
@@ -5218,11 +5414,11 @@ namespace CongoGames.Presentation
             avatar.transform.SetAsLastSibling();
             demo.gridFoundToastAvatar = avatar;
 
-            demo.gridFoundToastUser = CreateText(gridToast.transform, "User", font, 24, TextAnchor.MiddleCenter, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, 20f), new Vector2(-26f, 34f));
+            demo.gridFoundToastUser = CreateText(gridToast.transform, "User", font, 24, TextAnchor.MiddleCenter, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, 24f), new Vector2(-26f, 34f));
             demo.gridFoundToastUser.color = new Color(0.95f, 0.95f, 1f, 1f);
-            demo.gridFoundToastWord = CreateText(gridToast.transform, "Word", font, 34, TextAnchor.MiddleCenter, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, -20f), new Vector2(-26f, 76f));
+            demo.gridFoundToastWord = CreateText(gridToast.transform, "Word", font, 34, TextAnchor.MiddleCenter, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, -18f), new Vector2(-26f, 88f));
             demo.gridFoundToastWord.color = new Color(0.3f, 1f, 0.55f, 1f);
-            demo.gridFoundToastPoints = CreateText(gridToast.transform, "Points", font, 34, TextAnchor.MiddleCenter, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 22f), new Vector2(-26f, 42f));
+            demo.gridFoundToastPoints = CreateText(gridToast.transform, "Points", font, 34, TextAnchor.MiddleCenter, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 26f), new Vector2(-26f, 46f));
             demo.gridFoundToastPoints.color = new Color(1f, 0.84f, 0.25f, 1f);
             if (demo.gridFoundToastWord != null)
             {
@@ -5277,7 +5473,7 @@ namespace CongoGames.Presentation
             GameObject mem = PanelShell(modeRoot, "PanelMemory", "memory", new Color(0.06f, 0.11f, 0.09f, 0.96f), white, surf);
             demo.memoryTitle = Title(mem.transform, font, "MemTitle", "Mémoire", new Vector2(0f, -32f));
             Transform memHost = CreateGridHost(mem.transform, "MemoryGridHost", 0.50f, new Vector2(0f, 6f), new Vector2(900f, 330f));
-            demo.memoryCards = MemoryGrid(memHost, font, white, 132f, 14f);
+            demo.memoryCards = MemoryGrid(memHost, font, white, 96f, 10f);
             demo.memorySubtitle = Sub(mem.transform, font, "MemSub", new Vector2(0f, -218f));
             demo.memorySubtitle.fontSize = 26;
             demo.memorySubtitle.lineSpacing = 1.08f;
@@ -5439,7 +5635,7 @@ namespace CongoGames.Presentation
             if (demo.wordFeedback != null)
             {
                 demo.wordFeedback.text = !hadInput
-                    ? "Réponse vide — tape le mot puis Valider."
+                    ? "Réponse vide — envoie le mot via chat/clavier puis Entrée."
                     : (ok
                         ? "Bravo — c’est " + matchedWord + " ! (" + (demo.currentGridSolved != null ? demo.currentGridSolved.Count : 0) + "/"
                         + (demo.currentGridAllWords != null ? demo.currentGridAllWords.Count : 0) + " pour cette grille.)"
@@ -5478,7 +5674,7 @@ namespace CongoGames.Presentation
             if (demo.crosswordFeedback != null)
             {
                 demo.crosswordFeedback.text = !hadInput
-                    ? "Écris une réponse d'après les définitions puis Valider."
+                    ? "Réponse vide — envoie un mot via chat/clavier puis Entrée."
                     : (ok
                         ? "Trouvé ! « " + matchedWord + " ». (" + (demo.currentGridSolved != null ? demo.currentGridSolved.Count : 0) + "/"
                         + (demo.currentGridAllWords != null ? demo.currentGridAllWords.Count : 0) + " pour cette session.)"
@@ -5501,25 +5697,8 @@ namespace CongoGames.Presentation
 
         private static void OnMysterySubmit(MiniGamePanelContent demo)
         {
-            if (demo.mysteryAnswerInput == null) return;
-            string a = demo.mysteryAnswerInput.text?.Trim().ToUpperInvariant() ?? "";
-            bool hadInput = !string.IsNullOrEmpty(a);
-            string target = (demo.CurrentMysteryAnswer ?? "").Trim().ToUpperInvariant();
-            bool ok = hadInput && a == target;
-            if (demo.mysteryFeedback != null)
-            {
-                demo.mysteryFeedback.text = !hadInput
-                    ? "Réponse vide — passage au mode suivant."
-                    : (ok ? "Bravo !" : "Pas exact — le mot complet était « " + target + " ».");
-            }
-
-            GameSfxHub.Instance?.PlayResult(ok);
-            if (ok)
-            {
-                int points = demo.GrantModeSuccessPoints(10);
-                demo.ShowGridFoundToast(target, points);
-            }
-            MaybeAdvanceMiniGameAfterResponse();
+            string raw = demo.mysteryAnswerInput != null ? (demo.mysteryAnswerInput.text ?? "") : "";
+            demo.SubmitMysteryLetterGuess(raw, demo.ResolveCurrentGridPlayerName(), demo.ResolveCurrentGridAvatarUrl());
         }
 
         private static void OnImageGuessSubmit(MiniGamePanelContent demo)
@@ -5813,11 +5992,11 @@ namespace CongoGames.Presentation
             trigger.triggers.Add(exit);
         }
 
-        private static Button[] MemoryGrid(Transform parent, Font font, Sprite white, float cell = 118f, float gap = 14f)
+        private static Button[] MemoryGrid(Transform parent, Font font, Sprite white, float cell = 96f, float gap = 10f)
         {
-            Button[] btns = new Button[8];
+            Button[] btns = new Button[12];
             int col = 4;
-            int row = 2;
+            int row = 3;
             float w = col * cell + (col - 1) * gap;
             float h = row * cell + (row - 1) * gap;
             Vector2 o = new Vector2(-w * 0.5f + cell * 0.5f, -h * 0.5f + cell * 0.5f);

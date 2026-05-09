@@ -80,8 +80,8 @@ namespace CongoGames.Network
         private readonly HashSet<string> quizAnsweredUsers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly int[] quizVoteCounts = new int[4];
         private static readonly Regex QuizChoiceRegex = new Regex(@"(?:^|[^A-Z0-9])([ABCD]|[1-4])(?:[^A-Z0-9]|$)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        [SerializeField] [Min(0f)] private float qcmVoteDisplaySeconds = 5f;
-        [SerializeField] [Min(0f)] private float qcmScoreAfterVoteGapSeconds = 2f;
+        [SerializeField] [Min(0f)] private float qcmVoteDisplaySeconds = 6f;
+        [SerializeField] [Min(0f)] private float qcmScoreAfterVoteGapSeconds = 3f;
         private Coroutine pendingCorrectToastCo;
 
         /// <summary>
@@ -463,12 +463,13 @@ namespace CongoGames.Network
             {
                 GameAudioManager.Instance?.OnLiveCorrectAnswer();
                 AIHostManager.Instance?.Speak(user + " bonne reponse.");
+                MiniGamePanelContent.Instance?.RequestAdditionalAnnouncementDelay(Mathf.Max(0f, qcmVoteDisplaySeconds));
                 if (pendingCorrectToastCo != null)
                 {
                     StopCoroutine(pendingCorrectToastCo);
                     pendingCorrectToastCo = null;
                 }
-                float wait = Mathf.Max(0f, qcmVoteDisplaySeconds) + Mathf.Max(0f, qcmScoreAfterVoteGapSeconds);
+                float wait = 0f;
                 pendingCorrectToastCo = StartCoroutine(CoShowCorrectToastAfterDelay(
                     user,
                     msg.avatarUrl ?? msg.profilePictureUrl ?? "",

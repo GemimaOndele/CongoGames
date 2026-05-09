@@ -395,13 +395,7 @@ namespace CongoGames.Core
             float keepTimer = Mathf.Max(0.01f, timer);
             float keepDisplayed = Mathf.Max(0.01f, displayedRoundDuration);
 
-            float toastWaitUntil = Time.unscaledTime + 8f;
-            while (MiniGamePanelContent.Instance != null
-                && MiniGamePanelContent.Instance.IsScorePauseOverlayVisible
-                && Time.unscaledTime < toastWaitUntil)
-            {
-                yield return null;
-            }
+            yield return CoWaitForScoreOverlayAndAnnouncementWindow();
 
             HostTransitionOverlay.Instance?.ShowQuestionIncoming();
             AIHostManager.Instance?.InterruptSpeech();
@@ -428,13 +422,7 @@ namespace CongoGames.Core
 
         private IEnumerator CoStartModeAfterAnnouncement(string fromId, string toId, IGameMode mode)
         {
-            float toastWaitUntil = Time.unscaledTime + 8f;
-            while (MiniGamePanelContent.Instance != null
-                && MiniGamePanelContent.Instance.IsScorePauseOverlayVisible
-                && Time.unscaledTime < toastWaitUntil)
-            {
-                yield return null;
-            }
+            yield return CoWaitForScoreOverlayAndAnnouncementWindow();
 
             HostTransitionOverlay.Instance?.ShowNewGameIncoming(GetModeDisplayName(toId));
             AIHostManager.Instance?.InterruptSpeech();
@@ -450,6 +438,25 @@ namespace CongoGames.Core
             ApplyAndBeginMode(fromId, toId, mode);
             modeTransitionLocked = false;
             startModeCo = null;
+        }
+
+        private IEnumerator CoWaitForScoreOverlayAndAnnouncementWindow()
+        {
+            float toastWaitUntil = Time.unscaledTime + 12f;
+            while (MiniGamePanelContent.Instance != null
+                && MiniGamePanelContent.Instance.IsScorePauseOverlayVisible
+                && Time.unscaledTime < toastWaitUntil)
+            {
+                yield return null;
+            }
+
+            float announceWaitUntil = Time.unscaledTime + 8f;
+            while (MiniGamePanelContent.Instance != null
+                && Time.unscaledTime < MiniGamePanelContent.Instance.NextQuestionAnnouncementEarliestUnscaledTime
+                && Time.unscaledTime < announceWaitUntil)
+            {
+                yield return null;
+            }
         }
 
         private void ApplyAndBeginMode(string fromId, string modeId, IGameMode mode)
